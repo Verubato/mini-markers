@@ -1,0 +1,8 @@
+## Interface: 120001, 120000, 110207, 50503, 40402, 38000, 30405, 30300, 20505, 11508
+## Title: MiniPartyMarkers
+## Notes: Creates markers above party nameplates.
+## Author: Verz
+## Version: 1.0.0
+## IconTexture: Interface\AddOns\MiniPartyMarkers\icon.blp
+
+MiniPartyMarkers.lua
