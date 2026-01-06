@@ -3,7 +3,9 @@
 ## Notes: Creates markers above nameplates.
 ## Author: Verz
 ## Version: 1.0.0
-## IconTexture: Interface\AddOns\MiniMarkers\icon.blp
+## SavedVariables: MiniMarkersDB
+## IconTexture: Interface\AddOns\MiniMarkers\Icons\Addon.blp
 ## X-Curse-Project-ID: 1418841
 
+Config.lua
 MiniMarkers.lua
