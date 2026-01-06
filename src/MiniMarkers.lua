@@ -4,6 +4,9 @@ local db
 ---@type Db
 local dbDefaults = addon.Config.DbDefaults
 local loader
+local bnCacheInvalidator
+local bnFriendCache = {}
+local bnCacheValid = false
 
 ---@class Marker
 ---@field WithColor table
@@ -18,6 +21,54 @@ local function IsUnitInMyGroup(unit)
 	return UnitIsUnit(unit, "player") or UnitInParty(unit) or UnitInRaid(unit)
 end
 
+local function NormalizeRealm(realm)
+	if not realm or realm == "" then
+		return GetNormalizedRealmName()
+	end
+
+	return realm
+end
+
+local function BnKey(name, realm)
+	return name .. "-" .. NormalizeRealm(realm)
+end
+
+local function RebuildBNFriendCache()
+	wipe(bnFriendCache)
+
+	for i = 1, BNGetNumFriends() do
+		local info = C_BattleNet.GetFriendAccountInfo(i)
+		if info and info.gameAccountInfo then
+			local game = info.gameAccountInfo
+
+			if game.clientProgram == BNET_CLIENT_WOW and game.isOnline then
+				local name = game.characterName
+				local realm = game.realmName
+
+				if name then
+					bnFriendCache[BnKey(name, realm)] = true
+				end
+			end
+		end
+	end
+
+	bnCacheValid = true
+end
+
+local function IsFriend(unit)
+	if not bnCacheValid then
+		RebuildBNFriendCache()
+	end
+
+	local name, realm = UnitName(unit)
+	if not name then
+		return false
+	end
+
+	local key = BnKey(name, realm)
+	return bnFriendCache[key] == true
+end
+
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
@@ -30,7 +81,41 @@ local function GetNameplateAnchor(nameplate)
 end
 
 local function GetTextureForUnit(unit)
-	if db.GroupOnly and not IsUnitInMyGroup(unit) then
+	if not UnitExists(unit) then
+		return false
+	end
+
+	if db.FriendIconsEnabled and IsFriend(unit) then
+		if IsFriend(unit) then
+			return {
+				Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
+				AddBackground = true,
+				BackgroundPadding = 8,
+				Width = db.IconWidth or dbDefaults.IconWidth,
+				Height = db.IconHeight or dbDefaults.IconHeight,
+			}
+		end
+	end
+
+	local pass = db.EveryoneEnabled
+
+	if UnitIsEnemy("player", unit) then
+		pass = pass or db.EnemiesEnabled
+	end
+
+	if UnitIsFriend("player", unit) then
+		pass = pass or db.AlliesEnabled
+	end
+
+	if not UnitIsPlayer(unit) then
+		pass = pass or db.NpcsEnabled
+	end
+
+	if not pass and db.GroupEnabled then
+		pass = pass or IsUnitInMyGroup(unit)
+	end
+
+	if not pass then
 		return nil
 	end
 
@@ -39,7 +124,7 @@ local function GetTextureForUnit(unit)
 
 		if classFilename then
 			return {
-				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\" .. classFilename .. ".tga",
+				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Classes\\" .. classFilename .. ".tga",
 				AddBackground = true,
 				BackgroundPadding = 8,
 				Width = db.IconWidth or dbDefaults.IconWidth,
@@ -96,7 +181,7 @@ end
 local function AddMarker(unit, nameplate)
 	local options = GetTextureForUnit(unit)
 
-	if options == nil then
+	if not options then
 		HideMarker(nameplate)
 		return
 	end
@@ -232,3 +317,13 @@ end
 loader = CreateFrame("Frame")
 loader:RegisterEvent("ADDON_LOADED")
 loader:SetScript("OnEvent", OnAddonLoaded)
+
+bnCacheInvalidator = CreateFrame("Frame")
+bnCacheInvalidator:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")
+bnCacheInvalidator:RegisterEvent("BN_FRIEND_ACCOUNT_OFFLINE")
+bnCacheInvalidator:RegisterEvent("BN_FRIEND_INFO_CHANGED")
+bnCacheInvalidator:RegisterEvent("FRIENDLIST_UPDATE")
+
+bnCacheInvalidator:SetScript("OnEvent", function()
+	bnCacheValid = false
+end)

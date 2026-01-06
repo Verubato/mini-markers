@@ -1,15 +1,20 @@
 local addonName, addon = ...
 local verticalSpacing = 20
 local horizontalSpacing = 40
-local checkboxWidth = 150
+local checkboxWidth = 100
 ---@type Db
 local db
 ---@class Db
 local dbDefaults = {
-	Version = 1,
+	Version = 2,
+
+	EveryoneEnabled = false,
+	GroupEnabled = true,
+	AlliesEnabled = true,
+	EnemiesEnabled = false,
+	NpcsEnabled = false,
 
 	ClassIcons = true,
-	GroupOnly = true,
 
 	OffsetX = 0,
 	OffsetY = 0,
@@ -20,6 +25,9 @@ local dbDefaults = {
 	IconRotation = 90,
 	IconClassColors = true,
 	IconDesaturated = true,
+
+	FriendIconsEnabled = true,
+	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
 }
 
 local M = {
@@ -31,6 +39,7 @@ local function CopyTable(src, dst)
 	if type(dst) ~= "table" then
 		dst = {}
 	end
+
 	for k, v in pairs(src) do
 		if type(v) == "table" then
 			dst[k] = CopyTable(v, dst[k])
@@ -38,7 +47,22 @@ local function CopyTable(src, dst)
 			dst[k] = v
 		end
 	end
+
 	return dst
+end
+
+local function GetAndUpgradeDb()
+	local vars = MiniMarkersDB or {}
+
+	if not vars.Version or vars.Version == 1 then
+		-- sorry folks, you'll have to reconfigure
+		-- made some breaking changes from v1 to 2
+		MiniMarkersDB = {}
+	end
+
+	vars = CopyTable(dbDefaults, MiniMarkersDB)
+
+	return vars
 end
 
 local function ClampInt(v, minV, maxV, fallback)
@@ -170,8 +194,7 @@ local function AddCategory(panel)
 end
 
 function M:Init()
-	MiniMarkersDB = MiniMarkersDB or {}
-	db = CopyTable(dbDefaults, MiniMarkersDB)
+	db = GetAndUpgradeDb()
 
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
@@ -191,23 +214,79 @@ function M:Init()
 	description:SetPoint("TOPLEFT", title, 0, -verticalSpacing)
 	description:SetText("Show markers above nameplates.")
 
-	local groupOnlyChkBox = CreateSettingCheckbox(panel, {
-		Name = "Group only",
-		Tooltip = "Only show markers for group members.",
+	local everyoneChkBox = CreateSettingCheckbox(panel, {
+		Name = "Everyone",
+		Tooltip = "Show markers for everyone.",
 		Enabled = function()
-			return db.GroupOnly
+			return db.EveryoneEnabled
 		end,
 		OnChanged = function(enabled)
-			db.GroupOnly = enabled
+			db.EveryoneEnabled = enabled
 			addon:Refresh()
 		end,
 	})
 
-	groupOnlyChkBox:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
+	everyoneChkBox:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
+
+	local groupChkBox = CreateSettingCheckbox(panel, {
+		Name = "Group",
+		Tooltip = "Show markers for group members.",
+		Enabled = function()
+			return db.GroupEnabled
+		end,
+		OnChanged = function(enabled)
+			db.GroupEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	groupChkBox:SetPoint("LEFT", everyoneChkBox, "RIGHT", checkboxWidth, 0)
+
+	local alliesChkBox = CreateSettingCheckbox(panel, {
+		Name = "Allies",
+		Tooltip = "Show markers for friendly players.",
+		Enabled = function()
+			return db.AlliesEnabled
+		end,
+		OnChanged = function(enabled)
+			db.AlliesEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	alliesChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", checkboxWidth, 0)
+
+	local enemiesChkBox = CreateSettingCheckbox(panel, {
+		Name = "Enemies",
+		Tooltip = "Show markers for enemy players.",
+		Enabled = function()
+			return db.EnemiesEnabled
+		end,
+		OnChanged = function(enabled)
+			db.EnemiesEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", checkboxWidth, 0)
+
+	local friendsChkBox = CreateSettingCheckbox(panel, {
+		Name = "Friends",
+		Tooltip = "Use a special icon for btag friends.",
+		Enabled = function()
+			return db.FriendIconsEnabled
+		end,
+		OnChanged = function(enabled)
+			db.FriendIconsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	friendsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -8)
 
 	local classIconsChkBox = CreateSettingCheckbox(panel, {
 		Name = "Class Icons",
-		Tooltip = "Use class icons, or when unchecked use a default arrow icon.",
+		Tooltip = "Use class icons, or when unchecked use the specified texture.",
 		Enabled = function()
 			return db.ClassIcons
 		end,
@@ -217,7 +296,21 @@ function M:Init()
 		end,
 	})
 
-	classIconsChkBox:SetPoint("LEFT", groupOnlyChkBox, "RIGHT", checkboxWidth, 0)
+	classIconsChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
+
+	local npcsChkBox = CreateSettingCheckbox(panel, {
+		Name = "NPCs",
+		Tooltip = "Show markers for NPCs.",
+		Enabled = function()
+			return db.NpcsEnabled
+		end,
+		OnChanged = function(enabled)
+			db.NpcsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	npcsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
 
 	local textureLbl, textureBox = CreateEditBox(panel, false, "Texture", 400, function()
 		return db.IconTexture
@@ -230,7 +323,7 @@ function M:Init()
 		addon:Refresh()
 	end)
 
-	textureLbl:SetPoint("TOPLEFT", groupOnlyChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
+	textureLbl:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
 	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 4, -8)
 
 	local textureWidthLbl, textureWidthBox = CreateEditBox(panel, true, "Width", 50, function()
@@ -304,7 +397,11 @@ function M:Init()
 	offsetYBox:SetPoint("TOPLEFT", offsetYLbl, "BOTTOMLEFT", 4, -8)
 
 	panel.Controls = {
-		groupOnlyChkBox,
+		everyoneChkBox,
+		groupChkBox,
+		alliesChkBox,
+		enemiesChkBox,
+		friendsChkBox,
 		classIconsChkBox,
 		textureBox,
 		textureWidthBox,
