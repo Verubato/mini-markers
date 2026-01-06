@@ -83,6 +83,32 @@ local function ClampInt(v, minV, maxV, fallback)
 	return v
 end
 
+local function WireTabNavigation(editBoxes)
+	for i, box in ipairs(editBoxes) do
+		box:EnableKeyboard(true)
+
+		box:SetScript("OnTabPressed", function(self)
+			self:ClearFocus()
+
+			local backwards = IsShiftKeyDown()
+			local nextIndex = i + (backwards and -1 or 1)
+
+			-- wrap around
+			if nextIndex < 1 then
+				nextIndex = #editBoxes
+			elseif nextIndex > #editBoxes then
+				nextIndex = 1
+			end
+
+			local nextBox = editBoxes[nextIndex]
+			if nextBox then
+				nextBox:SetFocus()
+				nextBox:HighlightText()
+			end
+		end)
+	end
+end
+
 local function CreateEditBox(parent, numeric, labelText, width, getValue, setValue)
 	local label = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	label:SetText(labelText)
@@ -426,6 +452,15 @@ function M:Init()
 
 	offsetYLbl:SetPoint("LEFT", offsetXBox, "RIGHT", horizontalSpacing, offsetXBox:GetHeight() + 4)
 	offsetYBox:SetPoint("TOPLEFT", offsetYLbl, "BOTTOMLEFT", 4, -8)
+
+	WireTabNavigation({
+		textureBox,
+		textureWidthBox,
+		textureHeightBox,
+		textureRotBox,
+		offsetXBox,
+		offsetYBox,
+	})
 
 	panel.Controls = {
 		everyoneChkBox,
