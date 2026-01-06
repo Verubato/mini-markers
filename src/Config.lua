@@ -344,6 +344,20 @@ function M:Init()
 
 	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
 
+	local npcsChkBox = CreateSettingCheckbox(panel, {
+		Name = "NPCs",
+		Tooltip = "Show markers for NPCs.",
+		Enabled = function()
+			return db.NpcsEnabled
+		end,
+		OnChanged = function(enabled)
+			db.NpcsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	npcsChkBox:SetPoint("LEFT", guildChkBox, "RIGHT", checkboxWidth, 0)
+
 	local backgroundChkBox = CreateSettingCheckbox(panel, {
 		Name = "Background",
 		Tooltip = "Add a background behind the icons. Only used for non-class icons.",
@@ -357,20 +371,6 @@ function M:Init()
 	})
 
 	backgroundChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
-
-	local npcsChkBox = CreateSettingCheckbox(panel, {
-		Name = "NPCs",
-		Tooltip = "Show markers for NPCs.",
-		Enabled = function()
-			return db.NpcsEnabled
-		end,
-		OnChanged = function(enabled)
-			db.NpcsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	npcsChkBox:SetPoint("LEFT", backgroundChkBox, "RIGHT", checkboxWidth, 0)
 
 	local textureLbl, textureBox = CreateEditBox(panel, false, "Texture", 400, function()
 		return db.IconTexture
