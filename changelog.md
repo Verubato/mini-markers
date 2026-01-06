@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.0
+
+- Disabled markers for pets.
+- Disabled fading with nameplate distance.
+
 ## 2.2.0
 
 - Added icon for guild members.
