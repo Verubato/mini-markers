@@ -97,6 +97,16 @@ local function GetTextureForUnit(unit)
 		end
 	end
 
+	if db.GuildEnabled and UnitIsInMyGuild(unit) then
+		return {
+			Texture = db.GuildIconTexture or dbDefaults.GuildIconTexture,
+			AddBackground = true,
+			BackgroundPadding = 8,
+			Width = db.IconWidth or dbDefaults.IconWidth,
+			Height = db.IconHeight or dbDefaults.IconHeight,
+		}
+	end
+
 	local pass = db.EveryoneEnabled
 
 	if UnitIsEnemy("player", unit) then
