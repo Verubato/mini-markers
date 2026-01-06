@@ -14,6 +14,7 @@ local dbDefaults = {
 	EnemiesEnabled = false,
 	GuildEnabled = true,
 	NpcsEnabled = false,
+	PetsEnabled = false,
 
 	ClassIcons = true,
 	BackgroundEnabled = false,
