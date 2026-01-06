@@ -19,6 +19,8 @@ local dbDefaults = {
 	ClassIcons = true,
 	BackgroundEnabled = false,
 
+	EnableDistanceFading = false,
+
 	OffsetX = 0,
 	OffsetY = 0,
 

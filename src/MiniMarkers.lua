@@ -176,15 +176,38 @@ end
 ---@return Marker
 local function GetOrCreateMarker(nameplate)
 	local marker = nameplate.Marker
+	local ignoreAlpha = not db.EnableDistanceFading
 
 	if marker then
+		-- in case the db value has changed
+		marker.WithColor:SetIgnoreParentAlpha(ignoreAlpha)
+		marker.WithoutColor:SetIgnoreParentAlpha(ignoreAlpha)
+		marker.Background:SetIgnoreParentAlpha(ignoreAlpha)
+
 		return marker
 	end
 
 	marker = {
 		WithoutColor = nameplate:CreateTexture(nil, "OVERLAY", nil, 7),
 		WithColor = nameplate:CreateTexture(nil, "OVERLAY", nil, 7),
+		Background = nameplate:CreateTexture(nil, "BACKGROUND"),
 	}
+
+	local bg = marker.Background
+
+	bg:SetColorTexture(0, 0, 0, 1)
+
+	-- Circular mask
+	local mask = nameplate:CreateMaskTexture()
+	mask:SetTexture("Interface\\Minimap\\UI-Minimap-Background", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+	mask:SetAllPoints(bg)
+
+	bg:AddMaskTexture(mask)
+	bg.Mask = mask
+
+	marker.WithColor:SetIgnoreParentAlpha(ignoreAlpha)
+	marker.WithoutColor:SetIgnoreParentAlpha(ignoreAlpha)
+	marker.Background:SetIgnoreParentAlpha(ignoreAlpha)
 
 	marker.WithoutColor:Hide()
 	marker.WithColor:Hide()
@@ -253,20 +276,6 @@ local function AddMarker(unit, nameplate)
 	end
 
 	if options.BackgroundEnabled then
-		if not marker.Background then
-			local bg = nameplate:CreateTexture(nil, "BACKGROUND")
-			marker.Background = bg
-
-			bg:SetColorTexture(0, 0, 0, 1)
-
-			-- Circular mask
-			local mask = nameplate:CreateMaskTexture()
-			mask:SetTexture("Interface\\Minimap\\UI-Minimap-Background", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-			mask:SetAllPoints(bg)
-			bg:AddMaskTexture(mask)
-			bg.Mask = mask
-		end
-
 		local padding = options.BackgroundPadding or 0
 
 		marker.Background:ClearAllPoints()
