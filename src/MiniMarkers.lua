@@ -69,6 +69,18 @@ local function IsFriend(unit)
 	return bnFriendCache[key] == true
 end
 
+local function IsPet(unit)
+	if UnitIsUnit(unit, "pet") then
+		return true
+	end
+
+	if UnitIsOtherPlayersPet(unit) then
+		return true
+	end
+
+	return false
+end
+
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
@@ -109,18 +121,22 @@ local function GetTextureForUnit(unit)
 		}
 	end
 
+	if not UnitIsPlayer(unit) and not db.NpcsEnabled then
+		return
+	end
+
+	if IsPet(unit) and not db.PetsEnabled then
+		return
+	end
+
 	local pass = db.EveryoneEnabled
 
 	if UnitIsEnemy("player", unit) then
 		pass = pass or db.EnemiesEnabled
 	end
 
-	if UnitIsFriend("player", unit) then
+	if not pass and UnitIsFriend("player", unit) then
 		pass = pass or db.AlliesEnabled
-	end
-
-	if not UnitIsPlayer(unit) then
-		pass = pass or db.NpcsEnabled
 	end
 
 	if not pass and db.GroupEnabled then
