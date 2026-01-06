@@ -1,0 +1,9 @@
+## Interface: 120001, 120000, 110207, 50503, 40402, 38000, 30405, 20505, 11508
+## Title: MiniMarkers
+## Notes: Creates markers above nameplates.
+## Author: Verz
+## Version: 1.0.0
+## IconTexture: Interface\AddOns\MiniMarkers\icon.blp
+## X-Curse-Project-ID: 1418841
+
+MiniMarkers.lua
