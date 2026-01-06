@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0
+
+- Added icon for guild members.
+- Better custom texture handling.
+
 ## 2.1.0
 
 Added new friends icon feature plus some additional filters.
