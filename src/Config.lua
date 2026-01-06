@@ -12,6 +12,7 @@ local dbDefaults = {
 	GroupEnabled = true,
 	AlliesEnabled = true,
 	EnemiesEnabled = false,
+	GuildEnabled = true,
 	NpcsEnabled = false,
 
 	ClassIcons = true,
@@ -28,6 +29,7 @@ local dbDefaults = {
 
 	FriendIconsEnabled = true,
 	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
+	GuildIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Guild.tga",
 }
 
 local M = {
@@ -284,6 +286,20 @@ function M:Init()
 
 	friendsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -8)
 
+	local guildChkBox = CreateSettingCheckbox(panel, {
+		Name = "Guild",
+		Tooltip = "Use a special icon for guild members.",
+		Enabled = function()
+			return db.GuildEnabled
+		end,
+		OnChanged = function(enabled)
+			db.GuildEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
+
 	local classIconsChkBox = CreateSettingCheckbox(panel, {
 		Name = "Class Icons",
 		Tooltip = "Use class icons, or when unchecked use the specified texture.",
@@ -296,7 +312,7 @@ function M:Init()
 		end,
 	})
 
-	classIconsChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
+	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
 
 	local npcsChkBox = CreateSettingCheckbox(panel, {
 		Name = "NPCs",
@@ -323,7 +339,7 @@ function M:Init()
 		addon:Refresh()
 	end)
 
-	textureLbl:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
+	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
 	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 4, -8)
 
 	local textureWidthLbl, textureWidthBox = CreateEditBox(panel, true, "Width", 50, function()
