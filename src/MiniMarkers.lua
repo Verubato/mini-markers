@@ -89,7 +89,8 @@ local function GetTextureForUnit(unit)
 		if IsFriend(unit) then
 			return {
 				Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
-				AddBackground = true,
+				-- force background, don't use config
+				BackgroundEnabled = true,
 				BackgroundPadding = 8,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
@@ -100,7 +101,8 @@ local function GetTextureForUnit(unit)
 	if db.GuildEnabled and UnitIsInMyGuild(unit) then
 		return {
 			Texture = db.GuildIconTexture or dbDefaults.GuildIconTexture,
-			AddBackground = true,
+			-- force background, don't use config
+			BackgroundEnabled = true,
 			BackgroundPadding = 8,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
@@ -135,7 +137,8 @@ local function GetTextureForUnit(unit)
 		if classFilename then
 			return {
 				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Classes\\" .. classFilename .. ".tga",
-				AddBackground = true,
+				-- force background, don't use config
+				BackgroundEnabled = true,
 				BackgroundPadding = 8,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
@@ -144,7 +147,8 @@ local function GetTextureForUnit(unit)
 	end
 
 	return {
-		Atlas = db.IconTexture or dbDefaults.IconTexture,
+		Texture = db.IconTexture or dbDefaults.IconTexture,
+		BackgroundEnabled = db.BackgroundEnabled,
 		Rotation = db.IconRotation or dbDefaults.IconRotation,
 		Color = db.IconClassColors and GetClassColor(unit) or nil,
 		Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
@@ -212,10 +216,16 @@ local function AddMarker(unit, nameplate)
 		marker.WithColor:Hide()
 	end
 
-	if options.Atlas then
-		texture:SetAtlas(options.Atlas, false)
-	elseif options.Texture then
-		texture:SetTexture(options.Texture)
+	if options.Texture then
+		-- texture might be a number, in which case we need to parse it as such
+		local name = tonumber(options.Texture) or options.Texture
+		local isAtlas = C_Texture.GetAtlasInfo(name) ~= nil
+
+		if isAtlas then
+			texture:SetAtlas(name, false)
+		else
+			texture:SetTexture(name)
+		end
 	end
 
 	texture:SetSize(options.Width or 20, options.Height or 20)
@@ -226,7 +236,7 @@ local function AddMarker(unit, nameplate)
 		texture:SetVertexColor(options.Color.R, options.Color.G, options.Color.B, options.Color.A)
 	end
 
-	if options.AddBackground then
+	if options.BackgroundEnabled then
 		if not marker.Background then
 			local bg = nameplate:CreateTexture(nil, "BACKGROUND")
 			marker.Background = bg
