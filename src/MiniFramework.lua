@@ -3,6 +3,7 @@ local loader = CreateFrame("Frame")
 local loaded = false
 local onLoadCallbacks = {}
 local dropDownId = 1
+local sliderId = 1
 
 ---@class MiniFramework
 local M = {}
@@ -24,6 +25,39 @@ local function AddControlForRefresh(panel, control)
 			end
 		end
 	end
+end
+
+local function ConfigureNumbericBox(box, allowNegative)
+	if not allowNegative then
+		box:SetNumeric(true)
+		return
+	end
+
+	box:HookScript("OnTextChanged", function(boxSelf, userInput)
+		if not userInput then
+			return
+		end
+
+		local text = boxSelf:GetText()
+
+		-- allow: "", "-", "-123", "123"
+		if text == "" or text == "-" or text:match("^%-?%d+$") then
+			return
+		end
+
+		-- strip invalid chars
+		text = text:gsub("[^%d%-]", "")
+		-- only one leading '-'
+		text = text:gsub("%-+", "-")
+
+		if text:sub(1, 1) ~= "-" then
+			text = text:gsub("%-", "")
+		else
+			text = "-" .. text:sub(2):gsub("%-", "")
+		end
+
+		boxSelf:SetText(text)
+	end)
 end
 
 function M:Notify(msg, ...)
@@ -94,6 +128,20 @@ function M:AddCategory(panel)
 	return nil
 end
 
+function M:SettingsSize()
+	local settingsContainer = SettingsPanel and SettingsPanel.Container
+
+	if settingsContainer then
+		return settingsContainer:GetWidth(), settingsContainer:GetHeight()
+	end
+
+	if InterfaceOptionsFramePanelContainer then
+		return InterfaceOptionsFramePanelContainer:GetWidth(), InterfaceOptionsFramePanelContainer:GetHeight()
+	end
+
+	return 600, 600
+end
+
 function M:WireTabNavigation(controls)
 	for i, control in ipairs(controls) do
 		control:EnableKeyboard(true)
@@ -133,8 +181,8 @@ end
 
 ---Creates an edit box with a label using the specified options.
 ---@param options EditboxOptions
----@return table label
 ---@return table checkbox
+---@return table label
 function M:CreateEditBox(options)
 	if not options.Parent or not options.GetValue or not options.SetValue then
 		error("Invalid edit box options")
@@ -144,40 +192,11 @@ function M:CreateEditBox(options)
 	label:SetText(options.LabelText or "")
 
 	local box = CreateFrame("EditBox", nil, options.Parent, "InputBoxTemplate")
-	box:SetSize(options.EditBoxWidth or 80, options.EditBoxHeight or 20)
+	box:SetSize(options.Width or 80, options.Height or 20)
 	box:SetAutoFocus(false)
 
-	if options.Numeric == true then
-		if options.AllowNegatives == true then
-			-- can't use SetNumeric(true) because it doesn't allow negatives
-			box:SetScript("OnTextChanged", function(boxSelf, userInput)
-				if not userInput then
-					return
-				end
-
-				local text = boxSelf:GetText()
-
-				-- allow: "", "-", "-123", "123"
-				if text == "" or text == "-" or text:match("^%-?%d+$") then
-					return
-				end
-
-				-- strip invalid chars
-				text = text:gsub("[^%d%-]", "")
-				-- only one leading '-'
-				text = text:gsub("%-+", "-")
-
-				if text:sub(1, 1) ~= "-" then
-					text = text:gsub("%-", "")
-				else
-					text = "-" .. text:sub(2):gsub("%-", "")
-				end
-
-				boxSelf:SetText(text)
-			end)
-		else
-			box:SetNumeric(true)
-		end
+	if options.Numeric then
+		ConfigureNumbericBox(box, options.AllowNegatives)
 	end
 
 	local function Commit()
@@ -208,7 +227,7 @@ function M:CreateEditBox(options)
 
 	AddControlForRefresh(options.Parent, box)
 
-	return label, box
+	return box, label
 end
 
 ---Creates a dropdown menu using the specified options.
@@ -339,20 +358,6 @@ function M:Dropdown(options)
 	error("Failed to create a dropdown control")
 end
 
-function M:SettingsSize()
-	local settingsContainer = SettingsPanel and SettingsPanel.Container
-
-	if settingsContainer then
-		return settingsContainer:GetWidth(), settingsContainer:GetHeight()
-	end
-
-	if InterfaceOptionsFramePanelContainer then
-		return InterfaceOptionsFramePanelContainer:GetWidth(), InterfaceOptionsFramePanelContainer:GetHeight()
-	end
-
-	return 600, 600
-end
-
 ---Creates a checkbox using the specified options.
 ---@param options CheckboxOptions
 ---@return table checkbox
@@ -389,6 +394,101 @@ function M:CreateSettingCheckbox(options)
 	AddControlForRefresh(options.Parent, checkbox)
 
 	return checkbox
+end
+
+---Creates a slider using the specified options.
+---@param options SliderOptions
+---@return table checkbox
+---@return table editBox
+---@return table label
+function M:CreateSlider(options)
+	if
+		not options.Parent
+		or not options.GetValue
+		or not options.SetValue
+		or not options.Min
+		or not options.Max
+		or not options.Step
+	then
+		error("Invalid slider options")
+	end
+
+	local slider = CreateFrame("Slider", addonName .. "Slider" .. sliderId, options.Parent, "OptionsSliderTemplate")
+	sliderId = sliderId + 1
+
+	local label = slider:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+	label:SetPoint("BOTTOMLEFT", slider, "TOPLEFT", 0, 8)
+	label:SetText(options.LabelText)
+
+	slider:SetOrientation("HORIZONTAL")
+	slider:SetMinMaxValues(options.Min, options.Max)
+	slider:SetValue(options.GetValue())
+	slider:SetValueStep(options.Step)
+	slider:SetObeyStepOnDrag(true)
+	slider:SetHeight(20)
+	slider:SetWidth(options.Width or 400)
+
+	local low = _G[slider:GetName() .. "Low"]
+	local high = _G[slider:GetName() .. "High"]
+
+	if low and high then
+		low:SetText(options.Min)
+		high:SetText(options.Max)
+	end
+
+	local box = CreateFrame("EditBox", nil, options.Parent, "InputBoxTemplate")
+	ConfigureNumbericBox(box, options.Min < 0)
+
+	box:SetPoint("CENTER", slider, "CENTER", 0, 30)
+	box:SetFontObject("GameFontWhite")
+	box:SetSize(50, 20)
+	box:SetAutoFocus(false)
+	box:SetMaxLetters(math.log(options.Max, 10) + 1)
+	box:SetText(tostring(options.GetValue()))
+	box:SetJustifyH("CENTER")
+	box:SetCursorPosition(0)
+
+	slider:SetScript("OnValueChanged", function(_, sliderValue, userInput)
+		if userInput ~= nil and not userInput then
+			return
+		end
+
+		box:SetText(tostring(sliderValue))
+
+		options.SetValue(sliderValue)
+	end)
+
+	box:SetScript("OnTextChanged", function(_, userInput)
+		if not userInput then
+			return
+		end
+
+		local value = tonumber(box:GetText())
+
+		-- don't clamp values here, because they might still be typing out a number
+		if not value then
+			return
+		end
+
+		slider:SetValue(value)
+		options.SetValue(value)
+	end)
+
+	function box.MiniRefresh(boxSelf)
+		local value = options.GetValue()
+		boxSelf:SetText(tostring(value))
+		boxSelf:SetCursorPosition(0)
+	end
+
+	function slider.MiniRefresh(sliderSelf)
+		local value = options.GetValue()
+		sliderSelf:SetValue(value)
+	end
+
+	AddControlForRefresh(options.Parent, slider)
+	AddControlForRefresh(options.Parent, box)
+
+	return slider, box, label
 end
 
 function M:RegisterSlashCommand(category, panel)
@@ -481,8 +581,8 @@ loader:SetScript("OnEvent", OnAddonLoaded)
 ---@field Tooltip string?
 ---@field Numeric boolean?
 ---@field AllowNegatives boolean?
----@field EditBoxWidth number?
----@field EditBoxHeight number?
+---@field Width number?
+---@field Height number?
 ---@field GetValue fun(): string|number
 ---@field SetValue fun(value: string|number)
 
@@ -493,3 +593,14 @@ loader:SetScript("OnEvent", OnAddonLoaded)
 ---@field GetValue fun(): string
 ---@field SetValue fun(value: string)
 ---@field GetText? fun(value: any): string
+
+---@class SliderOptions
+---@field Parent table
+---@field LabelText string
+---@field Tooltip string?
+---@field Min number
+---@field Max number
+---@field Step number
+---@field Width number?
+---@field GetValue fun(): number
+---@field SetValue fun(value: number)
