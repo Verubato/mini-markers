@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.0
+
+- Added role icons feature.
+- Some internal re-work to use a common mini framework.
+
 ## 2.3.0
 
 - Disabled markers for pets.
