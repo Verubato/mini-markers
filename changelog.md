@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.6.0
+
+- Swapped to slider controls for numeric config controls.
+- Updated role icons.
+
 ## 2.5.0
 
 Some internal framework updates to make things easier to support/maintain.
