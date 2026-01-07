@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.6.1
+
+Prevent anchoring to the personal resource display.
+
 ## 2.6.0
 
 - Swapped to slider controls for numeric config controls.
