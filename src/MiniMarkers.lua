@@ -103,7 +103,7 @@ local function GetTextureForUnit(unit)
 				Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
 				-- force background, don't use config
 				BackgroundEnabled = true,
-				BackgroundPadding = 8,
+				BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
@@ -115,7 +115,7 @@ local function GetTextureForUnit(unit)
 			Texture = db.GuildIconTexture or dbDefaults.GuildIconTexture,
 			-- force background, don't use config
 			BackgroundEnabled = true,
-			BackgroundPadding = 8,
+			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
 		}
@@ -147,6 +147,25 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
+	-- prioritise role icons first
+	if db.RoleIcons then
+		local role = UnitGroupRolesAssigned(unit)
+
+		if role and role ~= "NONE" then
+			return {
+				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Roles\\" .. role .. ".tga",
+				-- force background, don't use config
+				BackgroundEnabled = true,
+				BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+				Width = db.IconWidth or dbDefaults.IconWidth,
+				Height = db.IconHeight or dbDefaults.IconHeight,
+				Color = db.IconClassColors and GetClassColor(unit) or nil,
+				Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
+			}
+		end
+	end
+
+	-- then class/texture icons after
 	if db.ClassIcons then
 		local _, classFilename = UnitClass(unit)
 
@@ -155,22 +174,26 @@ local function GetTextureForUnit(unit)
 				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Classes\\" .. classFilename .. ".tga",
 				-- force background, don't use config
 				BackgroundEnabled = true,
-				BackgroundPadding = 8,
+				BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
 		end
 	end
 
-	return {
-		Texture = db.IconTexture or dbDefaults.IconTexture,
-		BackgroundEnabled = db.BackgroundEnabled,
-		Rotation = db.IconRotation or dbDefaults.IconRotation,
-		Color = db.IconClassColors and GetClassColor(unit) or nil,
-		Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
-		Width = db.IconWidth or dbDefaults.IconWidth,
-		Height = db.IconHeight or dbDefaults.IconHeight,
-	}
+	if db.TextureIcons then
+		return {
+			Texture = db.IconTexture or dbDefaults.IconTexture,
+			BackgroundEnabled = db.BackgroundEnabled,
+			Rotation = db.IconRotation or dbDefaults.IconRotation,
+			Width = db.IconWidth or dbDefaults.IconWidth,
+			Height = db.IconHeight or dbDefaults.IconHeight,
+			Color = db.IconClassColors and GetClassColor(unit) or nil,
+			Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
+		}
+	end
+
+	return nil
 end
 
 ---@return Marker

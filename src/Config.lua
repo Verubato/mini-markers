@@ -17,7 +17,8 @@ local dbDefaults = {
 	PetsEnabled = false,
 
 	ClassIcons = true,
-	BackgroundEnabled = false,
+	TextureIcons = false,
+	RoleIcons = false,
 
 	EnableDistanceFading = false,
 
@@ -30,6 +31,8 @@ local dbDefaults = {
 	IconRotation = 90,
 	IconClassColors = true,
 	IconDesaturated = true,
+	BackgroundEnabled = false,
+	BackgroundPadding = 10,
 
 	FriendIconsEnabled = true,
 	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
@@ -330,20 +333,6 @@ function M:Init()
 
 	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local classIconsChkBox = CreateSettingCheckbox(panel, {
-		Name = "Class Icons",
-		Tooltip = "Use class icons, or when unchecked use the specified texture.",
-		Enabled = function()
-			return db.ClassIcons
-		end,
-		OnChanged = function(enabled)
-			db.ClassIcons = enabled
-			addon:Refresh()
-		end,
-	})
-
-	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
-
 	local npcsChkBox = CreateSettingCheckbox(panel, {
 		Name = "NPCs",
 		Tooltip = "Show markers for NPCs.",
@@ -358,19 +347,56 @@ function M:Init()
 
 	npcsChkBox:SetPoint("LEFT", guildChkBox, "RIGHT", checkboxWidth, 0)
 
-	local backgroundChkBox = CreateSettingCheckbox(panel, {
-		Name = "Background",
-		Tooltip = "Add a background behind the icons. Only used for non-class icons.",
+	local classIconsChkBox
+	local textureIconsChkBox
+
+	classIconsChkBox = CreateSettingCheckbox(panel, {
+		Name = "Class Icons",
+		Tooltip = "Use special high quality class icons.",
 		Enabled = function()
-			return db.BackgroundEnabled
+			return db.ClassIcons
 		end,
 		OnChanged = function(enabled)
-			db.BackgroundEnabled = enabled
+			db.ClassIcons = enabled
+			db.TextureIcons = not enabled
+
+			textureIconsChkBox:Refresh()
 			addon:Refresh()
 		end,
 	})
 
-	backgroundChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
+	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
+
+	textureIconsChkBox = CreateSettingCheckbox(panel, {
+		Name = "Texture Icons",
+		Tooltip = "Use the specified texture for icons.",
+		Enabled = function()
+			return db.TextureIcons
+		end,
+		OnChanged = function(enabled)
+			db.TextureIcons = enabled
+			db.ClassIcons = not enabled
+
+			classIconsChkBox:Refresh()
+			addon:Refresh()
+		end,
+	})
+
+	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
+
+	local roleIconsChkBox = CreateSettingCheckbox(panel, {
+		Name = "Role Icons",
+		Tooltip = "Use tank/healer/dps role icons.",
+		Enabled = function()
+			return db.RoleIcons
+		end,
+		OnChanged = function(enabled)
+			db.RoleIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	roleIconsChkBox:SetPoint("LEFT", textureIconsChkBox, "RIGHT", checkboxWidth, 0)
 
 	local textureLbl, textureBox = CreateEditBox(panel, false, "Texture", 400, function()
 		return db.IconTexture
@@ -456,6 +482,20 @@ function M:Init()
 	offsetYLbl:SetPoint("LEFT", offsetXBox, "RIGHT", horizontalSpacing, offsetXBox:GetHeight() + 4)
 	offsetYBox:SetPoint("TOPLEFT", offsetYLbl, "BOTTOMLEFT", 4, -8)
 
+	local backgroundChkBox = CreateSettingCheckbox(panel, {
+		Name = "Background",
+		Tooltip = "Add a background behind the icons. Only used for non-class icons.",
+		Enabled = function()
+			return db.BackgroundEnabled
+		end,
+		OnChanged = function(enabled)
+			db.BackgroundEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	backgroundChkBox:SetPoint("TOPLEFT", offsetXBox, "BOTTOMLEFT", -8, -verticalSpacing)
+
 	WireTabNavigation({
 		textureBox,
 		textureWidthBox,
@@ -472,6 +512,7 @@ function M:Init()
 		enemiesChkBox,
 		friendsChkBox,
 		classIconsChkBox,
+		textureIconsChkBox,
 		backgroundChkBox,
 		textureBox,
 		textureWidthBox,
