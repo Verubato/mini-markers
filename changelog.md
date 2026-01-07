@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.5.0
+
+Some internal framework updates to make things easier to support/maintain.
+
 ## 2.4.1
 
 Loading saved variables bug fix.
