@@ -1,9 +1,11 @@
 local addonName, addon = ...
+---@type MiniFramework
+local mini = addon.Framework
 ---@type Db
 local db
 ---@type Db
 local dbDefaults = addon.Config.DbDefaults
-local loader
+local eventsFrame
 local bnCacheInvalidator
 local bnFriendCache = {}
 local bnCacheValid = false
@@ -349,42 +351,30 @@ local function OnEvent(_, event, unit)
 	end)
 end
 
-local function OnAddonLoaded(_, _, name)
-	if name ~= addonName then
-		return
-	end
-
+local function OnAddonLoaded()
 	addon.Config:Init()
 
 	db = MiniMarkersDB or {}
 
-	loader:UnregisterEvent("ADDON_LOADED")
-
-	loader:SetScript("OnEvent", OnEvent)
-	loader:RegisterEvent("PLAYER_ENTERING_WORLD")
-	loader:RegisterEvent("GROUP_ROSTER_UPDATE")
-	loader:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-	loader:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+	eventsFrame = CreateFrame("Frame")
+	eventsFrame:SetScript("OnEvent", OnEvent)
+	eventsFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+	eventsFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+	eventsFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+	eventsFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
 
 function addon:Refresh()
-	db = MiniMarkersDB or {}
+	db = mini:GetSavedVars()
 	UpdateAllNameplates()
 end
 
-function addon:Notify(msg)
-	local formatted = string.format("%s - %s", addonName, msg)
-	print(formatted)
-end
-
 if not C_NamePlate or not C_NamePlate.GetNamePlates or not C_NamePlate.GetNamePlateForUnit then
-	print(string.format("%s is unable to run due to missing nameplate APIs.", addonName))
+	mini:Notify("Unable to run due to missing nameplate APIs.")
 	return
 end
 
-loader = CreateFrame("Frame")
-loader:RegisterEvent("ADDON_LOADED")
-loader:SetScript("OnEvent", OnAddonLoaded)
+mini:WaitForAddonLoad(OnAddonLoaded)
 
 bnCacheInvalidator = CreateFrame("Frame")
 bnCacheInvalidator:RegisterEvent("BN_FRIEND_ACCOUNT_ONLINE")

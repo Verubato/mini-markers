@@ -1,4 +1,6 @@
 local addonName, addon = ...
+---@type MiniFramework
+local mini = addon.Framework
 local verticalSpacing = 20
 local horizontalSpacing = 40
 local checkboxWidth = 100
@@ -44,188 +46,16 @@ local M = {
 }
 addon.Config = M
 
-local function CopyTable(src, dst)
-	if type(dst) ~= "table" then
-		dst = {}
-	end
-
-	for k, v in pairs(src) do
-		if type(v) == "table" then
-			dst[k] = CopyTable(v, dst[k])
-		elseif dst[k] == nil then
-			dst[k] = v
-		end
-	end
-
-	return dst
-end
-
 local function GetAndUpgradeDb()
-	local vars = MiniMarkersDB or {}
+	local vars = mini:GetSavedVars(dbDefaults)
 
 	if not vars.Version or vars.Version == 1 then
 		-- sorry folks, you'll have to reconfigure
 		-- made some breaking changes from v1 to 2
-		MiniMarkersDB = {}
+		vars = mini:ResetSavedVars(dbDefaults)
 	end
-
-	vars = CopyTable(dbDefaults, MiniMarkersDB)
 
 	return vars
-end
-
-local function ClampInt(v, minV, maxV, fallback)
-	v = tonumber(v)
-	if not v then
-		return fallback
-	end
-	v = math.floor(v + 0.5)
-	if v < minV then
-		return minV
-	end
-	if v > maxV then
-		return maxV
-	end
-	return v
-end
-
-local function WireTabNavigation(editBoxes)
-	for i, box in ipairs(editBoxes) do
-		box:EnableKeyboard(true)
-
-		box:SetScript("OnTabPressed", function(self)
-			self:ClearFocus()
-
-			local backwards = IsShiftKeyDown()
-			local nextIndex = i + (backwards and -1 or 1)
-
-			-- wrap around
-			if nextIndex < 1 then
-				nextIndex = #editBoxes
-			elseif nextIndex > #editBoxes then
-				nextIndex = 1
-			end
-
-			local nextBox = editBoxes[nextIndex]
-			if nextBox then
-				nextBox:SetFocus()
-				nextBox:HighlightText()
-			end
-		end)
-	end
-end
-
-local function CreateEditBox(parent, numeric, labelText, width, getValue, setValue)
-	local label = parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
-	label:SetText(labelText)
-
-	local box = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
-	box:SetSize(width or 80, 20)
-	box:SetAutoFocus(false)
-
-	if numeric then
-		-- can't use SetNumeric(true) because it doesn't allow negatives
-		box:SetScript("OnTextChanged", function(self, userInput)
-			if not userInput then
-				return
-			end
-
-			local text = self:GetText()
-
-			-- allow: "", "-", "-123", "123"
-			if text == "" or text == "-" or text:match("^%-?%d+$") then
-				return
-			end
-
-			-- strip invalid chars
-			text = text:gsub("[^%d%-]", "")
-			-- only one leading '-'
-			text = text:gsub("%-+", "-")
-
-			if text:sub(1, 1) ~= "-" then
-				text = text:gsub("%-", "")
-			else
-				text = "-" .. text:sub(2):gsub("%-", "")
-			end
-
-			self:SetText(text)
-		end)
-	end
-
-	local function Commit()
-		local new = box:GetText()
-
-		setValue(new)
-
-		box:SetText(tostring(getValue()))
-		box:SetCursorPosition(0)
-	end
-
-	box:SetScript("OnEnterPressed", function(self)
-		self:ClearFocus()
-		Commit()
-	end)
-
-	box:SetScript("OnEditFocusLost", Commit)
-
-	function box:Refresh()
-		box:SetText(tostring(getValue()))
-		box:SetCursorPosition(0)
-	end
-
-	box:Refresh()
-
-	return label, box
-end
-
-local function CreateSettingCheckbox(panel, setting)
-	local checkbox = CreateFrame("CheckButton", nil, panel, "UICheckButtonTemplate")
-	checkbox.Text:SetText(" " .. setting.Name)
-	checkbox.Text:SetFontObject("GameFontNormal")
-	checkbox:SetChecked(setting.Enabled())
-	checkbox:HookScript("OnClick", function()
-		setting.OnChanged(checkbox:GetChecked())
-	end)
-
-	checkbox:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-		GameTooltip:SetText(setting.Name, 1, 0.82, 0)
-		GameTooltip:AddLine(setting.Tooltip, 1, 1, 1, true)
-		GameTooltip:Show()
-	end)
-
-	checkbox:SetScript("OnLeave", function()
-		GameTooltip:Hide()
-	end)
-
-	function checkbox:Refresh()
-		checkbox:SetChecked(setting.Enabled())
-	end
-
-	return checkbox
-end
-
-function CanOpenOptionsDuringCombat()
-	if LE_EXPANSION_LEVEL_CURRENT == nil or LE_EXPANSION_MIDNIGHT == nil then
-		return true
-	end
-
-	return LE_EXPANSION_LEVEL_CURRENT < LE_EXPANSION_MIDNIGHT
-end
-
-local function AddCategory(panel)
-	if Settings then
-		local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
-		Settings.RegisterAddOnCategory(category)
-
-		return category
-	elseif InterfaceOptions_AddCategory then
-		InterfaceOptions_AddCategory(panel)
-
-		return panel
-	end
-
-	return nil
 end
 
 function M:Init()
@@ -234,7 +64,7 @@ function M:Init()
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
 
-	local category = AddCategory(panel)
+	local category = mini:AddCategory(panel)
 
 	if not category then
 		return
@@ -249,7 +79,7 @@ function M:Init()
 	description:SetPoint("TOPLEFT", title, 0, -verticalSpacing)
 	description:SetText("Show markers above nameplates.")
 
-	local everyoneChkBox = CreateSettingCheckbox(panel, {
+	local everyoneChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Everyone",
 		Tooltip = "Show markers for everyone.",
 		Enabled = function()
@@ -263,7 +93,7 @@ function M:Init()
 
 	everyoneChkBox:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
 
-	local groupChkBox = CreateSettingCheckbox(panel, {
+	local groupChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Group",
 		Tooltip = "Show markers for group members.",
 		Enabled = function()
@@ -277,7 +107,7 @@ function M:Init()
 
 	groupChkBox:SetPoint("LEFT", everyoneChkBox, "RIGHT", checkboxWidth, 0)
 
-	local alliesChkBox = CreateSettingCheckbox(panel, {
+	local alliesChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Allies",
 		Tooltip = "Show markers for friendly players.",
 		Enabled = function()
@@ -291,7 +121,7 @@ function M:Init()
 
 	alliesChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", checkboxWidth, 0)
 
-	local enemiesChkBox = CreateSettingCheckbox(panel, {
+	local enemiesChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Enemies",
 		Tooltip = "Show markers for enemy players.",
 		Enabled = function()
@@ -305,7 +135,7 @@ function M:Init()
 
 	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", checkboxWidth, 0)
 
-	local friendsChkBox = CreateSettingCheckbox(panel, {
+	local friendsChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Friends",
 		Tooltip = "Use a special icon for btag friends.",
 		Enabled = function()
@@ -319,7 +149,7 @@ function M:Init()
 
 	friendsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -8)
 
-	local guildChkBox = CreateSettingCheckbox(panel, {
+	local guildChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Guild",
 		Tooltip = "Use a special icon for guild members.",
 		Enabled = function()
@@ -333,7 +163,7 @@ function M:Init()
 
 	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local npcsChkBox = CreateSettingCheckbox(panel, {
+	local npcsChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "NPCs",
 		Tooltip = "Show markers for NPCs.",
 		Enabled = function()
@@ -350,7 +180,7 @@ function M:Init()
 	local classIconsChkBox
 	local textureIconsChkBox
 
-	classIconsChkBox = CreateSettingCheckbox(panel, {
+	classIconsChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Class Icons",
 		Tooltip = "Use special high quality class icons.",
 		Enabled = function()
@@ -360,14 +190,14 @@ function M:Init()
 			db.ClassIcons = enabled
 			db.TextureIcons = not enabled
 
-			textureIconsChkBox:Refresh()
+			textureIconsChkBox:MiniRefresh()
 			addon:Refresh()
 		end,
 	})
 
 	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
 
-	textureIconsChkBox = CreateSettingCheckbox(panel, {
+	textureIconsChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Texture Icons",
 		Tooltip = "Use the specified texture for icons.",
 		Enabled = function()
@@ -377,14 +207,14 @@ function M:Init()
 			db.TextureIcons = enabled
 			db.ClassIcons = not enabled
 
-			classIconsChkBox:Refresh()
+			classIconsChkBox:MiniRefresh()
 			addon:Refresh()
 		end,
 	})
 
 	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local roleIconsChkBox = CreateSettingCheckbox(panel, {
+	local roleIconsChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Role Icons",
 		Tooltip = "Use tank/healer/dps role icons.",
 		Enabled = function()
@@ -398,7 +228,7 @@ function M:Init()
 
 	roleIconsChkBox:SetPoint("LEFT", textureIconsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local textureLbl, textureBox = CreateEditBox(panel, false, "Texture", 400, function()
+	local textureLbl, textureBox = mini:CreateEditBox(panel, false, "Texture", 400, function()
 		return db.IconTexture
 	end, function(value)
 		if db.IconTexture == value then
@@ -412,77 +242,77 @@ function M:Init()
 	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
 	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 4, -8)
 
-	local textureWidthLbl, textureWidthBox = CreateEditBox(panel, true, "Width", 50, function()
+	local textureWidthLbl, textureWidthBox = mini:CreateEditBox(panel, true, "Width", 50, function()
 		return tonumber(db.IconWidth)
 	end, function(value)
 		if db.IconWidth == value then
 			return
 		end
 
-		db.IconWidth = ClampInt(value, 1, 500, dbDefaults.IconWidth)
+		db.IconWidth = mini:ClampInt(value, 1, 500, dbDefaults.IconWidth)
 		addon:Refresh()
 	end)
 
 	textureWidthLbl:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", -4, -verticalSpacing)
 	textureWidthBox:SetPoint("TOPLEFT", textureWidthLbl, "BOTTOMLEFT", 4, -8)
 
-	local textureHeightLbl, textureHeightBox = CreateEditBox(panel, true, "Height", 50, function()
+	local textureHeightLbl, textureHeightBox = mini:CreateEditBox(panel, true, "Height", 50, function()
 		return tonumber(db.IconHeight)
 	end, function(value)
 		if db.IconHeight == value then
 			return
 		end
 
-		db.IconHeight = ClampInt(value, 1, 500, dbDefaults.IconHeight)
+		db.IconHeight = mini:ClampInt(value, 1, 500, dbDefaults.IconHeight)
 		addon:Refresh()
 	end)
 
 	textureHeightLbl:SetPoint("LEFT", textureWidthBox, "RIGHT", horizontalSpacing, textureWidthBox:GetHeight() + 4)
 	textureHeightBox:SetPoint("TOPLEFT", textureHeightLbl, "BOTTOMLEFT", 4, -8)
 
-	local textureRotLbl, textureRotBox = CreateEditBox(panel, true, "Rotation (degrees)", 50, function()
+	local textureRotLbl, textureRotBox = mini:CreateEditBox(panel, true, "Rotation (degrees)", 50, function()
 		return tonumber(db.IconRotation)
 	end, function(value)
 		if db.IconRotation == value then
 			return
 		end
 
-		db.IconRotation = ClampInt(value, 0, 360, 0)
+		db.IconRotation = mini:ClampInt(value, 0, 360, 0)
 		addon:Refresh()
 	end)
 
 	textureRotLbl:SetPoint("LEFT", textureHeightBox, "RIGHT", horizontalSpacing, textureHeightBox:GetHeight() + 4)
 	textureRotBox:SetPoint("TOPLEFT", textureRotLbl, "BOTTOMLEFT", 4, -8)
 
-	local offsetXLbl, offsetXBox = CreateEditBox(panel, true, "X Offset", 50, function()
+	local offsetXLbl, offsetXBox = mini:CreateEditBox(panel, true, "X Offset", 50, function()
 		return tonumber(db.OffsetX)
 	end, function(value)
 		if db.OffsetX == value then
 			return
 		end
 
-		db.OffsetX = ClampInt(value, -200, 200, 0)
+		db.OffsetX = mini:ClampInt(value, -200, 200, 0)
 		addon:Refresh()
 	end)
 
 	offsetXLbl:SetPoint("TOPLEFT", textureWidthBox, "BOTTOMLEFT", -4, -verticalSpacing)
 	offsetXBox:SetPoint("TOPLEFT", offsetXLbl, "BOTTOMLEFT", 4, -8)
 
-	local offsetYLbl, offsetYBox = CreateEditBox(panel, true, "Y Offset", 50, function()
+	local offsetYLbl, offsetYBox = mini:CreateEditBox(panel, true, "Y Offset", 50, function()
 		return tonumber(db.OffsetY)
 	end, function(value)
 		if db.OffsetY == value then
 			return
 		end
 
-		db.OffsetY = ClampInt(value, -200, 200, 0)
+		db.OffsetY = mini:ClampInt(value, -200, 200, 0)
 		addon:Refresh()
 	end)
 
 	offsetYLbl:SetPoint("LEFT", offsetXBox, "RIGHT", horizontalSpacing, offsetXBox:GetHeight() + 4)
 	offsetYBox:SetPoint("TOPLEFT", offsetYLbl, "BOTTOMLEFT", 4, -8)
 
-	local backgroundChkBox = CreateSettingCheckbox(panel, {
+	local backgroundChkBox = mini:CreateSettingCheckbox(panel, {
 		Name = "Background",
 		Tooltip = "Add a background behind the icons. Only used for non-class icons.",
 		Enabled = function()
@@ -496,7 +326,7 @@ function M:Init()
 
 	backgroundChkBox:SetPoint("TOPLEFT", offsetXBox, "BOTTOMLEFT", -8, -verticalSpacing)
 
-	WireTabNavigation({
+	mini:WireTabNavigation({
 		textureBox,
 		textureWidthBox,
 		textureHeightBox,
@@ -505,69 +335,26 @@ function M:Init()
 		offsetYBox,
 	})
 
-	panel.Controls = {
-		everyoneChkBox,
-		groupChkBox,
-		alliesChkBox,
-		enemiesChkBox,
-		friendsChkBox,
-		classIconsChkBox,
-		textureIconsChkBox,
-		backgroundChkBox,
-		textureBox,
-		textureWidthBox,
-		textureHeightBox,
-		textureRotBox,
-		offsetXBox,
-		offsetYBox,
-	}
-
-	function panel.Refresh()
-		for _, c in ipairs(panel.Controls) do
-			if c.Refresh then
-				c:Refresh()
-			end
-		end
-	end
-
 	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
 	resetBtn:SetSize(120, 26)
 	resetBtn:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 0, 16)
 	resetBtn:SetText("Reset")
 	resetBtn:SetScript("OnClick", function()
 		if InCombatLockdown() then
-			addon:Notify("Can't reset during combat.")
+			mini:NotifyCombatLockdown()
 			return
 		end
 
-		for k in pairs(db) do
-			db[k] = nil
-		end
+		db = mini:ResetSavedVars(dbDefaults)
 
-		db = CopyTable(dbDefaults, db)
-		MiniMarkersDB = db
-
+		panel:MiniRefresh()
 		addon:Refresh()
-		panel:Refresh()
-		addon:Notify("Settings reset to default.")
+		mini:Notify("Settings reset to default.")
 	end)
 
 	SLASH_MINIMARKERS1 = "/minimarkers"
 	SLASH_MINIMARKERS2 = "/minim"
 	SLASH_MINIMARKERS3 = "/mm"
 
-	SlashCmdList.MINIMARKERS = function()
-		if Settings and Settings.OpenToCategory then
-			if not InCombatLockdown() or CanOpenOptionsDuringCombat() then
-				Settings.OpenToCategory(category:GetID())
-			else
-				addon:Notify("Can't open options during combat.")
-			end
-		elseif InterfaceOptionsFrame_OpenToCategory then
-			-- workaround the classic bug where the first call opens the Game interface
-			-- and a second call is required
-			InterfaceOptionsFrame_OpenToCategory(panel)
-			InterfaceOptionsFrame_OpenToCategory(panel)
-		end
-	end
+	mini:RegisterSlashCommand(category, panel)
 end
