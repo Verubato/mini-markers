@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1
+
+Loading saved variables bug fix.
+
 ## 2.4.0
 
 - Added role icons feature.
