@@ -2,7 +2,7 @@ local addonName, addon = ...
 ---@type MiniFramework
 local mini = addon.Framework
 local verticalSpacing = 20
-local horizontalSpacing = 40
+local horizontalSpacing = 20
 local checkboxWidth = 100
 ---@type Db
 local db
@@ -238,10 +238,11 @@ function M:Init()
 
 	roleIconsChkBox:SetPoint("LEFT", textureIconsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local textureLbl, textureBox = mini:CreateEditBox({
+	local textureBox, textureLbl = mini:CreateEditBox({
 		Parent = panel,
 		LabelText = "Texture",
-		EditBoxWidth = 400,
+		-- same width as 2 sliders plus gap
+		Width = 200 * 2 + horizontalSpacing,
 		GetValue = function()
 			return db.IconTexture
 		end,
@@ -255,14 +256,16 @@ function M:Init()
 		end,
 	})
 
-	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
-	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 4, -8)
+	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 4, -verticalSpacing)
+	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 0, -8)
 
-	local textureWidthLbl, textureWidthBox = mini:CreateEditBox({
+	local textureWidthSlider, textureWidthBox = mini:CreateSlider({
 		Parent = panel,
-		Numeric = true,
 		LabelText = "Width",
-		EditBoxWidth = 50,
+		Min = 10,
+		Max = 200,
+		Step = 5,
+		Width = 200,
 		GetValue = function()
 			return tonumber(db.IconWidth) or dbDefaults.IconWidth
 		end,
@@ -271,19 +274,20 @@ function M:Init()
 				return
 			end
 
-			db.IconWidth = mini:ClampInt(value, 1, 500, dbDefaults.IconWidth)
+			db.IconWidth = mini:ClampInt(value, 10, 200, dbDefaults.IconWidth)
 			addon:Refresh()
 		end,
 	})
 
-	textureWidthLbl:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", -4, -verticalSpacing)
-	textureWidthBox:SetPoint("TOPLEFT", textureWidthLbl, "BOTTOMLEFT", 4, -8)
+	textureWidthSlider:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
-	local textureHeightLbl, textureHeightBox = mini:CreateEditBox({
+	local textureHeightSlider, textureHeightBox = mini:CreateSlider({
 		Parent = panel,
-		Numeric = true,
 		LabelText = "Height",
-		EditBoxWidth = 50,
+		Min = 10,
+		Max = 200,
+		Step = 5,
+		Width = 200,
 		GetValue = function()
 			return tonumber(db.IconHeight) or dbDefaults.IconHeight
 		end,
@@ -292,41 +296,20 @@ function M:Init()
 				return
 			end
 
-			db.IconHeight = mini:ClampInt(value, 1, 500, dbDefaults.IconHeight)
+			db.IconHeight = mini:ClampInt(value, 10, 200, dbDefaults.IconHeight)
 			addon:Refresh()
 		end,
 	})
 
-	textureHeightLbl:SetPoint("LEFT", textureWidthBox, "RIGHT", horizontalSpacing, textureWidthBox:GetHeight() + 4)
-	textureHeightBox:SetPoint("TOPLEFT", textureHeightLbl, "BOTTOMLEFT", 4, -8)
+	textureHeightSlider:SetPoint("LEFT", textureWidthSlider, "RIGHT", horizontalSpacing, 0)
 
-	local textureRotLbl, textureRotBox = mini:CreateEditBox({
-		Parent = panel,
-		Numeric = true,
-		LabelText = "Rotation (degrees)",
-		EditBoxWidth = 50,
-		GetValue = function()
-			return tonumber(db.IconRotation) or dbDefaults.IconRotation
-		end,
-		SetValue = function(value)
-			if db.IconRotation == value then
-				return
-			end
-
-			db.IconRotation = mini:ClampInt(value, 0, 360, 0)
-			addon:Refresh()
-		end,
-	})
-
-	textureRotLbl:SetPoint("LEFT", textureHeightBox, "RIGHT", horizontalSpacing, textureHeightBox:GetHeight() + 4)
-	textureRotBox:SetPoint("TOPLEFT", textureRotLbl, "BOTTOMLEFT", 4, -8)
-
-	local offsetXLbl, offsetXBox = mini:CreateEditBox({
-		Parent = panel,
-		Numeric = true,
-		AllowNegatives = true,
+	local offsetXSlider, offsetXBox = mini:CreateSlider({
 		LabelText = "X Offset",
-		EditBoxWidth = 50,
+		Parent = panel,
+		Min = -200,
+		Max = 200,
+		Step = 5,
+		Width = 200,
 		GetValue = function()
 			return tonumber(db.OffsetX) or dbDefaults.OffsetX
 		end,
@@ -340,15 +323,15 @@ function M:Init()
 		end,
 	})
 
-	offsetXLbl:SetPoint("TOPLEFT", textureWidthBox, "BOTTOMLEFT", -4, -verticalSpacing)
-	offsetXBox:SetPoint("TOPLEFT", offsetXLbl, "BOTTOMLEFT", 4, -8)
+	offsetXSlider:SetPoint("TOPLEFT", textureWidthSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
-	local offsetYLbl, offsetYBox = mini:CreateEditBox({
+	local offsetYSlider, offsetYBox = mini:CreateSlider({
 		Parent = panel,
-		Numeric = true,
-		AllowNegatives = true,
+		Min = -200,
+		Max = 200,
+		Step = 5,
+		Width = 200,
 		LabelText = "Y Offset",
-		EditBoxWidth = 50,
 		GetValue = function()
 			return tonumber(db.OffsetY) or dbDefaults.OffsetY
 		end,
@@ -362,8 +345,29 @@ function M:Init()
 		end,
 	})
 
-	offsetYLbl:SetPoint("LEFT", offsetXBox, "RIGHT", horizontalSpacing, offsetXBox:GetHeight() + 4)
-	offsetYBox:SetPoint("TOPLEFT", offsetYLbl, "BOTTOMLEFT", 4, -8)
+	offsetYSlider:SetPoint("LEFT", offsetXSlider, "RIGHT", horizontalSpacing, 0)
+
+	local textureRotSlider, textureRotBox = mini:CreateSlider({
+		Parent = panel,
+		Min = 0,
+		Max = 360,
+		Step = 15,
+		Width = 200,
+		LabelText = "Rotation",
+		GetValue = function()
+			return tonumber(db.IconRotation) or dbDefaults.IconRotation
+		end,
+		SetValue = function(value)
+			if db.IconRotation == value then
+				return
+			end
+
+			db.IconRotation = mini:ClampInt(value, 0, 360, 0)
+			addon:Refresh()
+		end,
+	})
+
+	textureRotSlider:SetPoint("TOPLEFT", offsetXSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
 	local backgroundChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -378,15 +382,15 @@ function M:Init()
 		end,
 	})
 
-	backgroundChkBox:SetPoint("TOPLEFT", offsetXBox, "BOTTOMLEFT", -8, -verticalSpacing)
+	backgroundChkBox:SetPoint("TOPLEFT", textureRotSlider, "BOTTOMLEFT", 0, -verticalSpacing)
 
 	mini:WireTabNavigation({
 		textureBox,
 		textureWidthBox,
 		textureHeightBox,
-		textureRotBox,
 		offsetXBox,
 		offsetYBox,
+		textureRotBox,
 	})
 
 	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
