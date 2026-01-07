@@ -96,7 +96,12 @@ end
 
 local function GetTextureForUnit(unit)
 	if not UnitExists(unit) then
-		return false
+		return nil
+	end
+
+	if UnitIsUnit(unit, "player") then
+		-- prevent anchoring to the personal resource display
+		return nil
 	end
 
 	if db.FriendIconsEnabled and IsFriend(unit) then
@@ -124,11 +129,11 @@ local function GetTextureForUnit(unit)
 	end
 
 	if not UnitIsPlayer(unit) and not db.NpcsEnabled then
-		return
+		return nil
 	end
 
 	if IsPet(unit) and not db.PetsEnabled then
-		return
+		return nil
 	end
 
 	local pass = db.EveryoneEnabled
