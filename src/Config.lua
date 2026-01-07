@@ -79,13 +79,14 @@ function M:Init()
 	description:SetPoint("TOPLEFT", title, 0, -verticalSpacing)
 	description:SetText("Show markers above nameplates.")
 
-	local everyoneChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Everyone",
+	local everyoneChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Everyone",
 		Tooltip = "Show markers for everyone.",
-		Enabled = function()
+		GetValue = function()
 			return db.EveryoneEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.EveryoneEnabled = enabled
 			addon:Refresh()
 		end,
@@ -93,13 +94,14 @@ function M:Init()
 
 	everyoneChkBox:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
 
-	local groupChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Group",
+	local groupChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Group",
 		Tooltip = "Show markers for group members.",
-		Enabled = function()
+		GetValue = function()
 			return db.GroupEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.GroupEnabled = enabled
 			addon:Refresh()
 		end,
@@ -107,13 +109,14 @@ function M:Init()
 
 	groupChkBox:SetPoint("LEFT", everyoneChkBox, "RIGHT", checkboxWidth, 0)
 
-	local alliesChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Allies",
+	local alliesChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Allies",
 		Tooltip = "Show markers for friendly players.",
-		Enabled = function()
+		GetValue = function()
 			return db.AlliesEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.AlliesEnabled = enabled
 			addon:Refresh()
 		end,
@@ -121,13 +124,14 @@ function M:Init()
 
 	alliesChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", checkboxWidth, 0)
 
-	local enemiesChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Enemies",
+	local enemiesChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Enemies",
 		Tooltip = "Show markers for enemy players.",
-		Enabled = function()
+		GetValue = function()
 			return db.EnemiesEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.EnemiesEnabled = enabled
 			addon:Refresh()
 		end,
@@ -135,13 +139,14 @@ function M:Init()
 
 	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", checkboxWidth, 0)
 
-	local friendsChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Friends",
+	local friendsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Friends",
 		Tooltip = "Use a special icon for btag friends.",
-		Enabled = function()
+		GetValue = function()
 			return db.FriendIconsEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.FriendIconsEnabled = enabled
 			addon:Refresh()
 		end,
@@ -149,13 +154,14 @@ function M:Init()
 
 	friendsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -8)
 
-	local guildChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Guild",
+	local guildChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Guild",
 		Tooltip = "Use a special icon for guild members.",
-		Enabled = function()
+		GetValue = function()
 			return db.GuildEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.GuildEnabled = enabled
 			addon:Refresh()
 		end,
@@ -163,13 +169,14 @@ function M:Init()
 
 	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local npcsChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "NPCs",
+	local npcsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "NPCs",
 		Tooltip = "Show markers for NPCs.",
-		Enabled = function()
+		GetValue = function()
 			return db.NpcsEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.NpcsEnabled = enabled
 			addon:Refresh()
 		end,
@@ -180,13 +187,14 @@ function M:Init()
 	local classIconsChkBox
 	local textureIconsChkBox
 
-	classIconsChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Class Icons",
+	classIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Class Icons",
 		Tooltip = "Use special high quality class icons.",
-		Enabled = function()
+		GetValue = function()
 			return db.ClassIcons
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.ClassIcons = enabled
 			db.TextureIcons = not enabled
 
@@ -197,13 +205,14 @@ function M:Init()
 
 	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
 
-	textureIconsChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Texture Icons",
+	textureIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Texture Icons",
 		Tooltip = "Use the specified texture for icons.",
-		Enabled = function()
+		GetValue = function()
 			return db.TextureIcons
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.TextureIcons = enabled
 			db.ClassIcons = not enabled
 
@@ -214,13 +223,14 @@ function M:Init()
 
 	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local roleIconsChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Role Icons",
+	local roleIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Role Icons",
 		Tooltip = "Use tank/healer/dps role icons.",
-		Enabled = function()
+		GetValue = function()
 			return db.RoleIcons
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.RoleIcons = enabled
 			addon:Refresh()
 		end,
@@ -228,97 +238,141 @@ function M:Init()
 
 	roleIconsChkBox:SetPoint("LEFT", textureIconsChkBox, "RIGHT", checkboxWidth, 0)
 
-	local textureLbl, textureBox = mini:CreateEditBox(panel, false, "Texture", 400, function()
-		return db.IconTexture
-	end, function(value)
-		if db.IconTexture == value then
-			return
-		end
+	local textureLbl, textureBox = mini:CreateEditBox({
+		Parent = panel,
+		LabelText = "Texture",
+		EditBoxWidth = 400,
+		GetValue = function()
+			return db.IconTexture
+		end,
+		SetValue = function(value)
+			if db.IconTexture == value then
+				return
+			end
 
-		db.IconTexture = value
-		addon:Refresh()
-	end)
+			db.IconTexture = value
+			addon:Refresh()
+		end,
+	})
 
 	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 0, -verticalSpacing)
 	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 4, -8)
 
-	local textureWidthLbl, textureWidthBox = mini:CreateEditBox(panel, true, "Width", 50, function()
-		return tonumber(db.IconWidth)
-	end, function(value)
-		if db.IconWidth == value then
-			return
-		end
+	local textureWidthLbl, textureWidthBox = mini:CreateEditBox({
+		Parent = panel,
+		Numeric = true,
+		LabelText = "Width",
+		EditBoxWidth = 50,
+		GetValue = function()
+			return tonumber(db.IconWidth) or dbDefaults.IconWidth
+		end,
+		SetValue = function(value)
+			if db.IconWidth == value then
+				return
+			end
 
-		db.IconWidth = mini:ClampInt(value, 1, 500, dbDefaults.IconWidth)
-		addon:Refresh()
-	end)
+			db.IconWidth = mini:ClampInt(value, 1, 500, dbDefaults.IconWidth)
+			addon:Refresh()
+		end,
+	})
 
 	textureWidthLbl:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", -4, -verticalSpacing)
 	textureWidthBox:SetPoint("TOPLEFT", textureWidthLbl, "BOTTOMLEFT", 4, -8)
 
-	local textureHeightLbl, textureHeightBox = mini:CreateEditBox(panel, true, "Height", 50, function()
-		return tonumber(db.IconHeight)
-	end, function(value)
-		if db.IconHeight == value then
-			return
-		end
+	local textureHeightLbl, textureHeightBox = mini:CreateEditBox({
+		Parent = panel,
+		Numeric = true,
+		LabelText = "Height",
+		EditBoxWidth = 50,
+		GetValue = function()
+			return tonumber(db.IconHeight) or dbDefaults.IconHeight
+		end,
+		SetValue = function(value)
+			if db.IconHeight == value then
+				return
+			end
 
-		db.IconHeight = mini:ClampInt(value, 1, 500, dbDefaults.IconHeight)
-		addon:Refresh()
-	end)
+			db.IconHeight = mini:ClampInt(value, 1, 500, dbDefaults.IconHeight)
+			addon:Refresh()
+		end,
+	})
 
 	textureHeightLbl:SetPoint("LEFT", textureWidthBox, "RIGHT", horizontalSpacing, textureWidthBox:GetHeight() + 4)
 	textureHeightBox:SetPoint("TOPLEFT", textureHeightLbl, "BOTTOMLEFT", 4, -8)
 
-	local textureRotLbl, textureRotBox = mini:CreateEditBox(panel, true, "Rotation (degrees)", 50, function()
-		return tonumber(db.IconRotation)
-	end, function(value)
-		if db.IconRotation == value then
-			return
-		end
+	local textureRotLbl, textureRotBox = mini:CreateEditBox({
+		Parent = panel,
+		Numeric = true,
+		LabelText = "Rotation (degrees)",
+		EditBoxWidth = 50,
+		GetValue = function()
+			return tonumber(db.IconRotation) or dbDefaults.IconRotation
+		end,
+		SetValue = function(value)
+			if db.IconRotation == value then
+				return
+			end
 
-		db.IconRotation = mini:ClampInt(value, 0, 360, 0)
-		addon:Refresh()
-	end)
+			db.IconRotation = mini:ClampInt(value, 0, 360, 0)
+			addon:Refresh()
+		end,
+	})
 
 	textureRotLbl:SetPoint("LEFT", textureHeightBox, "RIGHT", horizontalSpacing, textureHeightBox:GetHeight() + 4)
 	textureRotBox:SetPoint("TOPLEFT", textureRotLbl, "BOTTOMLEFT", 4, -8)
 
-	local offsetXLbl, offsetXBox = mini:CreateEditBox(panel, true, "X Offset", 50, function()
-		return tonumber(db.OffsetX)
-	end, function(value)
-		if db.OffsetX == value then
-			return
-		end
+	local offsetXLbl, offsetXBox = mini:CreateEditBox({
+		Parent = panel,
+		Numeric = true,
+		AllowNegatives = true,
+		LabelText = "X Offset",
+		EditBoxWidth = 50,
+		GetValue = function()
+			return tonumber(db.OffsetX) or dbDefaults.OffsetX
+		end,
+		SetValue = function(value)
+			if db.OffsetX == value then
+				return
+			end
 
-		db.OffsetX = mini:ClampInt(value, -200, 200, 0)
-		addon:Refresh()
-	end)
+			db.OffsetX = mini:ClampInt(value, -200, 200, 0)
+			addon:Refresh()
+		end,
+	})
 
 	offsetXLbl:SetPoint("TOPLEFT", textureWidthBox, "BOTTOMLEFT", -4, -verticalSpacing)
 	offsetXBox:SetPoint("TOPLEFT", offsetXLbl, "BOTTOMLEFT", 4, -8)
 
-	local offsetYLbl, offsetYBox = mini:CreateEditBox(panel, true, "Y Offset", 50, function()
-		return tonumber(db.OffsetY)
-	end, function(value)
-		if db.OffsetY == value then
-			return
-		end
+	local offsetYLbl, offsetYBox = mini:CreateEditBox({
+		Parent = panel,
+		Numeric = true,
+		AllowNegatives = true,
+		LabelText = "Y Offset",
+		EditBoxWidth = 50,
+		GetValue = function()
+			return tonumber(db.OffsetY) or dbDefaults.OffsetY
+		end,
+		SetValue = function(value)
+			if db.OffsetY == value then
+				return
+			end
 
-		db.OffsetY = mini:ClampInt(value, -200, 200, 0)
-		addon:Refresh()
-	end)
+			db.OffsetY = mini:ClampInt(value, -200, 200, 0)
+			addon:Refresh()
+		end,
+	})
 
 	offsetYLbl:SetPoint("LEFT", offsetXBox, "RIGHT", horizontalSpacing, offsetXBox:GetHeight() + 4)
 	offsetYBox:SetPoint("TOPLEFT", offsetYLbl, "BOTTOMLEFT", 4, -8)
 
-	local backgroundChkBox = mini:CreateSettingCheckbox(panel, {
-		Name = "Background",
+	local backgroundChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Background",
 		Tooltip = "Add a background behind the icons. Only used for non-class icons.",
-		Enabled = function()
+		GetValue = function()
 			return db.BackgroundEnabled
 		end,
-		OnChanged = function(enabled)
+		SetValue = function(enabled)
 			db.BackgroundEnabled = enabled
 			addon:Refresh()
 		end,
