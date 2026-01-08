@@ -231,6 +231,21 @@ function M:Init()
 
 	specIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
 
+	local roleIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Role Icons",
+		Tooltip = "Use tank/healer/dps role icons.",
+		GetValue = function()
+			return db.RoleIcons
+		end,
+		SetValue = function(enabled)
+			db.RoleIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	roleIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", checkboxWidth, 0)
+
 	local textureIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Texture Icons",
@@ -245,22 +260,7 @@ function M:Init()
 		end,
 	})
 
-	textureIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", checkboxWidth, 0)
-
-	local roleIconsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Role Icons",
-		Tooltip = "Use tank/healer/dps role icons.",
-		GetValue = function()
-			return db.RoleIcons
-		end,
-		SetValue = function(enabled)
-			db.RoleIcons = enabled
-			addon:Refresh()
-		end,
-	})
-
-	roleIconsChkBox:SetPoint("LEFT", textureIconsChkBox, "RIGHT", checkboxWidth, 0)
+	textureIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", checkboxWidth, 0)
 
 	typeIcons = {
 		classIconsChkBox,
