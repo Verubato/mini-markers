@@ -4,6 +4,7 @@ local loaded = false
 local onLoadCallbacks = {}
 local dropDownId = 1
 local sliderId = 1
+local dialog
 
 ---@class MiniFramework
 local M = {}
@@ -58,6 +59,49 @@ local function ConfigureNumbericBox(box, allowNegative)
 
 		boxSelf:SetText(text)
 	end)
+end
+
+local function GetOrCreateDialog()
+	if dialog then
+		return dialog
+	end
+
+	dialog = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+	dialog:SetSize(360, 140)
+	dialog:SetFrameStrata("DIALOG")
+	dialog:SetClampedToScreen(true)
+	dialog:SetMovable(true)
+	dialog:EnableMouse(true)
+	dialog:RegisterForDrag("LeftButton")
+	dialog:SetScript("OnDragStart", dialog.StartMoving)
+	dialog:SetScript("OnDragStop", dialog.StopMovingOrSizing)
+	dialog:Hide()
+
+	dialog:SetBackdrop({
+		bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+		tile = true,
+		tileSize = 16,
+		edgeSize = 16,
+		insets = { left = 4, right = 4, top = 4, bottom = 4 },
+	})
+	dialog:SetBackdropColor(0, 0, 0, 0.9)
+
+	dialog.Text = dialog:CreateFontString(nil, "ARTWORK", "GameFontHighlightLarge")
+	dialog.Text:SetPoint("TOPLEFT", 12, -12)
+	dialog.Text:SetPoint("TOPRIGHT", -12, -12)
+	dialog.Text:SetJustifyH("LEFT")
+	dialog.Text:SetJustifyV("TOP")
+
+	dialog.CloseButton = CreateFrame("Button", nil, dialog, "UIPanelButtonTemplate")
+	dialog.CloseButton:SetSize(80, 22)
+	dialog.CloseButton:SetPoint("BOTTOM", 0, 12)
+	dialog.CloseButton:SetText(CLOSE)
+	dialog.CloseButton:SetScript("OnClick", function()
+		dialog:Hide()
+	end)
+
+	return dialog
 end
 
 function M:Notify(msg, ...)
@@ -489,6 +533,34 @@ function M:CreateSlider(options)
 	AddControlForRefresh(options.Parent, box)
 
 	return slider, box, label
+end
+
+---@param text string
+---@param width number?
+---@param height number?
+function M:ShowDialog(text, width, height)
+	local dlg = GetOrCreateDialog()
+
+	if width then
+		dlg:SetWidth(width)
+	end
+
+	if height then
+		dlg:SetHeight(height)
+	end
+
+	dlg.Text:SetText(text)
+
+	dlg:ClearAllPoints()
+	dlg:SetPoint("CENTER", UIParent, "CENTER")
+
+	dlg:Show()
+end
+
+function M:HideDialog()
+	if dialog then
+		dialog:Hide()
+	end
 end
 
 function M:RegisterSlashCommand(category, panel)

@@ -19,6 +19,7 @@ local dbDefaults = {
 	PetsEnabled = false,
 
 	ClassIcons = true,
+	SpecIcons = false,
 	TextureIcons = false,
 	RoleIcons = false,
 
@@ -184,10 +185,15 @@ function M:Init()
 
 	npcsChkBox:SetPoint("LEFT", guildChkBox, "RIGHT", checkboxWidth, 0)
 
-	local classIconsChkBox
-	local textureIconsChkBox
+	local typeIcons
 
-	classIconsChkBox = mini:CreateSettingCheckbox({
+	function RefreshTypes()
+		for _, type in ipairs(typeIcons) do
+			type:MiniRefresh()
+		end
+	end
+
+	local classIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Class Icons",
 		Tooltip = "Use special high quality class icons.",
@@ -196,16 +202,36 @@ function M:Init()
 		end,
 		SetValue = function(enabled)
 			db.ClassIcons = enabled
-			db.TextureIcons = not enabled
-
-			textureIconsChkBox:MiniRefresh()
+			RefreshTypes()
 			addon:Refresh()
 		end,
 	})
 
 	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
 
-	textureIconsChkBox = mini:CreateSettingCheckbox({
+	local specIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Spec Icons",
+		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
+		GetValue = function()
+			return db.SpecIcons
+		end,
+		SetValue = function(enabled)
+			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
+				mini:ShowDialog("Spec icons requires FrameSort 7.8.1+ to function.")
+				RefreshTypes()
+				return
+			end
+
+			db.SpecIcons = enabled
+			RefreshTypes()
+			addon:Refresh()
+		end,
+	})
+
+	specIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
+
+	local textureIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Texture Icons",
 		Tooltip = "Use the specified texture for icons.",
@@ -214,14 +240,12 @@ function M:Init()
 		end,
 		SetValue = function(enabled)
 			db.TextureIcons = enabled
-			db.ClassIcons = not enabled
-
-			classIconsChkBox:MiniRefresh()
+			RefreshTypes()
 			addon:Refresh()
 		end,
 	})
 
-	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
+	textureIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", checkboxWidth, 0)
 
 	local roleIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -237,6 +261,13 @@ function M:Init()
 	})
 
 	roleIconsChkBox:SetPoint("LEFT", textureIconsChkBox, "RIGHT", checkboxWidth, 0)
+
+	typeIcons = {
+		classIconsChkBox,
+		specIconsChkBox,
+		roleIconsChkBox,
+		textureIconsChkBox,
+	}
 
 	local textureBox, textureLbl = mini:CreateEditBox({
 		Parent = panel,
@@ -372,7 +403,7 @@ function M:Init()
 	local backgroundChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Background",
-		Tooltip = "Add a background behind the icons. Only used for non-class icons.",
+		Tooltip = "Add a background behind the icons. Only used for texture icons.",
 		GetValue = function()
 			return db.BackgroundEnabled
 		end,

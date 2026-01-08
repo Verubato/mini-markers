@@ -16,10 +16,6 @@ local bnCacheValid = false
 ---@field Background table
 
 local function IsUnitInMyGroup(unit)
-	if not UnitExists(unit) then
-		return false
-	end
-
 	return UnitIsUnit(unit, "player") or UnitInParty(unit) or UnitInRaid(unit)
 end
 
@@ -104,17 +100,23 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
+	if not UnitIsPlayer(unit) and not db.NpcsEnabled then
+		return nil
+	end
+
+	if IsPet(unit) and not db.PetsEnabled then
+		return nil
+	end
+
 	if db.FriendIconsEnabled and IsFriend(unit) then
-		if IsFriend(unit) then
-			return {
-				Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
-				-- force background, don't use config
-				BackgroundEnabled = true,
-				BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
-				Width = db.IconWidth or dbDefaults.IconWidth,
-				Height = db.IconHeight or dbDefaults.IconHeight,
-			}
-		end
+		return {
+			Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
+			-- force background, don't use config
+			BackgroundEnabled = true,
+			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+			Width = db.IconWidth or dbDefaults.IconWidth,
+			Height = db.IconHeight or dbDefaults.IconHeight,
+		}
 	end
 
 	if db.GuildEnabled and UnitIsInMyGuild(unit) then
@@ -126,14 +128,6 @@ local function GetTextureForUnit(unit)
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
 		}
-	end
-
-	if not UnitIsPlayer(unit) and not db.NpcsEnabled then
-		return nil
-	end
-
-	if IsPet(unit) and not db.PetsEnabled then
-		return nil
 	end
 
 	local pass = db.EveryoneEnabled
@@ -154,9 +148,38 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
-	-- prioritise role icons first
+	-- prioritise icons in this order: spec -> role -> class -> texture
+
+	local fs = FrameSortApi and FrameSortApi.v3
+	if db.SpecIcons and GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
+		local specId = fs.Inspector:GetUnitSpecId(unit)
+		if specId then
+			local _, _, _, icon = GetSpecializationInfoByID(specId)
+
+			if icon then
+				return {
+					Texture = icon,
+					BackgroundEnabled = db.BackgroundEnabled,
+					Width = db.IconWidth or dbDefaults.IconWidth,
+					Height = db.IconHeight or dbDefaults.IconHeight,
+				}
+			end
+		end
+	end
+
 	if db.RoleIcons then
-		local role = UnitGroupRolesAssigned(unit)
+		local role
+
+		if IsUnitInMyGroup(unit) then
+			role = UnitGroupRolesAssigned(unit)
+		elseif GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
+			local specId = fs.Inspector:GetUnitSpecId(unit)
+
+			if specId then
+				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
+				role = specRole
+			end
+		end
 
 		if role and role ~= "NONE" then
 			return {
@@ -172,7 +195,6 @@ local function GetTextureForUnit(unit)
 		end
 	end
 
-	-- then class/texture icons after
 	if db.ClassIcons then
 		local _, classFilename = UnitClass(unit)
 
@@ -356,8 +378,18 @@ local function OnEvent(_, event, unit)
 	end)
 end
 
+local function OnFrameSortInspect()
+	UpdateAllNameplates()
+end
+
 local function OnAddonLoaded()
 	addon.Config:Init()
+
+	local fs = FrameSortApi and FrameSortApi.v3
+
+	if fs and fs.Inspector and fs.Inspector.RegisterCallback then
+		fs.Inspector:RegisterCallback(OnFrameSortInspect)
+	end
 
 	db = MiniMarkersDB or {}
 
