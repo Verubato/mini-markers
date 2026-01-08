@@ -159,7 +159,6 @@ local function GetTextureForUnit(unit)
 			if icon then
 				return {
 					Texture = icon,
-					BackgroundEnabled = db.BackgroundEnabled,
 					Width = db.IconWidth or dbDefaults.IconWidth,
 					Height = db.IconHeight or dbDefaults.IconHeight,
 				}
