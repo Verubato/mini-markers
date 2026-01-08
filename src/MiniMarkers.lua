@@ -239,10 +239,9 @@ local function GetTextureForUnit(unit)
 		if classFilename then
 			return {
 				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
-				-- force background, don't use config
-				BackgroundEnabled = true,
-				BackgroundShape = backgroundCircle,
-				BackgroundPadding = CircleBackgroundPadding(iconWidth),
+				BackgroundEnabled = db.BackgroundEnabled,
+				BackgroundShape = backgroundSquare,
+				BackgroundPadding = SquareBackgroundPadding(iconWidth),
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
