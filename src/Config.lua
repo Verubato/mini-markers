@@ -317,10 +317,10 @@ function M:Init()
 	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 4, -verticalSpacing)
 	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 0, -8)
 
-	local textureWidthSlider, textureWidthBox = mini:CreateSlider({
+	local textureSizeSlider, textureSizeBox = mini:CreateSlider({
 		Parent = panel,
-		LabelText = "Width",
-		Min = 10,
+		LabelText = "Size",
+		Min = 20,
 		Max = 200,
 		Step = 5,
 		Width = 200,
@@ -328,38 +328,19 @@ function M:Init()
 			return tonumber(db.IconWidth) or dbDefaults.IconWidth
 		end,
 		SetValue = function(value)
-			if db.IconWidth == value then
+			local size = mini:ClampInt(value, 20, 200, dbDefaults.IconWidth)
+
+			if db.IconWidth == value and db.IconHeight == value then
 				return
 			end
 
-			db.IconWidth = mini:ClampInt(value, 10, 200, dbDefaults.IconWidth)
+			db.IconWidth = size
+			db.IconHeight = size
 			addon:Refresh()
 		end,
 	})
 
-	textureWidthSlider:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", 0, -verticalSpacing * 3)
-
-	local textureHeightSlider, textureHeightBox = mini:CreateSlider({
-		Parent = panel,
-		LabelText = "Height",
-		Min = 10,
-		Max = 200,
-		Step = 5,
-		Width = 200,
-		GetValue = function()
-			return tonumber(db.IconHeight) or dbDefaults.IconHeight
-		end,
-		SetValue = function(value)
-			if db.IconHeight == value then
-				return
-			end
-
-			db.IconHeight = mini:ClampInt(value, 10, 200, dbDefaults.IconHeight)
-			addon:Refresh()
-		end,
-	})
-
-	textureHeightSlider:SetPoint("LEFT", textureWidthSlider, "RIGHT", horizontalSpacing, 0)
+	textureSizeSlider:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
 	local offsetXSlider, offsetXBox = mini:CreateSlider({
 		LabelText = "X Offset",
@@ -381,7 +362,7 @@ function M:Init()
 		end,
 	})
 
-	offsetXSlider:SetPoint("TOPLEFT", textureWidthSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+	offsetXSlider:SetPoint("TOPLEFT", textureSizeSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
 	local offsetYSlider, offsetYBox = mini:CreateSlider({
 		Parent = panel,
@@ -444,8 +425,7 @@ function M:Init()
 
 	mini:WireTabNavigation({
 		textureBox,
-		textureWidthBox,
-		textureHeightBox,
+		textureSizeBox,
 		offsetXBox,
 		offsetYBox,
 		textureRotBox,
