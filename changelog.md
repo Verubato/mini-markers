@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.7.0
+
+Added spec icons feature. Note that it requires FrameSort 7.8.1+.
+
 ## 2.6.1
 
 Prevent anchoring to the personal resource display.

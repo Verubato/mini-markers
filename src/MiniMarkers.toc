@@ -2,8 +2,9 @@
 ## Title: MiniMarkers
 ## Notes: Creates markers above nameplates.
 ## Author: Verz
-## Version: 2.6.1
+## Version: 2.7.0
 ## SavedVariables: MiniMarkersDB
+## OptionalDeps: FrameSort
 ## IconTexture: Interface\AddOns\MiniMarkers\Icons\Addon.blp
 ## X-Curse-Project-ID: 1418841
 
