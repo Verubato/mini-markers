@@ -30,8 +30,8 @@ local dbDefaults = {
 	OffsetY = 0,
 
 	IconTexture = "covenantsanctum-renown-doublearrow-depressed",
-	IconWidth = 32,
-	IconHeight = 32,
+	IconWidth = 50,
+	IconHeight = 50,
 	IconRotation = 90,
 
 	IconClassColors = true,
