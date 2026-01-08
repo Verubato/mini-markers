@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.0
+
+Added pet icons feature.
+
 ## 2.7.0
 
 Added spec icons feature. Note that it requires FrameSort 7.8.1+.
