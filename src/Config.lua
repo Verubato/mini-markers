@@ -32,6 +32,7 @@ local dbDefaults = {
 	IconWidth = 32,
 	IconHeight = 32,
 	IconRotation = 90,
+	PetIconScale = 0.5,
 	IconClassColors = true,
 	IconDesaturated = true,
 	BackgroundEnabled = false,
@@ -40,6 +41,7 @@ local dbDefaults = {
 	FriendIconsEnabled = true,
 	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
 	GuildIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Guild.tga",
+	PetIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Pet.tga",
 }
 
 local M = {
@@ -184,6 +186,21 @@ function M:Init()
 	})
 
 	npcsChkBox:SetPoint("LEFT", guildChkBox, "RIGHT", checkboxWidth, 0)
+
+	local petsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Pets",
+		Tooltip = "Show markers for pets.",
+		GetValue = function()
+			return db.PetsEnabled
+		end,
+		SetValue = function(enabled)
+			db.PetsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	petsChkBox:SetPoint("LEFT", npcsChkBox, "RIGHT", checkboxWidth, 0)
 
 	local typeIcons
 

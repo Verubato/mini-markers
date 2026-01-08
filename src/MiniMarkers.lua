@@ -104,8 +104,21 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
-	if IsPet(unit) and not db.PetsEnabled then
-		return nil
+	if IsPet(unit) then
+		if not db.PetsEnabled then
+			return nil
+		end
+
+		local petScale = db.PetIconScale or dbDefaults.PetIconScale
+		return {
+			Texture = db.PetIconTexture or dbDefaults.PetIconTexture,
+			-- force background, don't use config
+			BackgroundEnabled = true,
+			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+			Width = (db.IconWidth or dbDefaults.IconWidth) * petScale,
+			Height = (db.IconHeight or dbDefaults.IconHeight) * petScale,
+			Color = db.IconClassColors and GetClassColor(unit) or nil,
+		}
 	end
 
 	if db.FriendIconsEnabled and IsFriend(unit) then
