@@ -141,15 +141,15 @@ local function GetTextureForUnit(unit)
 	local pass = db.EveryoneEnabled
 
 	if db.EnemiesEnabled then
-		pass = pass or UnitIsEnemy("player", unit)
+		pass = pass or (UnitIsPlayer(unit) and UnitIsEnemy("player", unit))
 	end
 
 	if db.AlliesEnabled then
-		pass = pass or UnitIsFriend("player", unit)
+		pass = pass or (UnitIsPlayer(unit) and UnitIsFriend("player", unit))
 	end
 
 	if db.GroupEnabled then
-		pass = pass or IsUnitInMyGroup(unit)
+		pass = pass or (UnitIsPlayer(unit) and IsUnitInMyGroup(unit))
 	end
 
 	if db.NpcsEnabled then
