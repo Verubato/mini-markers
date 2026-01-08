@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.9.0
+
+- Added high quality spec icons.
+- Collapsed width+height slider into single size slider.
+- Some background fixes.
+
 ## 2.8.2
 
 Fixed NPCs getting markers when they shouldn't.
