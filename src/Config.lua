@@ -8,7 +8,7 @@ local checkboxWidth = 100
 local db
 ---@class Db
 local dbDefaults = {
-	Version = 3,
+	Version = 4,
 
 	EveryoneEnabled = false,
 	GroupEnabled = true,
@@ -17,6 +17,7 @@ local dbDefaults = {
 	GuildEnabled = true,
 	NpcsEnabled = false,
 	PetsEnabled = false,
+	FriendsEnabled = true,
 
 	ClassIcons = true,
 	SpecIcons = false,
@@ -32,15 +33,16 @@ local dbDefaults = {
 	IconWidth = 32,
 	IconHeight = 32,
 	IconRotation = 90,
-	PetIconScale = 0.5,
+
 	IconClassColors = true,
 	IconDesaturated = true,
-	BackgroundEnabled = false,
+	BackgroundEnabled = true,
 
-	FriendIconsEnabled = true,
 	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
 	GuildIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Guild.tga",
 	PetIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Pet.tga",
+
+	PetIconScale = 0.5,
 }
 
 local M = {
@@ -58,6 +60,10 @@ local function GetAndUpgradeDb()
 	elseif vars.Version == 2 then
 		vars.BackgroundPadding = nil
 		vars.Version = 3
+	elseif vars.Version == 3 then
+		vars.FriendsEnabled = vars.FriendIconsEnabled
+		vars.FriendIconsEnabled = nil
+		vars.Version = 4
 	end
 
 	return vars
@@ -149,10 +155,10 @@ function M:Init()
 		LabelText = "Friends",
 		Tooltip = "Use a special icon for btag friends.",
 		GetValue = function()
-			return db.FriendIconsEnabled
+			return db.FriendsEnabled
 		end,
 		SetValue = function(enabled)
-			db.FriendIconsEnabled = enabled
+			db.FriendsEnabled = enabled
 			addon:Refresh()
 		end,
 	})
@@ -422,7 +428,7 @@ function M:Init()
 	local backgroundChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Background",
-		Tooltip = "Add a background behind the icons. Only used for texture icons.",
+		Tooltip = "Add a background behind the icons. Doesn't apply for class icons.",
 		GetValue = function()
 			return db.BackgroundEnabled
 		end,
