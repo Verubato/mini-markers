@@ -8,7 +8,7 @@ local checkboxWidth = 100
 local db
 ---@class Db
 local dbDefaults = {
-	Version = 4,
+	Version = 5,
 
 	EveryoneEnabled = false,
 	GroupEnabled = true,
@@ -38,10 +38,6 @@ local dbDefaults = {
 	IconDesaturated = true,
 	BackgroundEnabled = true,
 
-	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
-	GuildIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Guild.tga",
-	PetIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Pet.tga",
-
 	PetIconScale = 0.5,
 }
 
@@ -52,18 +48,24 @@ addon.Config = M
 
 local function GetAndUpgradeDb()
 	local vars = mini:GetSavedVars(dbDefaults)
-
-	if not vars.Version or vars.Version == 1 then
-		-- sorry folks, you'll have to reconfigure
-		-- made some breaking changes from v1 to 2
-		vars = mini:ResetSavedVars(dbDefaults)
-	elseif vars.Version == 2 then
-		vars.BackgroundPadding = nil
-		vars.Version = 3
-	elseif vars.Version == 3 then
-		vars.FriendsEnabled = vars.FriendIconsEnabled
-		vars.FriendIconsEnabled = nil
-		vars.Version = 4
+	while vars.Version ~= dbDefaults.Version do
+		if not vars.Version or vars.Version == 1 then
+			-- sorry folks, you'll have to reconfigure
+			-- made some breaking changes from v1 to 2
+			vars = mini:ResetSavedVars(dbDefaults)
+		elseif vars.Version == 2 then
+			vars.BackgroundPadding = nil
+			vars.Version = 3
+		elseif vars.Version == 3 then
+			vars.FriendsEnabled = vars.FriendIconsEnabled
+			vars.FriendIconsEnabled = nil
+			vars.Version = 4
+		elseif vars.Version == 4 then
+			vars.FriendIconTexture = nil
+			vars.GuildIconTexture = nil
+			vars.PetIconTexture = nil
+			vars.Version = 5
+		end
 	end
 
 	return vars

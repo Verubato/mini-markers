@@ -11,7 +11,10 @@ local bnFriendCache = {}
 local bnCacheValid = false
 local backgroundCircle = 1
 local backgroundSquare = 2
-local texturesRoot = "Interface\\AddOns\\" .. addonName .. "\\Icons\\"
+local texturesRoot = "Interface\\AddOns\\" .. addonName .. "\\Textures\\"
+local friendIconTexture = texturesRoot .. "Friend.tga"
+local guildIconTexture = texturesRoot .. "Guild.tga"
+local petIconTexture = texturesRoot .. "Pet.tga"
 
 ---@class Marker
 ---@field WithColor table
@@ -121,7 +124,7 @@ local function GetTextureForUnit(unit)
 
 		local petScale = db.PetIconScale or dbDefaults.PetIconScale
 		return {
-			Texture = db.PetIconTexture or dbDefaults.PetIconTexture,
+			Texture = petIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = CircleBackgroundPadding(iconWidth * petScale),
@@ -133,7 +136,7 @@ local function GetTextureForUnit(unit)
 
 	if db.FriendsEnabled and IsFriend(unit) then
 		return {
-			Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
+			Texture = friendIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = CircleBackgroundPadding(iconWidth),
@@ -144,7 +147,7 @@ local function GetTextureForUnit(unit)
 
 	if db.GuildEnabled and UnitIsInMyGuild(unit) then
 		return {
-			Texture = db.GuildIconTexture or dbDefaults.GuildIconTexture,
+			Texture = guildIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = CircleBackgroundPadding(iconWidth),
