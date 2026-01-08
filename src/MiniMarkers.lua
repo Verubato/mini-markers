@@ -176,17 +176,17 @@ local function GetTextureForUnit(unit)
 		local specId = fs.Inspector:GetUnitSpecId(unit)
 		if specId then
 			local _, _, _, icon = GetSpecializationInfoByID(specId)
+			local texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Specs\\" .. specId .. ".tga"
 
-			if icon then
-				return {
-					Texture = icon,
-					BackgroundEnabled = db.BackgroundEnabled,
-					BackgroundShape = backgroundSquare,
-					BackgroundPadding = 5,
-					Width = db.IconWidth or dbDefaults.IconWidth,
-					Height = db.IconHeight or dbDefaults.IconHeight,
-				}
-			end
+			return {
+				Texture = texture,
+				FallbackTexture = icon,
+				BackgroundEnabled = db.BackgroundEnabled,
+				BackgroundShape = backgroundSquare,
+				BackgroundPadding = 5,
+				Width = db.IconWidth or dbDefaults.IconWidth,
+				Height = db.IconHeight or dbDefaults.IconHeight,
+			}
 		end
 	end
 
@@ -287,7 +287,7 @@ local function GetOrCreateMarker(nameplate)
 	bg.Circle:AddMaskTexture(circleMask)
 
 	local squareMask = nameplate:CreateMaskTexture()
-	squareMask:SetTexture("Interface\\Addons\\WHITE8x8", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
+	squareMask:SetTexture("Interface\\AddOns\\" .. addonName .. "\\Icons\\Masks\\White128x128.tga", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
 	squareMask:SetAllPoints(bg.Square)
 
 	bg.Square:AddMaskTexture(squareMask)
@@ -364,6 +364,10 @@ local function AddMarker(unit, nameplate)
 			texture:SetAtlas(name, false)
 		else
 			texture:SetTexture(name)
+
+			if not texture:GetTexture() and options.FallbackTexture then
+				texture:SetTexture(options.FallbackTexture)
+			end
 		end
 	end
 
