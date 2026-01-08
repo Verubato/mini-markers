@@ -109,7 +109,7 @@ local function GetTextureForUnit(unit)
 		return {
 			Texture = db.PetIconTexture or dbDefaults.PetIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
-			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+			BackgroundPadding = 5,
 			Width = (db.IconWidth or dbDefaults.IconWidth) * petScale,
 			Height = (db.IconHeight or dbDefaults.IconHeight) * petScale,
 			Color = db.IconClassColors and GetClassColor(unit) or nil,
@@ -121,7 +121,7 @@ local function GetTextureForUnit(unit)
 			Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
 			-- force background, don't use config
 			BackgroundEnabled = true,
-			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+			BackgroundPadding = 5,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
 		}
@@ -132,7 +132,7 @@ local function GetTextureForUnit(unit)
 			Texture = db.GuildIconTexture or dbDefaults.GuildIconTexture,
 			-- force background, don't use config
 			BackgroundEnabled = true,
-			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+			BackgroundPadding = 5,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
 		}
@@ -203,7 +203,7 @@ local function GetTextureForUnit(unit)
 				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Roles\\" .. role .. ".tga",
 				-- force background, don't use config
 				BackgroundEnabled = true,
-				BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+				BackgroundPadding = 5,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 				Color = db.IconClassColors and GetClassColor(unit) or nil,
@@ -220,7 +220,7 @@ local function GetTextureForUnit(unit)
 				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Classes\\" .. classFilename .. ".tga",
 				-- force background, don't use config
 				BackgroundEnabled = true,
-				BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
+				BackgroundPadding = 8,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
@@ -231,6 +231,7 @@ local function GetTextureForUnit(unit)
 		return {
 			Texture = db.IconTexture or dbDefaults.IconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
+			BackgroundPadding = 5,
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,

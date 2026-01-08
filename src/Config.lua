@@ -8,7 +8,7 @@ local checkboxWidth = 100
 local db
 ---@class Db
 local dbDefaults = {
-	Version = 2,
+	Version = 3,
 
 	EveryoneEnabled = false,
 	GroupEnabled = true,
@@ -36,7 +36,6 @@ local dbDefaults = {
 	IconClassColors = true,
 	IconDesaturated = true,
 	BackgroundEnabled = false,
-	BackgroundPadding = 10,
 
 	FriendIconsEnabled = true,
 	FriendIconTexture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Friend.tga",
@@ -56,6 +55,9 @@ local function GetAndUpgradeDb()
 		-- sorry folks, you'll have to reconfigure
 		-- made some breaking changes from v1 to 2
 		vars = mini:ResetSavedVars(dbDefaults)
+	elseif vars.Version == 2 then
+		vars.BackgroundPadding = nil
+		vars.Version = 3
 	end
 
 	return vars
