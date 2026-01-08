@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.2
+
+Fixed NPCs getting markers when they shouldn't.
+
 ## 2.8.1
 
 Show icon logic fixes.
