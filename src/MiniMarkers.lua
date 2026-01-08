@@ -100,20 +100,15 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
-	if not UnitIsPlayer(unit) and not db.NpcsEnabled then
-		return nil
-	end
-
 	if IsPet(unit) then
-		if not db.PetsEnabled then
+		if not db.PetsEnabled and not db.EveryoneEnabled then
 			return nil
 		end
 
 		local petScale = db.PetIconScale or dbDefaults.PetIconScale
 		return {
 			Texture = db.PetIconTexture or dbDefaults.PetIconTexture,
-			-- force background, don't use config
-			BackgroundEnabled = true,
+			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundPadding = db.BackgroundPadding or dbDefaults.BackgroundPadding,
 			Width = (db.IconWidth or dbDefaults.IconWidth) * petScale,
 			Height = (db.IconHeight or dbDefaults.IconHeight) * petScale,
@@ -145,16 +140,20 @@ local function GetTextureForUnit(unit)
 
 	local pass = db.EveryoneEnabled
 
-	if UnitIsEnemy("player", unit) then
-		pass = pass or db.EnemiesEnabled
+	if db.EnemiesEnabled then
+		pass = pass or UnitIsEnemy("player", unit)
 	end
 
-	if not pass and UnitIsFriend("player", unit) then
-		pass = pass or db.AlliesEnabled
+	if db.AlliesEnabled then
+		pass = pass or UnitIsFriend("player", unit)
 	end
 
-	if not pass and db.GroupEnabled then
+	if db.GroupEnabled then
 		pass = pass or IsUnitInMyGroup(unit)
+	end
+
+	if db.NpcsEnabled then
+		pass = pass or not UnitIsPlayer(unit)
 	end
 
 	if not pass then
@@ -162,9 +161,15 @@ local function GetTextureForUnit(unit)
 	end
 
 	-- prioritise icons in this order: spec -> role -> class -> texture
-
 	local fs = FrameSortApi and FrameSortApi.v3
-	if db.SpecIcons and GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
+	if
+		UnitIsPlayer(unit)
+		and db.SpecIcons
+		and GetSpecializationInfoByID
+		and fs
+		and fs.Inspector
+		and fs.Inspector.GetUnitSpecId
+	then
 		local specId = fs.Inspector:GetUnitSpecId(unit)
 		if specId then
 			local _, _, _, icon = GetSpecializationInfoByID(specId)
