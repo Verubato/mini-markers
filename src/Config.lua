@@ -27,7 +27,7 @@ local dbDefaults = {
 	EnableDistanceFading = false,
 
 	OffsetX = 0,
-	OffsetY = 0,
+	OffsetY = 20,
 
 	IconTexture = "covenantsanctum-renown-doublearrow-depressed",
 	IconWidth = 50,
