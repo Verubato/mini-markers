@@ -11,6 +11,7 @@ local bnFriendCache = {}
 local bnCacheValid = false
 local backgroundCircle = 1
 local backgroundSquare = 2
+local texturesRoot = "Interface\\AddOns\\" .. addonName .. "\\Icons\\"
 
 ---@class Marker
 ---@field WithColor table
@@ -81,6 +82,14 @@ local function IsPet(unit)
 	return false
 end
 
+local function CircleBackgroundPadding(width)
+	return (width / 10) + 10
+end
+
+local function SquareBackgroundPadding(width)
+	return (width / 10)
+end
+
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
@@ -102,6 +111,9 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
+	local iconWidth = db.IconWidth or dbDefaults.IconWidth
+	local iconHeight = db.IconHeight or dbDefaults.IconHeight
+
 	if IsPet(unit) then
 		if not db.PetsEnabled and not db.EveryoneEnabled then
 			return nil
@@ -112,9 +124,9 @@ local function GetTextureForUnit(unit)
 			Texture = db.PetIconTexture or dbDefaults.PetIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = 5,
-			Width = (db.IconWidth or dbDefaults.IconWidth) * petScale,
-			Height = (db.IconHeight or dbDefaults.IconHeight) * petScale,
+			BackgroundPadding = CircleBackgroundPadding(iconWidth * petScale),
+			Width = iconWidth * petScale,
+			Height = iconHeight * petScale,
 			Color = db.IconClassColors and GetClassColor(unit) or nil,
 		}
 	end
@@ -124,9 +136,9 @@ local function GetTextureForUnit(unit)
 			Texture = db.FriendIconTexture or dbDefaults.FriendIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = 5,
-			Width = db.IconWidth or dbDefaults.IconWidth,
-			Height = db.IconHeight or dbDefaults.IconHeight,
+			BackgroundPadding = CircleBackgroundPadding(iconWidth),
+			Width = iconWidth,
+			Height = iconHeight,
 		}
 	end
 
@@ -135,9 +147,9 @@ local function GetTextureForUnit(unit)
 			Texture = db.GuildIconTexture or dbDefaults.GuildIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = 5,
-			Width = db.IconWidth or dbDefaults.IconWidth,
-			Height = db.IconHeight or dbDefaults.IconHeight,
+			BackgroundPadding = CircleBackgroundPadding(iconWidth),
+			Width = iconWidth,
+			Height = iconHeight,
 		}
 	end
 
@@ -176,14 +188,14 @@ local function GetTextureForUnit(unit)
 		local specId = fs.Inspector:GetUnitSpecId(unit)
 		if specId then
 			local _, _, _, icon = GetSpecializationInfoByID(specId)
-			local texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Specs\\" .. specId .. ".tga"
+			local texture = texturesRoot .. "Specs\\" .. specId .. ".tga"
 
 			return {
 				Texture = texture,
 				FallbackTexture = icon,
 				BackgroundEnabled = db.BackgroundEnabled,
 				BackgroundShape = backgroundSquare,
-				BackgroundPadding = 5,
+				BackgroundPadding = SquareBackgroundPadding(iconWidth),
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
@@ -206,12 +218,12 @@ local function GetTextureForUnit(unit)
 
 		if role and role ~= "NONE" then
 			return {
-				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Roles\\" .. role .. ".tga",
+				Texture = texturesRoot .. "Roles\\" .. role .. ".tga",
 				BackgroundEnabled = db.BackgroundEnabled,
 				BackgroundShape = backgroundCircle,
-				BackgroundPadding = 5,
-				Width = db.IconWidth or dbDefaults.IconWidth,
-				Height = db.IconHeight or dbDefaults.IconHeight,
+				BackgroundPadding = CircleBackgroundPadding(iconWidth),
+				Width = iconWidth,
+				Height = iconHeight,
 				Color = db.IconClassColors and GetClassColor(unit) or nil,
 				Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
 			}
@@ -223,11 +235,11 @@ local function GetTextureForUnit(unit)
 
 		if classFilename then
 			return {
-				Texture = "Interface\\AddOns\\" .. addonName .. "\\Icons\\Classes\\" .. classFilename .. ".tga",
+				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
 				-- force background, don't use config
 				BackgroundEnabled = true,
 				BackgroundShape = backgroundCircle,
-				BackgroundPadding = 8,
+				BackgroundPadding = CircleBackgroundPadding(iconWidth),
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
@@ -239,7 +251,7 @@ local function GetTextureForUnit(unit)
 			Texture = db.IconTexture or dbDefaults.IconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = 5,
+			BackgroundPadding = CircleBackgroundPadding(iconWidth),
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
@@ -277,20 +289,16 @@ local function GetOrCreateMarker(nameplate)
 
 	local bg = marker.Background
 
-	bg.Circle:SetColorTexture(0, 0, 0, 1)
+	local squareTexture = nameplate:CreateMaskTexture()
+	squareTexture:SetTexture(texturesRoot .. "Shapes\\White128x128.tga")
+	squareTexture:SetAllPoints(bg.Square)
+
+	bg.Square:AddMaskTexture(squareTexture)
 	bg.Square:SetColorTexture(0, 0, 0, 1)
 
-	local circleMask = nameplate:CreateMaskTexture()
-	circleMask:SetTexture("Interface\\Minimap\\UI-Minimap-Background", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-	circleMask:SetAllPoints(bg.Circle)
-
-	bg.Circle:AddMaskTexture(circleMask)
-
-	local squareMask = nameplate:CreateMaskTexture()
-	squareMask:SetTexture("Interface\\AddOns\\" .. addonName .. "\\Icons\\Masks\\White128x128.tga", "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-	squareMask:SetAllPoints(bg.Square)
-
-	bg.Square:AddMaskTexture(squareMask)
+	-- don't use masks for circles as they don't scale properly at different sizes
+	bg.Circle:SetTexture(texturesRoot .. "Shapes\\Circle128x128.tga")
+	bg.Circle:SetVertexColor(0, 0, 0, 1)
 
 	marker.WithColor:SetIgnoreParentAlpha(ignoreAlpha)
 	marker.WithoutColor:SetIgnoreParentAlpha(ignoreAlpha)
@@ -316,6 +324,19 @@ local function HideMarkerBackground(marker)
 	if marker.Background.Square then
 		marker.Background.Square:Hide()
 	end
+end
+
+local function ApplyBackground(bg, texture, padding)
+	padding = padding or 0
+
+	local w, h = texture:GetSize()
+	local size = math.max(w, h) + padding * 2
+	size = math.floor(size + 0.5)
+
+	bg:ClearAllPoints()
+	bg:SetPoint("CENTER", texture, "CENTER")
+	bg:SetSize(size, size)
+	bg:Show()
 end
 
 local function HideMarker(nameplate)
@@ -379,6 +400,11 @@ local function AddMarker(unit, nameplate)
 		texture:SetVertexColor(options.Color.R, options.Color.G, options.Color.B, options.Color.A)
 	end
 
+	local anchor = GetNameplateAnchor(nameplate)
+	texture:ClearAllPoints()
+	texture:SetPoint("BOTTOM", anchor, "TOP", tonumber(db.OffsetX) or 0, tonumber(db.OffsetY) or 0)
+	texture:Show()
+
 	if options.BackgroundEnabled then
 		local padding = options.BackgroundPadding or 0
 		local bg
@@ -392,20 +418,11 @@ local function AddMarker(unit, nameplate)
 		HideMarkerBackground(marker)
 
 		if bg then
-			bg:ClearAllPoints()
-			bg:SetPoint("TOPLEFT", texture, "TOPLEFT", -padding, padding)
-			bg:SetPoint("BOTTOMRIGHT", texture, "BOTTOMRIGHT", padding, -padding)
-			bg:Show()
+			ApplyBackground(bg, texture, padding)
 		end
 	else
 		HideMarkerBackground(marker)
 	end
-
-	local anchor = GetNameplateAnchor(nameplate)
-
-	texture:ClearAllPoints()
-	texture:SetPoint("BOTTOM", anchor, "TOP", tonumber(db.OffsetX) or 0, tonumber(db.OffsetY) or 0)
-	texture:Show()
 end
 
 local function UpdateAllNameplates()
