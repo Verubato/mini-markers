@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.9.1
+
+Fixed addon icon path.
+
 ## 2.9.0
 
 - Added high quality spec icons.
