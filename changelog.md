@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.1
+
+Show icon logic fixes.
+
 ## 2.8.0
 
 Added pet icons feature.
