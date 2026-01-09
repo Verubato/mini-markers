@@ -5,7 +5,7 @@ local verticalSpacing = 14
 local horizontalSpacing = 20
 ---@class Db
 local dbDefaults = {
-	Version = 6,
+	Version = 7,
 
 	EveryoneEnabled = false,
 	GroupEnabled = true,
@@ -38,19 +38,21 @@ local dbDefaults = {
 
 	EnableDistanceFading = false,
 
+	IconWidth = 50,
+	IconHeight = 50,
+
 	OffsetX = 0,
 	OffsetY = 20,
 
-	BackgroundPadding = 10,
-
 	IconTexture = "covenantsanctum-renown-doublearrow-depressed",
-	IconWidth = 50,
-	IconHeight = 50,
 	IconRotation = 90,
 
 	IconClassColors = true,
 	IconDesaturated = true,
-	BackgroundEnabled = true,
+
+	FriendlyBackgroundEnabled = true,
+	EnemyBackgroundEnabled = true,
+	BackgroundPadding = 6,
 
 	PetIconScale = 0.5,
 }
@@ -115,6 +117,12 @@ local function GetAndUpgradeDb()
 			vars.RoleIcons = nil
 
 			vars.Version = 6
+		elseif vars.Version == 6 then
+			vars.FriendlBackgroundEnabled = vars.BackgroundEnabled
+			vars.EnemyBackgroundEnabled = vars.BackgroundEnabled
+			vars.BackgroundEnabled = nil
+
+			vars.Version = 7
 		end
 	end
 

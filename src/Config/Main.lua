@@ -282,21 +282,36 @@ function M:Build()
 	sizeDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	sizeDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local backgroundChkBox = mini:CreateSettingCheckbox({
+	local friendlyBgChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
-		LabelText = "Background",
-		Tooltip = "Add a background behind the icons.",
+		LabelText = "Friendly Background",
+		Tooltip = "Add a background behind friendly icons.",
 		GetValue = function()
-			return db.BackgroundEnabled
+			return db.FriendlyBackgroundEnabled
 		end,
 		SetValue = function(enabled)
-			db.BackgroundEnabled = enabled
+			db.FriendlyBackgroundEnabled = enabled
 			addon:Refresh()
 		end,
 	})
 
-	backgroundChkBox:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	backgroundChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+	friendlyBgChkBox:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	friendlyBgChkBox:SetPoint("LEFT", panel, "LEFT", columnStep, 0)
+
+	local enemyBgChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Enemy Background",
+		Tooltip = "Add a background behind enemy icons.",
+		GetValue = function()
+			return db.EnemyBackgroundEnabled
+		end,
+		SetValue = function(enabled)
+			db.EnemyBackgroundEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyBgChkBox:SetPoint("LEFT", friendlyBgChkBox, "RIGHT", columnStep * 2, 0)
 
 	-- not sure why it needs horizontalSpacing / 2, would have thought just horizontalSpacing itself should do it
 	local sliderWidth = (usableWidth / 2) - horizontalSpacing / 2
@@ -323,7 +338,7 @@ function M:Build()
 		end,
 	})
 
-	sizeSlider:SetPoint("TOP", backgroundChkBox, "BOTTOM", 0, -verticalSpacing * 3)
+	sizeSlider:SetPoint("TOP", friendlyBgChkBox, "BOTTOM", 0, -verticalSpacing * 3)
 	sizeSlider:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local backgroundPaddingSlider, backgroundPaddingBox = mini:CreateSlider({

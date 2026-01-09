@@ -211,7 +211,7 @@ local function GetTextureForUnit(unit)
 		local petScale = db.PetIconScale or dbDefaults.PetIconScale
 		return {
 			Texture = petIconTexture,
-			BackgroundEnabled = db.BackgroundEnabled,
+			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = db.BackgroundPadding,
 			Width = iconWidth * petScale,
@@ -223,7 +223,7 @@ local function GetTextureForUnit(unit)
 	if db.FriendsEnabled and IsFriend(unit) then
 		return {
 			Texture = friendIconTexture,
-			BackgroundEnabled = db.BackgroundEnabled,
+			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = db.BackgroundPadding,
 			Width = iconWidth,
@@ -234,7 +234,7 @@ local function GetTextureForUnit(unit)
 	if db.GuildEnabled and UnitIsInMyGuild(unit) then
 		return {
 			Texture = guildIconTexture,
-			BackgroundEnabled = db.BackgroundEnabled,
+			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = db.BackgroundPadding,
 			Width = iconWidth,
@@ -246,7 +246,14 @@ local function GetTextureForUnit(unit)
 	local isPlayer = UnitIsPlayer(unit)
 	local isFriendly = UnitIsFriend("player", unit)
 	local isEnemy = UnitIsEnemy("player", unit)
+
+	-- treat neutrals as friendly
+	if not isFriendly and not isEnemy then
+		isFriendly = true
+	end
+
 	local pass = db.EveryoneEnabled
+	local backgroundEnabled = (isFriendly and db.FriendlyBackgroundEnabled) or (isEnemy and db.EnemyBackgroundEnabled)
 
 	if db.EnemiesEnabled then
 		pass = pass or (isPlayer and isEnemy)
@@ -304,7 +311,7 @@ local function GetTextureForUnit(unit)
 			return {
 				Texture = texture,
 				FallbackTexture = icon,
-				BackgroundEnabled = db.BackgroundEnabled,
+				BackgroundEnabled = backgroundEnabled,
 				BackgroundShape = backgroundSquare,
 				BackgroundPadding = db.BackgroundPadding,
 				Width = db.IconWidth or dbDefaults.IconWidth,
@@ -331,7 +338,7 @@ local function GetTextureForUnit(unit)
 		if role and role ~= "NONE" then
 			return {
 				Texture = texturesRoot .. "Roles\\" .. role .. ".tga",
-				BackgroundEnabled = db.BackgroundEnabled,
+				BackgroundEnabled = backgroundEnabled,
 				BackgroundShape = backgroundCircle,
 				BackgroundPadding = db.BackgroundPadding,
 				Width = iconWidth,
@@ -348,7 +355,7 @@ local function GetTextureForUnit(unit)
 		if classFilename then
 			return {
 				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
-				BackgroundEnabled = db.BackgroundEnabled,
+				BackgroundEnabled = backgroundEnabled,
 				BackgroundShape = backgroundSquare,
 				BackgroundPadding = db.BackgroundPadding,
 				Width = db.IconWidth or dbDefaults.IconWidth,
@@ -360,7 +367,7 @@ local function GetTextureForUnit(unit)
 	if (isFriendly and db.FriendlyTextureIcons) or (isEnemy and db.EnemyTextureIcons) then
 		return {
 			Texture = db.IconTexture or dbDefaults.IconTexture,
-			BackgroundEnabled = db.BackgroundEnabled,
+			BackgroundEnabled = backgroundEnabled,
 			BackgroundShape = backgroundCircle,
 			BackgroundPadding = db.BackgroundPadding,
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
