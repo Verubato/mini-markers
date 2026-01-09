@@ -33,6 +33,14 @@ local function NormalizeRealm(realm)
 	return realm
 end
 
+local function IsSecret(value)
+	if not issecretvalue then
+		return false
+	end
+
+	return issercretvalue(value)
+end
+
 local function BnKey(name, realm)
 	return name .. "-" .. NormalizeRealm(realm)
 end
@@ -144,6 +152,44 @@ local function GetNameplateAnchor(nameplate)
 	return nameplate.UnitFrame:IsVisible() and nameplate.UnitFrame or nameplate
 end
 
+-- FrameSort 7.8.2 does this, but previous version didn't
+-- so let's do it here manually for a few weeks then remove it
+local function ResolveUnit(unit)
+	if not string.find(unit, "nameplate") then
+		return unit
+	end
+
+	local _, instanceType = IsInInstance()
+
+	if instanceType ~= "arena" then
+		return unit
+	end
+
+	local count = GetNumArenaOpponentSpecs()
+
+	if count <= 0 then
+		return unit
+	end
+
+	for i = 1, count do
+		local resolvedUnit = "arena" .. i
+		local resolvedPetUnit = "arena" .. i
+		local isUnit = UnitIsUnit(unit, resolvedUnit)
+
+		if not IsSecret(isUnit) and isUnit then
+			return resolvedUnit
+		end
+
+		local isPetUnit = UnitIsUnit(unit, resolvedPetUnit)
+
+		if not IsSecret(isPetUnit) and isPetUnit then
+			return resolvedUnit
+		end
+	end
+
+	return unit
+end
+
 local function GetTextureForUnit(unit)
 	if not UnitExists(unit) then
 		return nil
@@ -241,14 +287,16 @@ local function GetTextureForUnit(unit)
 
 	-- prioritise icons in this order: spec -> role -> class -> texture
 	if
-		UnitIsPlayer(unit)
+		isPlayer
 		and GetSpecializationInfoByID
 		and ((isFriendly and db.FriendlySpecIcons) or (isEnemy and db.EnemySpecIcons))
 		and fs
 		and fs.Inspector
 		and fs.Inspector.GetUnitSpecId
 	then
-		local specId = fs.Inspector:GetUnitSpecId(unit)
+		local resolved = ResolveUnit(unit) or unit
+		local specId = fs.Inspector:GetUnitSpecId(resolved)
+
 		if specId then
 			local _, _, _, icon = GetSpecializationInfoByID(specId)
 			local texture = texturesRoot .. "Specs\\" .. specId .. ".tga"
@@ -271,7 +319,8 @@ local function GetTextureForUnit(unit)
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
 		elseif GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
-			local specId = fs.Inspector:GetUnitSpecId(unit)
+			local resolved = ResolveUnit(unit) or unit
+			local specId = fs.Inspector:GetUnitSpecId(resolved)
 
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
