@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.0
+
+- Split many single options into separate friendly and enemy settings.
+- Config UI rework.
+- New role filters.
+- Added PvP flagged filter.
+
 ## 2.10.0
 
 Added background padding slider.
