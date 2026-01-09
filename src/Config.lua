@@ -29,6 +29,8 @@ local dbDefaults = {
 	OffsetX = 0,
 	OffsetY = 20,
 
+	BackgroundPadding = 10,
+
 	IconTexture = "covenantsanctum-renown-doublearrow-depressed",
 	IconWidth = 50,
 	IconHeight = 50,
@@ -342,6 +344,28 @@ function M:Init()
 
 	textureSizeSlider:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
+	local textureRotSlider, textureRotBox = mini:CreateSlider({
+		Parent = panel,
+		Min = 0,
+		Max = 360,
+		Step = 15,
+		Width = 200,
+		LabelText = "Rotation",
+		GetValue = function()
+			return tonumber(db.IconRotation) or dbDefaults.IconRotation
+		end,
+		SetValue = function(value)
+			if db.IconRotation == value then
+				return
+			end
+
+			db.IconRotation = mini:ClampInt(value, 0, 360, 0)
+			addon:Refresh()
+		end,
+	})
+
+	textureRotSlider:SetPoint("LEFT", textureSizeSlider, "RIGHT", horizontalSpacing, 0)
+
 	local offsetXSlider, offsetXBox = mini:CreateSlider({
 		LabelText = "X Offset",
 		Parent = panel,
@@ -386,28 +410,6 @@ function M:Init()
 
 	offsetYSlider:SetPoint("LEFT", offsetXSlider, "RIGHT", horizontalSpacing, 0)
 
-	local textureRotSlider, textureRotBox = mini:CreateSlider({
-		Parent = panel,
-		Min = 0,
-		Max = 360,
-		Step = 15,
-		Width = 200,
-		LabelText = "Rotation",
-		GetValue = function()
-			return tonumber(db.IconRotation) or dbDefaults.IconRotation
-		end,
-		SetValue = function(value)
-			if db.IconRotation == value then
-				return
-			end
-
-			db.IconRotation = mini:ClampInt(value, 0, 360, 0)
-			addon:Refresh()
-		end,
-	})
-
-	textureRotSlider:SetPoint("TOPLEFT", offsetXSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
-
 	local backgroundChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Background",
@@ -421,7 +423,29 @@ function M:Init()
 		end,
 	})
 
-	backgroundChkBox:SetPoint("TOPLEFT", textureRotSlider, "BOTTOMLEFT", 0, -verticalSpacing)
+	backgroundChkBox:SetPoint("TOPLEFT", offsetXSlider, "BOTTOMLEFT", 0, -verticalSpacing)
+
+	local backgroundPaddingSlider, backgroundPaddingBox = mini:CreateSlider({
+		LabelText = "Padding",
+		Parent = panel,
+		Min = 0,
+		Max = 30,
+		Step = 1,
+		Width = 200,
+		GetValue = function()
+			return tonumber(db.BackgroundPadding) or dbDefaults.BackgroundPadding
+		end,
+		SetValue = function(value)
+			if db.BackgroundPadding == value then
+				return
+			end
+
+			db.BackgroundPadding = mini:ClampInt(value, 0, 30, 0)
+			addon:Refresh()
+		end,
+	})
+
+	backgroundPaddingSlider:SetPoint("TOPLEFT", backgroundChkBox, "BOTTOMLEFT", 0, -verticalSpacing * 2)
 
 	mini:WireTabNavigation({
 		textureBox,
@@ -429,6 +453,7 @@ function M:Init()
 		offsetXBox,
 		offsetYBox,
 		textureRotBox,
+		backgroundPaddingBox,
 	})
 
 	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")

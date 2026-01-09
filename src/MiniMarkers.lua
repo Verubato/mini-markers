@@ -85,14 +85,6 @@ local function IsPet(unit)
 	return false
 end
 
-local function CircleBackgroundPadding(width)
-	return (width / 10) + 10
-end
-
-local function SquareBackgroundPadding(width)
-	return (width / 10)
-end
-
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
@@ -127,7 +119,7 @@ local function GetTextureForUnit(unit)
 			Texture = petIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = CircleBackgroundPadding(iconWidth * petScale),
+			BackgroundPadding = db.BackgroundPadding,
 			Width = iconWidth * petScale,
 			Height = iconHeight * petScale,
 			Color = db.IconClassColors and GetClassColor(unit) or nil,
@@ -139,7 +131,7 @@ local function GetTextureForUnit(unit)
 			Texture = friendIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = CircleBackgroundPadding(iconWidth),
+			BackgroundPadding = db.BackgroundPadding,
 			Width = iconWidth,
 			Height = iconHeight,
 		}
@@ -150,7 +142,7 @@ local function GetTextureForUnit(unit)
 			Texture = guildIconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = CircleBackgroundPadding(iconWidth),
+			BackgroundPadding = db.BackgroundPadding,
 			Width = iconWidth,
 			Height = iconHeight,
 		}
@@ -198,7 +190,7 @@ local function GetTextureForUnit(unit)
 				FallbackTexture = icon,
 				BackgroundEnabled = db.BackgroundEnabled,
 				BackgroundShape = backgroundSquare,
-				BackgroundPadding = SquareBackgroundPadding(iconWidth),
+				BackgroundPadding = db.BackgroundPadding,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
@@ -224,7 +216,7 @@ local function GetTextureForUnit(unit)
 				Texture = texturesRoot .. "Roles\\" .. role .. ".tga",
 				BackgroundEnabled = db.BackgroundEnabled,
 				BackgroundShape = backgroundCircle,
-				BackgroundPadding = CircleBackgroundPadding(iconWidth),
+				BackgroundPadding = db.BackgroundPadding,
 				Width = iconWidth,
 				Height = iconHeight,
 				Color = db.IconClassColors and GetClassColor(unit) or nil,
@@ -241,7 +233,7 @@ local function GetTextureForUnit(unit)
 				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
 				BackgroundEnabled = db.BackgroundEnabled,
 				BackgroundShape = backgroundSquare,
-				BackgroundPadding = SquareBackgroundPadding(iconWidth),
+				BackgroundPadding = db.BackgroundPadding,
 				Width = db.IconWidth or dbDefaults.IconWidth,
 				Height = db.IconHeight or dbDefaults.IconHeight,
 			}
@@ -253,7 +245,7 @@ local function GetTextureForUnit(unit)
 			Texture = db.IconTexture or dbDefaults.IconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = CircleBackgroundPadding(iconWidth),
+			BackgroundPadding = db.BackgroundPadding,
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
