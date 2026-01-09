@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.10.0
+
+Added background padding slider.
+
 ## 2.9.1
 
 Fixed addon icon path.
