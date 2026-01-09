@@ -1,9 +1,9 @@
 local addonName, addon = ...
 ---@type MiniFramework
 local mini = addon.Framework
-local verticalSpacing = 20
+local verticalSpacing = 14
 local horizontalSpacing = 20
-local checkboxWidth = 100
+local columns = 4
 ---@type Db
 local db
 ---@class Db
@@ -73,147 +73,34 @@ local function GetAndUpgradeDb()
 	return vars
 end
 
-function M:Init()
-	db = GetAndUpgradeDb()
-
+local function BuildMainPanel()
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
 
-	local category = mini:AddCategory(panel)
-
-	if not category then
-		return
-	end
-
 	local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
 	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOPLEFT", 0, -verticalSpacing)
+	title:SetPoint("TOP", 0, -verticalSpacing)
 	title:SetText(string.format("%s - %s", addonName, version))
 
 	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOPLEFT", title, 0, -verticalSpacing)
+	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
 	description:SetText("Show markers above nameplates.")
 
-	local everyoneChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Everyone",
-		Tooltip = "Show markers for everyone.",
-		GetValue = function()
-			return db.EveryoneEnabled
-		end,
-		SetValue = function(enabled)
-			db.EveryoneEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+	local priority = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+	priority:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing / 2)
+	priority:SetText("Priority: spec > class > role > texture.")
 
-	everyoneChkBox:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
+	local typesDivider = mini:CreateDivider(panel, "Icon Types")
 
-	local groupChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Group",
-		Tooltip = "Show markers for group members.",
-		GetValue = function()
-			return db.GroupEnabled
-		end,
-		SetValue = function(enabled)
-			db.GroupEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+	typesDivider:SetPoint("TOP", priority, "BOTTOM", 0, -verticalSpacing)
+	typesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	typesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	groupChkBox:SetPoint("LEFT", everyoneChkBox, "RIGHT", checkboxWidth, 0)
-
-	local alliesChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Allies",
-		Tooltip = "Show markers for friendly players.",
-		GetValue = function()
-			return db.AlliesEnabled
-		end,
-		SetValue = function(enabled)
-			db.AlliesEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	alliesChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", checkboxWidth, 0)
-
-	local enemiesChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Enemies",
-		Tooltip = "Show markers for enemy players.",
-		GetValue = function()
-			return db.EnemiesEnabled
-		end,
-		SetValue = function(enabled)
-			db.EnemiesEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", checkboxWidth, 0)
-
-	local friendsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Friends",
-		Tooltip = "Use a special icon for btag friends.",
-		GetValue = function()
-			return db.FriendsEnabled
-		end,
-		SetValue = function(enabled)
-			db.FriendsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	friendsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -8)
-
-	local guildChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Guild",
-		Tooltip = "Use a special icon for guild members.",
-		GetValue = function()
-			return db.GuildEnabled
-		end,
-		SetValue = function(enabled)
-			db.GuildEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", checkboxWidth, 0)
-
-	local npcsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "NPCs",
-		Tooltip = "Show markers for NPCs.",
-		GetValue = function()
-			return db.NpcsEnabled
-		end,
-		SetValue = function(enabled)
-			db.NpcsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	npcsChkBox:SetPoint("LEFT", guildChkBox, "RIGHT", checkboxWidth, 0)
-
-	local petsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Pets",
-		Tooltip = "Show markers for pets.",
-		GetValue = function()
-			return db.PetsEnabled
-		end,
-		SetValue = function(enabled)
-			db.PetsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	petsChkBox:SetPoint("LEFT", npcsChkBox, "RIGHT", checkboxWidth, 0)
-
+	local settingsWidth, _ = mini:SettingsSize()
+	local leftInset = horizontalSpacing
+	local rightInset = horizontalSpacing
+	local usableWidth = settingsWidth - leftInset - rightInset
+	local columnStep = usableWidth / (columns + 1)
 	local typeIcons
 
 	function RefreshTypes()
@@ -236,7 +123,8 @@ function M:Init()
 		end,
 	})
 
-	classIconsChkBox:SetPoint("TOPLEFT", friendsChkBox, "BOTTOMLEFT", 0, -8)
+	classIconsChkBox:SetPoint("TOP", typesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	classIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local specIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -258,7 +146,7 @@ function M:Init()
 		end,
 	})
 
-	specIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", checkboxWidth, 0)
+	specIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", columnStep, 0)
 
 	local roleIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -273,7 +161,7 @@ function M:Init()
 		end,
 	})
 
-	roleIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", checkboxWidth, 0)
+	roleIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", columnStep, 0)
 
 	local textureIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -289,7 +177,7 @@ function M:Init()
 		end,
 	})
 
-	textureIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", checkboxWidth, 0)
+	textureIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", columnStep, 0)
 
 	typeIcons = {
 		classIconsChkBox,
@@ -298,34 +186,171 @@ function M:Init()
 		textureIconsChkBox,
 	}
 
-	local textureBox, textureLbl = mini:CreateEditBox({
-		Parent = panel,
-		LabelText = "Texture",
-		-- same width as 2 sliders plus gap
-		Width = 200 * 2 + horizontalSpacing,
-		GetValue = function()
-			return db.IconTexture
-		end,
-		SetValue = function(value)
-			if db.IconTexture == value then
-				return
-			end
+	local filtersDivider = mini:CreateDivider(panel, "Filters")
 
-			db.IconTexture = value
+	filtersDivider:SetPoint("TOP", classIconsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
+	filtersDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	filtersDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local everyoneChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Everyone",
+		Tooltip = "Show markers for everyone.",
+		GetValue = function()
+			return db.EveryoneEnabled
+		end,
+		SetValue = function(enabled)
+			db.EveryoneEnabled = enabled
 			addon:Refresh()
 		end,
 	})
 
-	textureLbl:SetPoint("TOPLEFT", classIconsChkBox, "BOTTOMLEFT", 4, -verticalSpacing)
-	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 0, -8)
+	everyoneChkBox:SetPoint("TOP", filtersDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	everyoneChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local textureSizeSlider, textureSizeBox = mini:CreateSlider({
+	local groupChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Group",
+		Tooltip = "Show markers for group members.",
+		GetValue = function()
+			return db.GroupEnabled
+		end,
+		SetValue = function(enabled)
+			db.GroupEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	groupChkBox:SetPoint("LEFT", everyoneChkBox, "RIGHT", columnStep, 0)
+
+	local alliesChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Allies",
+		Tooltip = "Show markers for friendly players.",
+		GetValue = function()
+			return db.AlliesEnabled
+		end,
+		SetValue = function(enabled)
+			db.AlliesEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	alliesChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", columnStep, 0)
+
+	local enemiesChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Enemies",
+		Tooltip = "Show markers for enemy players.",
+		GetValue = function()
+			return db.EnemiesEnabled
+		end,
+		SetValue = function(enabled)
+			db.EnemiesEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", columnStep, 0)
+
+	local npcsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "NPCs",
+		Tooltip = "Show markers for NPCs.",
+		GetValue = function()
+			return db.NpcsEnabled
+		end,
+		SetValue = function(enabled)
+			db.NpcsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	npcsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
+
+	local petsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Pets",
+		Tooltip = "Show markers for pets.",
+		GetValue = function()
+			return db.PetsEnabled
+		end,
+		SetValue = function(enabled)
+			db.PetsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	petsChkBox:SetPoint("LEFT", npcsChkBox, "RIGHT", columnStep, 0)
+
+	local specialIconsDivider = mini:CreateDivider(panel, "Special Icons")
+
+	specialIconsDivider:SetPoint("TOP", npcsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
+	specialIconsDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	specialIconsDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local friendsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Friends",
+		Tooltip = "Use a special icon for btag friends.",
+		GetValue = function()
+			return db.FriendsEnabled
+		end,
+		SetValue = function(enabled)
+			db.FriendsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	friendsChkBox:SetPoint("TOP", specialIconsDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	friendsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+
+	local guildChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Guild",
+		Tooltip = "Use a special icon for guild members.",
+		GetValue = function()
+			return db.GuildEnabled
+		end,
+		SetValue = function(enabled)
+			db.GuildEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", columnStep, 0)
+
+	local sizeDivider = mini:CreateDivider(panel, "Size & Position & Background")
+
+	sizeDivider:SetPoint("TOP", friendsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
+	sizeDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	sizeDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local backgroundChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Background",
+		Tooltip = "Add a background behind the icons.",
+		GetValue = function()
+			return db.BackgroundEnabled
+		end,
+		SetValue = function(enabled)
+			db.BackgroundEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	backgroundChkBox:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	backgroundChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+
+	-- not sure why it needs horizontalSpacing / 2, would have thought just horizontalSpacing itself should do it
+	local sliderWidth = (usableWidth / 2) - horizontalSpacing / 2
+	local sizeSlider, textureSizeBox = mini:CreateSlider({
 		Parent = panel,
 		LabelText = "Size",
 		Min = 20,
 		Max = 200,
 		Step = 5,
-		Width = 200,
+		Width = sliderWidth,
 		GetValue = function()
 			return tonumber(db.IconWidth) or dbDefaults.IconWidth
 		end,
@@ -342,9 +367,136 @@ function M:Init()
 		end,
 	})
 
-	textureSizeSlider:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+	sizeSlider:SetPoint("TOP", backgroundChkBox, "BOTTOM", 0, -verticalSpacing * 3)
+	sizeSlider:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local textureRotSlider, textureRotBox = mini:CreateSlider({
+	local backgroundPaddingSlider, backgroundPaddingBox = mini:CreateSlider({
+		LabelText = "Padding",
+		Parent = panel,
+		Min = 0,
+		Max = 30,
+		Step = 1,
+		Width = sliderWidth,
+		GetValue = function()
+			return tonumber(db.BackgroundPadding) or dbDefaults.BackgroundPadding
+		end,
+		SetValue = function(value)
+			if db.BackgroundPadding == value then
+				return
+			end
+
+			db.BackgroundPadding = mini:ClampInt(value, 0, 30, 0)
+			addon:Refresh()
+		end,
+	})
+
+	backgroundPaddingSlider:SetPoint("LEFT", sizeSlider, "RIGHT", horizontalSpacing, 0)
+
+	local offsetXSlider, offsetXBox = mini:CreateSlider({
+		LabelText = "X Offset",
+		Parent = panel,
+		Min = -200,
+		Max = 200,
+		Step = 5,
+		Width = sliderWidth,
+		GetValue = function()
+			return tonumber(db.OffsetX) or dbDefaults.OffsetX
+		end,
+		SetValue = function(value)
+			if db.OffsetX == value then
+				return
+			end
+
+			db.OffsetX = mini:ClampInt(value, -200, 200, 0)
+			addon:Refresh()
+		end,
+	})
+
+	offsetXSlider:SetPoint("TOPLEFT", sizeSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+
+	local offsetYSlider, offsetYBox = mini:CreateSlider({
+		Parent = panel,
+		Min = -200,
+		Max = 200,
+		Step = 5,
+		Width = sliderWidth,
+		LabelText = "Y Offset",
+		GetValue = function()
+			return tonumber(db.OffsetY) or dbDefaults.OffsetY
+		end,
+		SetValue = function(value)
+			if db.OffsetY == value then
+				return
+			end
+
+			db.OffsetY = mini:ClampInt(value, -200, 200, 0)
+			addon:Refresh()
+		end,
+	})
+
+	offsetYSlider:SetPoint("LEFT", offsetXSlider, "RIGHT", horizontalSpacing, 0)
+
+	mini:WireTabNavigation({
+		textureSizeBox,
+		backgroundPaddingBox,
+		offsetXBox,
+		offsetYBox,
+	})
+
+	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+	resetBtn:SetSize(120, 26)
+	resetBtn:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -16, 16)
+	resetBtn:SetText("Reset")
+	resetBtn:SetScript("OnClick", function()
+		if InCombatLockdown() then
+			mini:NotifyCombatLockdown()
+			return
+		end
+
+		db = mini:ResetSavedVars(dbDefaults)
+
+		panel:MiniRefresh()
+		addon:Refresh()
+		mini:Notify("Settings reset to default.")
+	end)
+
+	return panel
+end
+
+local function BuildCustomTexturePanel()
+	local panel = CreateFrame("Frame")
+	panel.name = "Custom Texture"
+
+	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title:SetPoint("TOPLEFT", 0, -verticalSpacing)
+	title:SetText("Custom Texture")
+
+	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+	description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -verticalSpacing)
+	description:SetText("Specify a custom texture to use.")
+
+	local textureBox, textureLbl = mini:CreateEditBox({
+		Parent = panel,
+		LabelText = "Texture",
+		-- same width as 2 sliders plus gap
+		Width = 200 * 2 + horizontalSpacing,
+		GetValue = function()
+			return db.IconTexture
+		end,
+		SetValue = function(value)
+			if db.IconTexture == value then
+				return
+			end
+
+			db.IconTexture = tostring(value)
+			addon:Refresh()
+		end,
+	})
+
+	textureLbl:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
+	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 0, -8)
+
+	local textureRotSlider = mini:CreateSlider({
 		Parent = panel,
 		Min = 0,
 		Max = 360,
@@ -364,118 +516,27 @@ function M:Init()
 		end,
 	})
 
-	textureRotSlider:SetPoint("LEFT", textureSizeSlider, "RIGHT", horizontalSpacing, 0)
+	textureRotSlider:SetPoint("TOPLEFT", textureBox, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
-	local offsetXSlider, offsetXBox = mini:CreateSlider({
-		LabelText = "X Offset",
-		Parent = panel,
-		Min = -200,
-		Max = 200,
-		Step = 5,
-		Width = 200,
-		GetValue = function()
-			return tonumber(db.OffsetX) or dbDefaults.OffsetX
-		end,
-		SetValue = function(value)
-			if db.OffsetX == value then
-				return
-			end
+	return panel
+end
 
-			db.OffsetX = mini:ClampInt(value, -200, 200, 0)
-			addon:Refresh()
-		end,
-	})
+function M:Init()
+	db = GetAndUpgradeDb()
 
-	offsetXSlider:SetPoint("TOPLEFT", textureSizeSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+	local mainPanel = BuildMainPanel()
+	local category = mini:AddCategory(mainPanel)
 
-	local offsetYSlider, offsetYBox = mini:CreateSlider({
-		Parent = panel,
-		Min = -200,
-		Max = 200,
-		Step = 5,
-		Width = 200,
-		LabelText = "Y Offset",
-		GetValue = function()
-			return tonumber(db.OffsetY) or dbDefaults.OffsetY
-		end,
-		SetValue = function(value)
-			if db.OffsetY == value then
-				return
-			end
+	if not category then
+		return
+	end
 
-			db.OffsetY = mini:ClampInt(value, -200, 200, 0)
-			addon:Refresh()
-		end,
-	})
-
-	offsetYSlider:SetPoint("LEFT", offsetXSlider, "RIGHT", horizontalSpacing, 0)
-
-	local backgroundChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Background",
-		Tooltip = "Add a background behind the icons. Doesn't apply for class icons.",
-		GetValue = function()
-			return db.BackgroundEnabled
-		end,
-		SetValue = function(enabled)
-			db.BackgroundEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	backgroundChkBox:SetPoint("TOPLEFT", offsetXSlider, "BOTTOMLEFT", 0, -verticalSpacing)
-
-	local backgroundPaddingSlider, backgroundPaddingBox = mini:CreateSlider({
-		LabelText = "Padding",
-		Parent = panel,
-		Min = 0,
-		Max = 30,
-		Step = 1,
-		Width = 200,
-		GetValue = function()
-			return tonumber(db.BackgroundPadding) or dbDefaults.BackgroundPadding
-		end,
-		SetValue = function(value)
-			if db.BackgroundPadding == value then
-				return
-			end
-
-			db.BackgroundPadding = mini:ClampInt(value, 0, 30, 0)
-			addon:Refresh()
-		end,
-	})
-
-	backgroundPaddingSlider:SetPoint("TOPLEFT", backgroundChkBox, "BOTTOMLEFT", 0, -verticalSpacing * 2)
-
-	mini:WireTabNavigation({
-		textureBox,
-		textureSizeBox,
-		offsetXBox,
-		offsetYBox,
-		textureRotBox,
-		backgroundPaddingBox,
-	})
-
-	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-	resetBtn:SetSize(120, 26)
-	resetBtn:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", 0, 16)
-	resetBtn:SetText("Reset")
-	resetBtn:SetScript("OnClick", function()
-		if InCombatLockdown() then
-			mini:NotifyCombatLockdown()
-			return
-		end
-
-		db = mini:ResetSavedVars(dbDefaults)
-
-		panel:MiniRefresh()
-		addon:Refresh()
-		mini:Notify("Settings reset to default.")
-	end)
+	local texturePanel = BuildCustomTexturePanel()
+	mini:AddSubCategory(category, texturePanel)
 
 	SLASH_MINIMARKERS1 = "/minimarkers"
 	SLASH_MINIMARKERS2 = "/minim"
 	SLASH_MINIMARKERS3 = "/mm"
 
-	mini:RegisterSlashCommand(category, panel)
+	mini:RegisterSlashCommand(category, mainPanel)
 end

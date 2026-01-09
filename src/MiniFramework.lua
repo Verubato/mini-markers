@@ -172,6 +172,43 @@ function M:AddCategory(panel)
 	return nil
 end
 
+function M:AddSubCategory(parentCategory, panel)
+	if Settings and Settings.RegisterCanvasLayoutSubcategory then
+		Settings.RegisterCanvasLayoutSubcategory(parentCategory, panel, panel.name)
+	elseif InterfaceOptions_AddCategory then
+		InterfaceOptions_AddCategory(panel)
+	end
+end
+
+function M:CreateDivider(parent, text)
+	local container = CreateFrame("Frame", nil, parent)
+	container:SetHeight(20)
+
+	-- Left line
+	local leftLine = container:CreateTexture(nil, "ARTWORK")
+	leftLine:SetColorTexture(1, 1, 1, 0.15)
+	leftLine:SetHeight(1)
+
+	-- Right line
+	local rightLine = container:CreateTexture(nil, "ARTWORK")
+	rightLine:SetColorTexture(1, 1, 1, 0.15)
+	rightLine:SetHeight(1)
+
+	-- Center label
+	local label = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	label:SetText(text or "")
+	label:SetPoint("CENTER", container, "CENTER")
+
+	-- Layout
+	leftLine:SetPoint("LEFT", 16, 0)
+	leftLine:SetPoint("RIGHT", label, "LEFT", -8, 0)
+
+	rightLine:SetPoint("LEFT", label, "RIGHT", 8, 0)
+	rightLine:SetPoint("RIGHT", -16, 0)
+
+	return container
+end
+
 function M:SettingsSize()
 	local settingsContainer = SettingsPanel and SettingsPanel.Container
 
