@@ -121,7 +121,7 @@ function M:Build()
 	local enemyDpsChk = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "DPS",
-		Tooltip = "Show icons for friendly DPS.",
+		Tooltip = "Show icons for enemy DPS.",
 		GetValue = function()
 			return db.EnemyDpsEnabled
 		end,
