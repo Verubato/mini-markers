@@ -411,6 +411,12 @@ function M:Build()
 
 		db = mini:ResetSavedVars(dbDefaults)
 
+		local hasFs = FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector
+
+		if hasFs then
+			db.FriendlySpecIcons = true
+		end
+
 		panel:MiniRefresh()
 		addon:Refresh()
 		mini:Notify("Settings reset to default.")
