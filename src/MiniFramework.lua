@@ -184,22 +184,18 @@ function M:CreateDivider(parent, text)
 	local container = CreateFrame("Frame", nil, parent)
 	container:SetHeight(20)
 
-	-- Left line
 	local leftLine = container:CreateTexture(nil, "ARTWORK")
 	leftLine:SetColorTexture(1, 1, 1, 0.15)
 	leftLine:SetHeight(1)
 
-	-- Right line
 	local rightLine = container:CreateTexture(nil, "ARTWORK")
 	rightLine:SetColorTexture(1, 1, 1, 0.15)
 	rightLine:SetHeight(1)
 
-	-- Center label
 	local label = container:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	label:SetText(text or "")
 	label:SetPoint("CENTER", container, "CENTER")
 
-	-- Layout
 	leftLine:SetPoint("LEFT", 16, 0)
 	leftLine:SetPoint("RIGHT", label, "LEFT", -8, 0)
 

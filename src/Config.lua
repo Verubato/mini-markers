@@ -3,12 +3,14 @@ local addonName, addon = ...
 local mini = addon.Framework
 local verticalSpacing = 14
 local horizontalSpacing = 20
-local columns = 4
+local settingsWidth
+local leftInset = horizontalSpacing
+local rightInset = horizontalSpacing
 ---@type Db
 local db
 ---@class Db
 local dbDefaults = {
-	Version = 5,
+	Version = 6,
 
 	EveryoneEnabled = false,
 	GroupEnabled = true,
@@ -19,10 +21,25 @@ local dbDefaults = {
 	PetsEnabled = false,
 	FriendsEnabled = true,
 
-	ClassIcons = true,
-	SpecIcons = false,
-	TextureIcons = false,
-	RoleIcons = false,
+	FriendlyTankEnabled = true,
+	FriendlyHealerEnabled = true,
+	FriendlyDpsEnabled = true,
+
+	EnemyTankEnabled = true,
+	EnemyHealerEnabled = true,
+	EnemyDpsEnabled = true,
+
+	FriendlyClassIcons = true,
+	FriendlySpecIcons = false,
+	FriendlyTextureIcons = false,
+	FriendlyRoleIcons = false,
+
+	EnemyClassIcons = false,
+	EnemySpecIcons = false,
+	EnemyTextureIcons = false,
+	EnemyRoleIcons = true,
+
+	EnemyRedEnabled = true,
 
 	EnableDistanceFading = false,
 
@@ -55,18 +72,39 @@ local function GetAndUpgradeDb()
 			-- sorry folks, you'll have to reconfigure
 			-- made some breaking changes from v1 to 2
 			vars = mini:ResetSavedVars(dbDefaults)
+			vars.Version = 2
 		elseif vars.Version == 2 then
 			vars.BackgroundPadding = nil
+
 			vars.Version = 3
 		elseif vars.Version == 3 then
 			vars.FriendsEnabled = vars.FriendIconsEnabled
 			vars.FriendIconsEnabled = nil
+
 			vars.Version = 4
 		elseif vars.Version == 4 then
 			vars.FriendIconTexture = nil
 			vars.GuildIconTexture = nil
 			vars.PetIconTexture = nil
+
 			vars.Version = 5
+		elseif vars.Version == 5 then
+			vars.FriendlyClassIcons = vars.ClassIcons
+			vars.FriendlySpecIcons = vars.SpecIcons
+			vars.FriendlyTextureIcons = vars.TextureIcons
+			vars.FriendlyRoleIcons = vars.RoleIcons
+
+			vars.EnemyClassIcons = vars.ClassIcons
+			vars.EnemySpecIcons = vars.SpecIcons
+			vars.EnemyTextureIcons = vars.TextureIcons
+			vars.EnemyRoleIcons = vars.RoleIcons
+
+			vars.ClassIcons = nil
+			vars.SpecIcons = nil
+			vars.TextureIcons = nil
+			vars.RoleIcons = nil
+
+			vars.Version = 6
 		end
 	end
 
@@ -74,6 +112,10 @@ local function GetAndUpgradeDb()
 end
 
 local function BuildMainPanel()
+	local columns = 4
+	local usableWidth = settingsWidth - leftInset - rightInset
+	local columnStep = usableWidth / (columns + 1)
+
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
 
@@ -90,40 +132,26 @@ local function BuildMainPanel()
 	priority:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing / 2)
 	priority:SetText("Priority: spec > class > role > texture.")
 
-	local typesDivider = mini:CreateDivider(panel, "Icon Types")
+	local friendlyTypesDivider = mini:CreateDivider(panel, "Friendly Icon Types")
 
-	typesDivider:SetPoint("TOP", priority, "BOTTOM", 0, -verticalSpacing)
-	typesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	typesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-
-	local settingsWidth, _ = mini:SettingsSize()
-	local leftInset = horizontalSpacing
-	local rightInset = horizontalSpacing
-	local usableWidth = settingsWidth - leftInset - rightInset
-	local columnStep = usableWidth / (columns + 1)
-	local typeIcons
-
-	function RefreshTypes()
-		for _, type in ipairs(typeIcons) do
-			type:MiniRefresh()
-		end
-	end
+	friendlyTypesDivider:SetPoint("TOP", priority, "BOTTOM", 0, -verticalSpacing)
+	friendlyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	friendlyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
 	local classIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Class Icons",
 		Tooltip = "Use special high quality class icons.",
 		GetValue = function()
-			return db.ClassIcons
+			return db.FriendlyClassIcons
 		end,
 		SetValue = function(enabled)
-			db.ClassIcons = enabled
-			RefreshTypes()
+			db.FriendlyClassIcons = enabled
 			addon:Refresh()
 		end,
 	})
 
-	classIconsChkBox:SetPoint("TOP", typesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	classIconsChkBox:SetPoint("TOP", friendlyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	classIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local specIconsChkBox = mini:CreateSettingCheckbox({
@@ -131,17 +159,15 @@ local function BuildMainPanel()
 		LabelText = "Spec Icons",
 		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
 		GetValue = function()
-			return db.SpecIcons
+			return db.FriendlySpecIcons
 		end,
 		SetValue = function(enabled)
 			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
 				mini:ShowDialog("Spec icons requires FrameSort 7.8.1+ to function.")
-				RefreshTypes()
 				return
 			end
 
-			db.SpecIcons = enabled
-			RefreshTypes()
+			db.FriendlySpecIcons = enabled
 			addon:Refresh()
 		end,
 	})
@@ -153,10 +179,10 @@ local function BuildMainPanel()
 		LabelText = "Role Icons",
 		Tooltip = "Use tank/healer/dps role icons.",
 		GetValue = function()
-			return db.RoleIcons
+			return db.FriendlyRoleIcons
 		end,
 		SetValue = function(enabled)
-			db.RoleIcons = enabled
+			db.FriendlyRoleIcons = enabled
 			addon:Refresh()
 		end,
 	})
@@ -168,27 +194,91 @@ local function BuildMainPanel()
 		LabelText = "Texture Icons",
 		Tooltip = "Use the specified texture for icons.",
 		GetValue = function()
-			return db.TextureIcons
+			return db.FriendlyTextureIcons
 		end,
 		SetValue = function(enabled)
-			db.TextureIcons = enabled
-			RefreshTypes()
+			db.FriendlyTextureIcons = enabled
 			addon:Refresh()
 		end,
 	})
 
 	textureIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", columnStep, 0)
 
-	typeIcons = {
-		classIconsChkBox,
-		specIconsChkBox,
-		roleIconsChkBox,
-		textureIconsChkBox,
-	}
+	local enemyTypesDivider = mini:CreateDivider(panel, "Enemy Icon Types")
+
+	enemyTypesDivider:SetPoint("TOP", textureIconsChkBox, "BOTTOM", 0, -verticalSpacing)
+	enemyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	enemyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local enemyClassIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Class Icons",
+		Tooltip = "Use special high quality class icons.",
+		GetValue = function()
+			return db.EnemyClassIcons
+		end,
+		SetValue = function(enabled)
+			db.EnemyClassIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyClassIconsChkBox:SetPoint("TOP", enemyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	enemyClassIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+
+	local enemySpecIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Spec Icons",
+		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
+		GetValue = function()
+			return db.EnemySpecIcons
+		end,
+		SetValue = function(enabled)
+			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
+				mini:ShowDialog("Spec icons requires FrameSort 7.8.1+ to function.")
+				return
+			end
+
+			db.EnemySpecIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemySpecIconsChkBox:SetPoint("LEFT", enemyClassIconsChkBox, "RIGHT", columnStep, 0)
+
+	local enemyRoleIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Role Icons",
+		Tooltip = "Use tank/healer/dps role icons.",
+		GetValue = function()
+			return db.EnemyRoleIcons
+		end,
+		SetValue = function(enabled)
+			db.EnemyRoleIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyRoleIconsChkBox:SetPoint("LEFT", enemySpecIconsChkBox, "RIGHT", columnStep, 0)
+
+	local enemyTextureIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Texture Icons",
+		Tooltip = "Use the specified texture for icons.",
+		GetValue = function()
+			return db.EnemyTextureIcons
+		end,
+		SetValue = function(enabled)
+			db.EnemyTextureIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyTextureIconsChkBox:SetPoint("LEFT", enemyRoleIconsChkBox, "RIGHT", columnStep, 0)
 
 	local filtersDivider = mini:CreateDivider(panel, "Filters")
 
-	filtersDivider:SetPoint("TOP", classIconsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
+	filtersDivider:SetPoint("TOP", enemyClassIconsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
 	filtersDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	filtersDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
@@ -283,46 +373,9 @@ local function BuildMainPanel()
 
 	petsChkBox:SetPoint("LEFT", npcsChkBox, "RIGHT", columnStep, 0)
 
-	local specialIconsDivider = mini:CreateDivider(panel, "Special Icons")
-
-	specialIconsDivider:SetPoint("TOP", npcsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
-	specialIconsDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	specialIconsDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-
-	local friendsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Friends",
-		Tooltip = "Use a special icon for btag friends.",
-		GetValue = function()
-			return db.FriendsEnabled
-		end,
-		SetValue = function(enabled)
-			db.FriendsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	friendsChkBox:SetPoint("TOP", specialIconsDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	friendsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
-
-	local guildChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Guild",
-		Tooltip = "Use a special icon for guild members.",
-		GetValue = function()
-			return db.GuildEnabled
-		end,
-		SetValue = function(enabled)
-			db.GuildEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", columnStep, 0)
-
 	local sizeDivider = mini:CreateDivider(panel, "Size & Position & Background")
 
-	sizeDivider:SetPoint("TOP", friendsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
+	sizeDivider:SetPoint("TOP", petsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
 	sizeDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	sizeDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
@@ -468,11 +521,11 @@ local function BuildCustomTexturePanel()
 	panel.name = "Custom Texture"
 
 	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOPLEFT", 0, -verticalSpacing)
+	title:SetPoint("TOP", 0, -verticalSpacing)
 	title:SetText("Custom Texture")
 
 	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -verticalSpacing)
+	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing)
 	description:SetText("Specify a custom texture to use.")
 
 	local textureBox, textureLbl = mini:CreateEditBox({
@@ -493,8 +546,9 @@ local function BuildCustomTexturePanel()
 		end,
 	})
 
-	textureLbl:SetPoint("TOPLEFT", description, "BOTTOMLEFT", 0, -verticalSpacing)
-	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 0, -8)
+	textureLbl:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
+	textureLbl:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+	textureBox:SetPoint("TOPLEFT", textureLbl, "BOTTOMLEFT", 0, -verticalSpacing)
 
 	local textureRotSlider = mini:CreateSlider({
 		Parent = panel,
@@ -521,9 +575,207 @@ local function BuildCustomTexturePanel()
 	return panel
 end
 
+local function BuildRolesPanel()
+	local panel = CreateFrame("Frame")
+	panel.name = "Roles"
+
+	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title:SetPoint("TOP", 0, -verticalSpacing)
+	title:SetText("Role Options")
+
+	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
+	description:SetText("Additional role filters and colouring.")
+
+	local friendlyDivider = mini:CreateDivider(panel, "Friendly Filters")
+
+	friendlyDivider:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
+	friendlyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	friendlyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local columns = 3
+	local usableWidth = settingsWidth - leftInset - rightInset
+	local columnStep = usableWidth / (columns + 1)
+	local start = math.floor(columnStep / 2)
+
+	local friendlyTankChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Tanks",
+		Tooltip = "Show icons for friendly tanks.",
+		GetValue = function()
+			return db.FriendlyTankEnabled
+		end,
+		SetValue = function(enabled)
+			db.FriendlyTankEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	friendlyTankChk:SetPoint("TOP", friendlyDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	friendlyTankChk:SetPoint("LEFT", panel, "LEFT", start, 0)
+
+	local friendlyHealerChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Healers",
+		Tooltip = "Show icons for friendly healers.",
+		GetValue = function()
+			return db.FriendlyHealerEnabled
+		end,
+		SetValue = function(enabled)
+			db.FriendlyHealerEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	friendlyHealerChk:SetPoint("LEFT", friendlyTankChk, "RIGHT", columnStep, 0)
+
+	local friendlyDpsChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "DPS",
+		Tooltip = "Show icons for friendly DPS.",
+		GetValue = function()
+			return db.FriendlyDpsEnabled
+		end,
+		SetValue = function(enabled)
+			db.FriendlyDpsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	friendlyDpsChk:SetPoint("LEFT", friendlyHealerChk, "RIGHT", columnStep, 0)
+
+	local enemyDivider = mini:CreateDivider(panel, "Enemy Filters")
+
+	enemyDivider:SetPoint("TOP", friendlyDpsChk, "BOTTOM", 0, -verticalSpacing)
+	enemyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	enemyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local enemyTankChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Tanks",
+		Tooltip = "Show icons for enemy tanks.",
+		GetValue = function()
+			return db.EnemyTankEnabled
+		end,
+		SetValue = function(enabled)
+			db.EnemyTankEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyTankChk:SetPoint("TOP", enemyDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	enemyTankChk:SetPoint("LEFT", panel, "LEFT", start, 0)
+
+	local enemyHealerChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Healers",
+		Tooltip = "Show icons for enemy healers.",
+		GetValue = function()
+			return db.EnemyHealerEnabled
+		end,
+		SetValue = function(enabled)
+			db.EnemyHealerEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyHealerChk:SetPoint("LEFT", enemyTankChk, "RIGHT", columnStep, 0)
+
+	local enemyDpsChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "DPS",
+		Tooltip = "Show icons for friendly DPS.",
+		GetValue = function()
+			return db.EnemyDpsEnabled
+		end,
+		SetValue = function(enabled)
+			db.EnemyDpsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyDpsChk:SetPoint("LEFT", enemyHealerChk, "RIGHT", columnStep, 0)
+
+	local colouringDivider = mini:CreateDivider(panel, "Enemy Coloring")
+
+	colouringDivider:SetPoint("TOP", enemyDpsChk, "BOTTOM", 0, -verticalSpacing)
+	colouringDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	colouringDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local enemyRedChk = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Red enemies",
+		Tooltip = "Show red role and textre colors for enemies.",
+		GetValue = function()
+			return db.EnemyRedEnabled
+		end,
+		SetValue = function(enabled)
+			db.EnemyRedEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyRedChk:SetPoint("TOP", colouringDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	enemyRedChk:SetPoint("LEFT", panel, "LEFT", start, 0)
+
+	return panel
+end
+
+local function BuildSpecialPanel()
+	local columns = 2
+	local usableWidth = settingsWidth - leftInset - rightInset
+	local columnStep = usableWidth / (columns + 1)
+	local start = usableWidth / 4
+
+	local panel = CreateFrame("Frame")
+	panel.name = "Special Icons"
+
+	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+	title:SetPoint("TOP", 0, -verticalSpacing)
+	title:SetText("Special Icons")
+
+	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
+	description:SetText("Use special icons for friends and guild members.")
+
+	local friendsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Friends",
+		Tooltip = "Use a special icon for btag friends.",
+		GetValue = function()
+			return db.FriendsEnabled
+		end,
+		SetValue = function(enabled)
+			db.FriendsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	friendsChkBox:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
+	friendsChkBox:SetPoint("LEFT", panel, "LEFT", start, 0)
+
+	local guildChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Guild",
+		Tooltip = "Use a special icon for guild members.",
+		GetValue = function()
+			return db.GuildEnabled
+		end,
+		SetValue = function(enabled)
+			db.GuildEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	guildChkBox:SetPoint("LEFT", friendsChkBox, "RIGHT", columnStep, 0)
+
+	return panel
+end
+
 function M:Init()
 	db = GetAndUpgradeDb()
 
+	settingsWidth, _ = mini:SettingsSize()
 	local mainPanel = BuildMainPanel()
 	local category = mini:AddCategory(mainPanel)
 
@@ -531,8 +783,14 @@ function M:Init()
 		return
 	end
 
+	local rolesPanel = BuildRolesPanel()
+	mini:AddSubCategory(category, rolesPanel)
+
 	local texturePanel = BuildCustomTexturePanel()
 	mini:AddSubCategory(category, texturePanel)
+
+	local specialPanel = BuildSpecialPanel()
+	mini:AddSubCategory(category, specialPanel)
 
 	SLASH_MINIMARKERS1 = "/minimarkers"
 	SLASH_MINIMARKERS2 = "/minim"
