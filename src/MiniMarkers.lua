@@ -246,6 +246,7 @@ local function GetTextureForUnit(unit)
 	local isPlayer = UnitIsPlayer(unit)
 	local isFriendly = UnitIsFriend("player", unit)
 	local isEnemy = UnitIsEnemy("player", unit)
+	local isFlagged = UnitIsPVP(unit)
 
 	-- treat neutrals as friendly
 	if not isFriendly and not isEnemy then
@@ -269,6 +270,10 @@ local function GetTextureForUnit(unit)
 
 	if db.NpcsEnabled then
 		pass = pass or not isPlayer
+	end
+
+	if db.PvPEnabled then
+		pass = pass or UnitIsPVP(unit)
 	end
 
 	if HasAnyRoleFilter(isFriendly) then

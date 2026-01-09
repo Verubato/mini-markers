@@ -13,7 +13,8 @@ local dbDefaults = {
 	GuildEnabled = true,
 	NpcsEnabled = false,
 	PetsEnabled = false,
-	FriendsEnabled =true,
+	FriendsEnabled = true,
+	PvPEnabled = true,
 
 	FriendlyTankEnabled = true,
 	FriendlyHealerEnabled = true,

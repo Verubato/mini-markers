@@ -231,6 +231,21 @@ function M:Build()
 
 	groupChkBox:SetPoint("LEFT", enemiesChkBox, "RIGHT", columnStep, 0)
 
+	local pvpChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "PvP",
+		Tooltip = "Show markers for pvp flagged members.",
+		GetValue = function()
+			return db.PvPEnabled
+		end,
+		SetValue = function(enabled)
+			db.PvPEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	pvpChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", columnStep, 0)
+
 	local npcsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "NPCs",
