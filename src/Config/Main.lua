@@ -188,7 +188,7 @@ function M:Build()
 	local alliesChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Allies",
-		Tooltip = "Show markers for friendly players.",
+		Tooltip = "Show markers for all friendly players.",
 		GetValue = function()
 			return db.AlliesEnabled
 		end,
@@ -204,7 +204,7 @@ function M:Build()
 	local enemiesChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Enemies",
-		Tooltip = "Show markers for enemy players.",
+		Tooltip = "Show markers for all enemy players.",
 		GetValue = function()
 			return db.EnemiesEnabled
 		end,
