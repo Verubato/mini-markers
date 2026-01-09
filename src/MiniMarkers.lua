@@ -276,7 +276,7 @@ local function GetTextureForUnit(unit)
 		pass = pass or UnitIsPVP(unit)
 	end
 
-	if HasAnyRoleFilter(isFriendly) then
+	if HasAnyRoleFilter(isFriendly, isEnemy) then
 		local role
 
 		if IsUnitInMyGroup(unit) then
