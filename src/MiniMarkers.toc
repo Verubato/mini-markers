@@ -9,5 +9,9 @@
 ## X-Curse-Project-ID: 1418841
 
 MiniFramework.lua
-Config.lua
+Config\Config.lua
+Config\Main.lua
+Config\Roles.lua
+Config\CustomTexture.lua
+Config\SpecialIcons.lua
 MiniMarkers.lua
