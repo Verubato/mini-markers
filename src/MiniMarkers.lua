@@ -85,10 +85,58 @@ local function IsPet(unit)
 	return false
 end
 
+local function HasAnyRoleFilter(isFriendly, isEnemy)
+	if isFriendly then
+		return not db.FriendlyTankEnabled or not db.FriendlyHealerEnabled or not db.FriendlyDpsEnabled
+	end
+
+	if isEnemy then
+		return not db.EnemyTankEnabled or not db.EnemyHealerEnabled or not db.EnemyDpsEnabled
+	end
+
+	return false
+end
+
+local function IsRoleEnabled(role, isFriendly, isEnemy)
+	if isFriendly then
+		if role == "TANK" then
+			return db.FriendlyTankEnabled
+		elseif role == "HEALER" then
+			return db.FriendlyHealerEnabled
+		elseif role == "DAMAGER" then
+			return db.FriendlyDpsEnabled
+		end
+	elseif isEnemy then
+		if role == "TANK" then
+			return db.EnemyTankEnabled
+		elseif role == "HEALER" then
+			return db.EnemyHealerEnabled
+		elseif role == "DAMAGER" then
+			return db.EnemyDpsEnabled
+		end
+	end
+
+	return false
+end
+
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
 	return color and { R = color.r, G = color.g, B = color.b, A = 1 }
+end
+
+local function GetUnitColor(unit)
+	local isEnemy = UnitIsEnemy("player", unit)
+
+	if isEnemy and db.EnemyRedEnabled then
+		return { R = 1, G = 0, B = 0, A = 1 }
+	end
+
+	if db.IconClassColors then
+		return GetClassColor(unit)
+	end
+
+	return { R = 1, G = 1, B = 1, A = 1 }
 end
 
 local function GetNameplateAnchor(nameplate)
@@ -148,22 +196,43 @@ local function GetTextureForUnit(unit)
 		}
 	end
 
+	local fs = FrameSortApi and FrameSortApi.v3
+	local isPlayer = UnitIsPlayer(unit)
+	local isFriendly = UnitIsFriend("player", unit)
+	local isEnemy = UnitIsEnemy("player", unit)
 	local pass = db.EveryoneEnabled
 
 	if db.EnemiesEnabled then
-		pass = pass or (UnitIsPlayer(unit) and UnitIsEnemy("player", unit))
+		pass = pass or (isPlayer and isEnemy)
 	end
 
 	if db.AlliesEnabled then
-		pass = pass or (UnitIsPlayer(unit) and UnitIsFriend("player", unit))
+		pass = pass or (isPlayer and isFriendly)
 	end
 
 	if db.GroupEnabled then
-		pass = pass or (UnitIsPlayer(unit) and IsUnitInMyGroup(unit))
+		pass = pass or (isPlayer and IsUnitInMyGroup(unit))
 	end
 
 	if db.NpcsEnabled then
-		pass = pass or not UnitIsPlayer(unit)
+		pass = pass or not isPlayer
+	end
+
+	if HasAnyRoleFilter(isFriendly) then
+		local role
+
+		if IsUnitInMyGroup(unit) then
+			role = UnitGroupRolesAssigned(unit)
+		else
+			local specId = fs.Inspector:GetUnitSpecId(unit)
+			if specId then
+				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
+				role = specRole
+			end
+		end
+
+		-- doesn't matter if pass is already true, it's hard gated by the role filter here
+		pass = role and IsRoleEnabled(role, isFriendly, isEnemy)
 	end
 
 	if not pass then
@@ -171,11 +240,10 @@ local function GetTextureForUnit(unit)
 	end
 
 	-- prioritise icons in this order: spec -> role -> class -> texture
-	local fs = FrameSortApi and FrameSortApi.v3
 	if
 		UnitIsPlayer(unit)
-		and db.SpecIcons
 		and GetSpecializationInfoByID
+		and ((isFriendly and db.FriendlySpecIcons) or (isEnemy and db.EnemySpecIcons))
 		and fs
 		and fs.Inspector
 		and fs.Inspector.GetUnitSpecId
@@ -197,7 +265,7 @@ local function GetTextureForUnit(unit)
 		end
 	end
 
-	if db.RoleIcons then
+	if (isFriendly and db.FriendlyRoleIcons) or (isEnemy and db.EnemyRoleIcons) then
 		local role
 
 		if IsUnitInMyGroup(unit) then
@@ -219,13 +287,13 @@ local function GetTextureForUnit(unit)
 				BackgroundPadding = db.BackgroundPadding,
 				Width = iconWidth,
 				Height = iconHeight,
-				Color = db.IconClassColors and GetClassColor(unit) or nil,
+				Color = GetUnitColor(unit),
 				Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
 			}
 		end
 	end
 
-	if db.ClassIcons then
+	if (isFriendly and db.FriendlyClassIcons) or (isEnemy and db.EnemyClassIcons) then
 		local _, classFilename = UnitClass(unit)
 
 		if classFilename then
@@ -240,7 +308,7 @@ local function GetTextureForUnit(unit)
 		end
 	end
 
-	if db.TextureIcons then
+	if (isFriendly and db.FriendlyTextureIcons) or (isEnemy and db.EnemyTextureIcons) then
 		return {
 			Texture = db.IconTexture or dbDefaults.IconTexture,
 			BackgroundEnabled = db.BackgroundEnabled,
@@ -249,7 +317,7 @@ local function GetTextureForUnit(unit)
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
 			Width = db.IconWidth or dbDefaults.IconWidth,
 			Height = db.IconHeight or dbDefaults.IconHeight,
-			Color = db.IconClassColors and GetClassColor(unit) or nil,
+			Color = GetUnitColor(unit),
 			Desaturated = db.IconDesaturated or dbDefaults.IconDesaturated,
 		}
 	end
