@@ -204,7 +204,7 @@ local function GetTextureForUnit(unit)
 	local iconHeight = db.IconHeight or dbDefaults.IconHeight
 
 	if IsPet(unit) then
-		if not db.PetsEnabled and not db.EveryoneEnabled then
+		if not db.PetsEnabled then
 			return nil
 		end
 
@@ -252,7 +252,7 @@ local function GetTextureForUnit(unit)
 		isFriendly = true
 	end
 
-	local pass = db.EveryoneEnabled
+	local pass = false
 	local backgroundEnabled = (isFriendly and db.FriendlyBackgroundEnabled) or (isEnemy and db.EnemyBackgroundEnabled)
 
 	if db.EnemiesEnabled then

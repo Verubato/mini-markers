@@ -185,37 +185,6 @@ function M:Build()
 	filtersDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	filtersDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local everyoneChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Everyone",
-		Tooltip = "Show markers for everyone.",
-		GetValue = function()
-			return db.EveryoneEnabled
-		end,
-		SetValue = function(enabled)
-			db.EveryoneEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	everyoneChkBox:SetPoint("TOP", filtersDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	everyoneChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
-
-	local groupChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Group",
-		Tooltip = "Show markers for group members.",
-		GetValue = function()
-			return db.GroupEnabled
-		end,
-		SetValue = function(enabled)
-			db.GroupEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	groupChkBox:SetPoint("LEFT", everyoneChkBox, "RIGHT", columnStep, 0)
-
 	local alliesChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Allies",
@@ -229,7 +198,8 @@ function M:Build()
 		end,
 	})
 
-	alliesChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", columnStep, 0)
+	alliesChkBox:SetPoint("TOP", filtersDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	alliesChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local enemiesChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -246,6 +216,21 @@ function M:Build()
 
 	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", columnStep, 0)
 
+	local groupChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Group",
+		Tooltip = "Show markers for group members.",
+		GetValue = function()
+			return db.GroupEnabled
+		end,
+		SetValue = function(enabled)
+			db.GroupEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	groupChkBox:SetPoint("LEFT", enemiesChkBox, "RIGHT", columnStep, 0)
+
 	local npcsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "NPCs",
@@ -259,7 +244,7 @@ function M:Build()
 		end,
 	})
 
-	npcsChkBox:SetPoint("TOPLEFT", everyoneChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
+	npcsChkBox:SetPoint("TOPLEFT", alliesChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
 
 	local petsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,

@@ -7,14 +7,13 @@ local horizontalSpacing = 20
 local dbDefaults = {
 	Version = 7,
 
-	EveryoneEnabled = false,
 	GroupEnabled = true,
 	AlliesEnabled = true,
 	EnemiesEnabled = true,
 	GuildEnabled = true,
 	NpcsEnabled = false,
 	PetsEnabled = false,
-	FriendsEnabled = true,
+	FriendsEnabled =true,
 
 	FriendlyTankEnabled = true,
 	FriendlyHealerEnabled = true,
@@ -121,6 +120,7 @@ local function GetAndUpgradeDb()
 			vars.FriendlBackgroundEnabled = vars.BackgroundEnabled
 			vars.EnemyBackgroundEnabled = vars.BackgroundEnabled
 			vars.BackgroundEnabled = nil
+			vars.EveryoneEnabled = nil
 
 			vars.Version = 7
 		end
