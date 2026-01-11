@@ -7,7 +7,10 @@ local sliderId = 1
 local dialog
 
 ---@class MiniFramework
-local M = {}
+local M = {
+	VerticalSpacing = 16,
+	HorizontalSpacing = 20,
+}
 addon.Framework = M
 
 local function AddControlForRefresh(panel, control)
@@ -655,6 +658,15 @@ function M:ResetSavedVars(defaults)
 	end
 
 	return vars
+end
+
+function M:ColumnWidth(columns, padding, spacingColumns)
+	local settingsWidth, _ = M:SettingsSize()
+	-- add padding to the left and right
+	local usableWidth = settingsWidth - (padding * 2)
+	local width = math.floor(usableWidth / (columns + spacingColumns))
+
+	return width
 end
 
 local function OnAddonLoaded(_, _, name)

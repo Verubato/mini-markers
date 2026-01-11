@@ -1,8 +1,6 @@
 local _, addon = ...
 ---@type MiniFramework
 local mini = addon.Framework
-local verticalSpacing = 14
-local horizontalSpacing = 20
 ---@class Db
 local dbDefaults = {
 	Version = 7,
@@ -59,10 +57,6 @@ local dbDefaults = {
 
 local M = {
 	DbDefaults = dbDefaults,
-	VerticalSpacing = verticalSpacing,
-	HorizontalSpacing = horizontalSpacing,
-	LeftInset = horizontalSpacing,
-	RightInset = horizontalSpacing,
 	Panels = {},
 }
 addon.Config = M

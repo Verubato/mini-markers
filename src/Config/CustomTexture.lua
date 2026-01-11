@@ -6,9 +6,9 @@ local M = {}
 config.Panels.CustomTexture = M
 
 function M:Build()
-	local leftInset = config.LeftInset
-	local verticalSpacing = config.VerticalSpacing
-	local horizontalSpacing = config.HorizontalSpacing
+	local leftInset = mini.HorizontalSpacing
+	local verticalSpacing = mini.VerticalSpacing
+	local horizontalSpacing = mini.HorizontalSpacing
 
 	---@type Db
 	local db = addon.DB

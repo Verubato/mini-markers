@@ -8,13 +8,13 @@ config.Panels.SpecialIcons = M
 function M:Build()
 	---@type Db
 	local db = addon.DB
-	local leftInset = config.LeftInset
-	local rightInset = config.RightInset
-	local settingsWidth = mini:SettingsSize()
-	local verticalSpacing = config.VerticalSpacing
 	local columns = 2
+	local settingsWidth = mini:SettingsSize()
+	local leftInset = mini.HorizontalSpacing
+	local rightInset = mini.HorizontalSpacing
+	local verticalSpacing = mini.VerticalSpacing
 	local usableWidth = settingsWidth - leftInset - rightInset
-	local columnStep = usableWidth / (columns + 1)
+	local columnStep = mini:ColumnWidth(columns, mini.HorizontalSpacing, 1)
 	local start = usableWidth / 4
 
 	local panel = CreateFrame("Frame")

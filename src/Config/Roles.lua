@@ -6,10 +6,7 @@ local M = {}
 config.Panels.Roles = M
 
 function M:Build()
-	local leftInset = config.LeftInset
-	local rightInset = config.RightInset
-	local settingsWidth = mini:SettingsSize()
-	local verticalSpacing = config.VerticalSpacing
+	local verticalSpacing = mini.VerticalSpacing
 
 	---@type Db
 	local db = addon.DB
@@ -31,8 +28,7 @@ function M:Build()
 	friendlyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
 	local columns = 3
-	local usableWidth = settingsWidth - leftInset - rightInset
-	local columnStep = usableWidth / (columns + 1)
+	local columnStep = mini:ColumnWidth(columns, mini.HorizontalSpacing, 1)
 	local start = math.floor(columnStep / 2)
 
 	local friendlyTankChk = mini:CreateSettingCheckbox({

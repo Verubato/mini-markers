@@ -2,10 +2,6 @@ local addonName, addon = ...
 ---@type MiniFramework
 local mini = addon.Framework
 local config = addon.Config
-local verticalSpacing = 14
-local horizontalSpacing = 20
-local leftInset = horizontalSpacing
-local rightInset = horizontalSpacing
 ---@class Db
 local dbDefaults = config.DbDefaults
 local M = {}
@@ -14,10 +10,11 @@ addon.Config.Panels.Main = M
 function M:Build()
 	---@type Db
 	local db = addon.DB
+	local verticalSpacing = mini.VerticalSpacing
+	local horizontalSpacing = mini.HorizontalSpacing
+	local leftInset = horizontalSpacing
 	local columns = 4
-	local settingsWidth, _ = mini:SettingsSize()
-	local usableWidth = settingsWidth - leftInset - rightInset
-	local columnStep = usableWidth / (columns + 1)
+	local columnStep = mini:ColumnWidth(columns, horizontalSpacing, 1)
 
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
@@ -313,8 +310,9 @@ function M:Build()
 
 	enemyBgChkBox:SetPoint("LEFT", friendlyBgChkBox, "RIGHT", columnStep * 2, 0)
 
-	-- not sure why it needs horizontalSpacing / 2, would have thought just horizontalSpacing itself should do it
-	local sliderWidth = (usableWidth / 2) - horizontalSpacing / 2
+	local settingsWidth = mini:SettingsSize()
+	local usableWidth = settingsWidth - leftInset
+	local sliderWidth = (usableWidth / 2) - horizontalSpacing
 	local sizeSlider, textureSizeBox = mini:CreateSlider({
 		Parent = panel,
 		LabelText = "Size",
