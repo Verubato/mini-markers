@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
+Added FrameSort as dependency.
+
 ## 3.0.0
 
 - Split many single options into separate friendly and enemy settings.
