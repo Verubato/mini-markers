@@ -30,7 +30,7 @@ function M:Build()
 
 	local priority = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
 	priority:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing / 2)
-	priority:SetText("Priority: spec > class > role > texture.")
+	priority:SetText("Priority: spec > role -> class -> texture.")
 
 	local friendlyTypesDivider = mini:CreateDivider(panel, "Friendly Icon Types")
 
