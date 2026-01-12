@@ -283,7 +283,7 @@ local function GetTextureForUnit(unit)
 	end
 
 	if db.PvPEnabled then
-		pass = pass or UnitIsPVP(unit)
+		pass = pass or (isPlayer and UnitIsPVP(unit))
 	end
 
 	if HasAnyRoleFilter(isFriendly, isEnemy) then
