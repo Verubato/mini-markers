@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.2
+
+- Fixed bug when attempting to opening options during combat in Midnight.
+- Fixed priority text.
+
 ## 3.0.1
 
 Added FrameSort as dependency.
