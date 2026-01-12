@@ -313,7 +313,7 @@ function M:Build()
 	local settingsWidth = mini:SettingsSize()
 	local usableWidth = settingsWidth - leftInset
 	local sliderWidth = (usableWidth / 2) - horizontalSpacing
-	local sizeSlider, textureSizeBox = mini:CreateSlider({
+	local sizeSlider = mini:CreateSlider({
 		Parent = panel,
 		LabelText = "Size",
 		Min = 20,
@@ -336,10 +336,10 @@ function M:Build()
 		end,
 	})
 
-	sizeSlider:SetPoint("TOP", friendlyBgChkBox, "BOTTOM", 0, -verticalSpacing * 3)
-	sizeSlider:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+	sizeSlider.Slider:SetPoint("TOP", friendlyBgChkBox, "BOTTOM", 0, -verticalSpacing * 3)
+	sizeSlider.Slider:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local backgroundPaddingSlider, backgroundPaddingBox = mini:CreateSlider({
+	local backgroundPaddingSlider = mini:CreateSlider({
 		LabelText = "Padding",
 		Parent = panel,
 		Min = 0,
@@ -359,9 +359,9 @@ function M:Build()
 		end,
 	})
 
-	backgroundPaddingSlider:SetPoint("LEFT", sizeSlider, "RIGHT", horizontalSpacing, 0)
+	backgroundPaddingSlider.Slider:SetPoint("LEFT", sizeSlider.Slider, "RIGHT", horizontalSpacing, 0)
 
-	local offsetXSlider, offsetXBox = mini:CreateSlider({
+	local offsetXSlider = mini:CreateSlider({
 		LabelText = "X Offset",
 		Parent = panel,
 		Min = -200,
@@ -381,9 +381,9 @@ function M:Build()
 		end,
 	})
 
-	offsetXSlider:SetPoint("TOPLEFT", sizeSlider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+	offsetXSlider.Slider:SetPoint("TOPLEFT", sizeSlider.Slider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
-	local offsetYSlider, offsetYBox = mini:CreateSlider({
+	local offsetYSlider = mini:CreateSlider({
 		Parent = panel,
 		Min = -200,
 		Max = 200,
@@ -403,13 +403,13 @@ function M:Build()
 		end,
 	})
 
-	offsetYSlider:SetPoint("LEFT", offsetXSlider, "RIGHT", horizontalSpacing, 0)
+	offsetYSlider.Slider:SetPoint("LEFT", offsetXSlider.Slider, "RIGHT", horizontalSpacing, 0)
 
 	mini:WireTabNavigation({
-		textureSizeBox,
-		backgroundPaddingBox,
-		offsetXBox,
-		offsetYBox,
+		sizeSlider.EditBox,
+		backgroundPaddingSlider.EditBox,
+		offsetXSlider.EditBox,
+		offsetYSlider.EditBox,
 	})
 
 	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")

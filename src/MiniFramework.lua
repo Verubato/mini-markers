@@ -261,8 +261,7 @@ end
 
 ---Creates an edit box with a label using the specified options.
 ---@param options EditboxOptions
----@return table checkbox
----@return table label
+---@return EditBoxReturn
 function M:CreateEditBox(options)
 	if not options.Parent or not options.GetValue or not options.SetValue then
 		error("Invalid edit box options")
@@ -307,7 +306,7 @@ function M:CreateEditBox(options)
 
 	AddControlForRefresh(options.Parent, box)
 
-	return box, label
+	return { EditBox = box, Label = label }
 end
 
 ---Creates a dropdown menu using the specified options.
@@ -452,6 +451,9 @@ function M:CreateSettingCheckbox(options)
 	checkbox:SetChecked(options.GetValue())
 	checkbox:HookScript("OnClick", function()
 		options.SetValue(checkbox:GetChecked())
+
+		-- check the value changed at the source
+		checkbox:SetChecked(options.GetValue())
 	end)
 
 	if options.Tooltip then
@@ -478,9 +480,7 @@ end
 
 ---Creates a slider using the specified options.
 ---@param options SliderOptions
----@return table checkbox
----@return table editBox
----@return table label
+---@return SliderReturn
 function M:CreateSlider(options)
 	if
 		not options.Parent
@@ -568,7 +568,7 @@ function M:CreateSlider(options)
 	AddControlForRefresh(options.Parent, slider)
 	AddControlForRefresh(options.Parent, box)
 
-	return slider, box, label
+	return { Slider = slider, EditBox = box, Label = label }
 end
 
 ---@param text string
@@ -609,10 +609,10 @@ end
 
 function M:OpenSettings(category, panel)
 	if Settings and Settings.OpenToCategory then
-		if not InCombatLockdown() or CanOpenOptionsDuringCombat() then
+		if not InCombatLockdown() or M:CanOpenOptionsDuringCombat() then
 			Settings.OpenToCategory(category:GetID())
 		else
-			mini:NotifyCombatLockdown()
+			M:NotifyCombatLockdown()
 		end
 	elseif InterfaceOptionsFrame_OpenToCategory then
 		-- workaround the classic bug where the first call opens the Game interface
@@ -702,6 +702,15 @@ loader:SetScript("OnEvent", OnAddonLoaded)
 ---@field Height number?
 ---@field GetValue fun(): string|number
 ---@field SetValue fun(value: string|number)
+
+---@class EditBoxReturn
+---@field EditBox table
+---@field Label table
+
+---@class SliderReturn
+---@field Label table
+---@field EditBox table
+---@field Slider table
 
 ---@class DropdownOptions
 ---@field Parent table
