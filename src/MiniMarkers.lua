@@ -11,6 +11,7 @@ local bnFriendCache = {}
 local bnCacheValid = false
 local backgroundCircle = 1
 local backgroundSquare = 2
+local creatureTypeTotem = 11
 local texturesRoot = "Interface\\AddOns\\" .. addonName .. "\\Textures\\"
 local friendIconTexture = texturesRoot .. "Friend.tga"
 local guildIconTexture = texturesRoot .. "Guild.tga"
@@ -91,6 +92,11 @@ local function IsPet(unit)
 	end
 
 	return false
+end
+
+local function IsTotem(unit)
+	local creatureType, creatureTypeId = UnitCreatureType(unit)
+	return creatureType == "Totem" or creatureTypeId == creatureTypeTotem
 end
 
 local function HasAnyRoleFilter(isFriendly, isEnemy)
@@ -200,6 +206,11 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
+	-- ignore totems
+	if IsTotem(unit) then
+		return nil
+	end
+
 	local iconWidth = db.IconWidth or dbDefaults.IconWidth
 	local iconHeight = db.IconHeight or dbDefaults.IconHeight
 
@@ -283,6 +294,7 @@ local function GetTextureForUnit(unit)
 		else
 			local resolved = ResolveUnit(unit) or unit
 			local specId = fs.Inspector:GetUnitSpecId(resolved)
+
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
 				role = specRole
