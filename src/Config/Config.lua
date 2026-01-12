@@ -143,9 +143,9 @@ function M:Init()
 	local specialPanel = M.Panels.SpecialIcons:Build()
 	mini:AddSubCategory(category, specialPanel)
 
-	SLASH_MINIMARKERS1 = "/minimarkers"
-	SLASH_MINIMARKERS2 = "/minim"
-	SLASH_MINIMARKERS3 = "/mm"
-
-	mini:RegisterSlashCommand(category, mainPanel)
+	mini:RegisterSlashCommand(category, mainPanel, {
+		"/minimarkers",
+		"/minim",
+		"/mm",
+	})
 end

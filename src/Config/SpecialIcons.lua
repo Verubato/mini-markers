@@ -28,7 +28,7 @@ function M:Build()
 	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
 	description:SetText("Use special icons for friends and guild members.")
 
-	local friendsChkBox = mini:CreateSettingCheckbox({
+	local friendsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Friends",
 		Tooltip = "Use a special icon for btag friends.",
@@ -44,7 +44,7 @@ function M:Build()
 	friendsChkBox:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
 	friendsChkBox:SetPoint("LEFT", panel, "LEFT", start, 0)
 
-	local guildChkBox = mini:CreateSettingCheckbox({
+	local guildChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Guild",
 		Tooltip = "Use a special icon for guild members.",
