@@ -7,7 +7,7 @@
 
 ## 3.0.1
 
-Added FrameSort as dependency.
+Added FrameSort as a dependency.
 
 ## 3.0.0
 
