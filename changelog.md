@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.3
+
+- Fixed flagged NPCs showing when PvP checkbox ticked.
+- Fixed totems from showing markers.
+- Re-ordered config checkboxes to follow the priority.
+
 ## 3.0.2
 
 - Fixed bug when attempting to opening options during combat in Midnight.
