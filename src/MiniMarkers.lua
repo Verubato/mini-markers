@@ -246,7 +246,6 @@ local function GetTextureForUnit(unit)
 	local isPlayer = UnitIsPlayer(unit)
 	local isFriendly = UnitIsFriend("player", unit)
 	local isEnemy = UnitIsEnemy("player", unit)
-	local isFlagged = UnitIsPVP(unit)
 
 	-- treat neutrals as friendly
 	if not isFriendly and not isEnemy then
