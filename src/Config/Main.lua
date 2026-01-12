@@ -38,22 +38,6 @@ function M:Build()
 	friendlyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	friendlyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local classIconsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Class Icons",
-		Tooltip = "Use special high quality class icons.",
-		GetValue = function()
-			return db.FriendlyClassIcons
-		end,
-		SetValue = function(enabled)
-			db.FriendlyClassIcons = enabled
-			addon:Refresh()
-		end,
-	})
-
-	classIconsChkBox:SetPoint("TOP", friendlyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	classIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
-
 	local specIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Spec Icons",
@@ -72,7 +56,8 @@ function M:Build()
 		end,
 	})
 
-	specIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", columnStep, 0)
+	specIconsChkBox:SetPoint("TOP", friendlyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	specIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local roleIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -89,6 +74,21 @@ function M:Build()
 
 	roleIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", columnStep, 0)
 
+	local classIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Class Icons",
+		Tooltip = "Use special high quality class icons.",
+		GetValue = function()
+			return db.FriendlyClassIcons
+		end,
+		SetValue = function(enabled)
+			db.FriendlyClassIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	classIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", columnStep, 0)
+
 	local textureIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Texture Icons",
@@ -102,29 +102,13 @@ function M:Build()
 		end,
 	})
 
-	textureIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", columnStep, 0)
+	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", columnStep, 0)
 
 	local enemyTypesDivider = mini:CreateDivider(panel, "Enemy Icon Types")
 
 	enemyTypesDivider:SetPoint("TOP", textureIconsChkBox, "BOTTOM", 0, -verticalSpacing)
 	enemyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	enemyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-
-	local enemyClassIconsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "Class Icons",
-		Tooltip = "Use special high quality class icons.",
-		GetValue = function()
-			return db.EnemyClassIcons
-		end,
-		SetValue = function(enabled)
-			db.EnemyClassIcons = enabled
-			addon:Refresh()
-		end,
-	})
-
-	enemyClassIconsChkBox:SetPoint("TOP", enemyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	enemyClassIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local enemySpecIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -144,7 +128,8 @@ function M:Build()
 		end,
 	})
 
-	enemySpecIconsChkBox:SetPoint("LEFT", enemyClassIconsChkBox, "RIGHT", columnStep, 0)
+	enemySpecIconsChkBox:SetPoint("TOP", enemyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	enemySpecIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local enemyRoleIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
@@ -161,6 +146,21 @@ function M:Build()
 
 	enemyRoleIconsChkBox:SetPoint("LEFT", enemySpecIconsChkBox, "RIGHT", columnStep, 0)
 
+	local enemyClassIconsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "Class Icons",
+		Tooltip = "Use special high quality class icons.",
+		GetValue = function()
+			return db.EnemyClassIcons
+		end,
+		SetValue = function(enabled)
+			db.EnemyClassIcons = enabled
+			addon:Refresh()
+		end,
+	})
+
+	enemyClassIconsChkBox:SetPoint("LEFT", enemyRoleIconsChkBox, "RIGHT", columnStep, 0)
+
 	local enemyTextureIconsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Texture Icons",
@@ -174,7 +174,7 @@ function M:Build()
 		end,
 	})
 
-	enemyTextureIconsChkBox:SetPoint("LEFT", enemyRoleIconsChkBox, "RIGHT", columnStep, 0)
+	enemyTextureIconsChkBox:SetPoint("LEFT", enemyClassIconsChkBox, "RIGHT", columnStep, 0)
 
 	local filtersDivider = mini:CreateDivider(panel, "Filters")
 
@@ -243,21 +243,6 @@ function M:Build()
 
 	pvpChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", columnStep, 0)
 
-	local npcsChkBox = mini:CreateSettingCheckbox({
-		Parent = panel,
-		LabelText = "NPCs",
-		Tooltip = "Show markers for NPCs.",
-		GetValue = function()
-			return db.NpcsEnabled
-		end,
-		SetValue = function(enabled)
-			db.NpcsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
-
-	npcsChkBox:SetPoint("TOPLEFT", alliesChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
-
 	local petsChkBox = mini:CreateSettingCheckbox({
 		Parent = panel,
 		LabelText = "Pets",
@@ -271,7 +256,22 @@ function M:Build()
 		end,
 	})
 
-	petsChkBox:SetPoint("LEFT", npcsChkBox, "RIGHT", columnStep, 0)
+	petsChkBox:SetPoint("TOPLEFT", alliesChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
+
+	local npcsChkBox = mini:CreateSettingCheckbox({
+		Parent = panel,
+		LabelText = "NPCs",
+		Tooltip = "Show markers for NPCs.",
+		GetValue = function()
+			return db.NpcsEnabled
+		end,
+		SetValue = function(enabled)
+			db.NpcsEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	npcsChkBox:SetPoint("LEFT", petsChkBox, "RIGHT", columnStep, 0)
 
 	local sizeDivider = mini:CreateDivider(panel, "Size & Position & Background")
 
