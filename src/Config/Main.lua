@@ -32,13 +32,13 @@ function M:Build()
 	priority:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing / 2)
 	priority:SetText("Priority: spec > role -> class -> texture.")
 
-	local friendlyTypesDivider = mini:CreateDivider(panel, "Friendly Icon Types")
+	local friendlyTypesDivider = mini:Divider({ Parent = panel, Text = "Friendly Icon Types" })
 
 	friendlyTypesDivider:SetPoint("TOP", priority, "BOTTOM", 0, -verticalSpacing)
 	friendlyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	friendlyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local specIconsChkBox = mini:CreateSettingCheckbox({
+	local specIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Spec Icons",
 		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
@@ -47,7 +47,7 @@ function M:Build()
 		end,
 		SetValue = function(enabled)
 			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
-				mini:ShowDialog("Spec icons requires FrameSort 7.8.1+ to function.")
+				mini:ShowDialog({ Text = "Spec icons requires FrameSort 7.8.1+ to function." })
 				return
 			end
 
@@ -59,7 +59,7 @@ function M:Build()
 	specIconsChkBox:SetPoint("TOP", friendlyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	specIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local roleIconsChkBox = mini:CreateSettingCheckbox({
+	local roleIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Role Icons",
 		Tooltip = "Use tank/healer/dps role icons.",
@@ -74,7 +74,7 @@ function M:Build()
 
 	roleIconsChkBox:SetPoint("LEFT", specIconsChkBox, "RIGHT", columnStep, 0)
 
-	local classIconsChkBox = mini:CreateSettingCheckbox({
+	local classIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Class Icons",
 		Tooltip = "Use special high quality class icons.",
@@ -89,7 +89,7 @@ function M:Build()
 
 	classIconsChkBox:SetPoint("LEFT", roleIconsChkBox, "RIGHT", columnStep, 0)
 
-	local textureIconsChkBox = mini:CreateSettingCheckbox({
+	local textureIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Texture Icons",
 		Tooltip = "Use the specified texture for icons.",
@@ -104,13 +104,13 @@ function M:Build()
 
 	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", columnStep, 0)
 
-	local enemyTypesDivider = mini:CreateDivider(panel, "Enemy Icon Types")
+	local enemyTypesDivider = mini:Divider({ Parent = panel, Text = "Enemy Icon Types" })
 
 	enemyTypesDivider:SetPoint("TOP", textureIconsChkBox, "BOTTOM", 0, -verticalSpacing)
 	enemyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	enemyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local enemySpecIconsChkBox = mini:CreateSettingCheckbox({
+	local enemySpecIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Spec Icons",
 		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
@@ -119,7 +119,7 @@ function M:Build()
 		end,
 		SetValue = function(enabled)
 			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
-				mini:ShowDialog("Spec icons requires FrameSort 7.8.1+ to function.")
+				mini:ShowDialog({ Text = "Spec icons requires FrameSort 7.8.1+ to function." })
 				return
 			end
 
@@ -131,7 +131,7 @@ function M:Build()
 	enemySpecIconsChkBox:SetPoint("TOP", enemyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	enemySpecIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local enemyRoleIconsChkBox = mini:CreateSettingCheckbox({
+	local enemyRoleIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Role Icons",
 		Tooltip = "Use tank/healer/dps role icons.",
@@ -146,7 +146,7 @@ function M:Build()
 
 	enemyRoleIconsChkBox:SetPoint("LEFT", enemySpecIconsChkBox, "RIGHT", columnStep, 0)
 
-	local enemyClassIconsChkBox = mini:CreateSettingCheckbox({
+	local enemyClassIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Class Icons",
 		Tooltip = "Use special high quality class icons.",
@@ -161,7 +161,7 @@ function M:Build()
 
 	enemyClassIconsChkBox:SetPoint("LEFT", enemyRoleIconsChkBox, "RIGHT", columnStep, 0)
 
-	local enemyTextureIconsChkBox = mini:CreateSettingCheckbox({
+	local enemyTextureIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Texture Icons",
 		Tooltip = "Use the specified texture for icons.",
@@ -176,13 +176,13 @@ function M:Build()
 
 	enemyTextureIconsChkBox:SetPoint("LEFT", enemyClassIconsChkBox, "RIGHT", columnStep, 0)
 
-	local filtersDivider = mini:CreateDivider(panel, "Filters")
+	local filtersDivider = mini:Divider({ Parent = panel, Text = "Filters" })
 
 	filtersDivider:SetPoint("TOP", enemyClassIconsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
 	filtersDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	filtersDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local alliesChkBox = mini:CreateSettingCheckbox({
+	local alliesChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Allies",
 		Tooltip = "Show markers for all friendly players.",
@@ -198,7 +198,7 @@ function M:Build()
 	alliesChkBox:SetPoint("TOP", filtersDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	alliesChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local enemiesChkBox = mini:CreateSettingCheckbox({
+	local enemiesChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Enemies",
 		Tooltip = "Show markers for all enemy players.",
@@ -213,7 +213,7 @@ function M:Build()
 
 	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", columnStep, 0)
 
-	local groupChkBox = mini:CreateSettingCheckbox({
+	local groupChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Group",
 		Tooltip = "Show markers for group members.",
@@ -228,7 +228,7 @@ function M:Build()
 
 	groupChkBox:SetPoint("LEFT", enemiesChkBox, "RIGHT", columnStep, 0)
 
-	local pvpChkBox = mini:CreateSettingCheckbox({
+	local pvpChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "PvP",
 		Tooltip = "Show markers for pvp flagged members.",
@@ -243,7 +243,7 @@ function M:Build()
 
 	pvpChkBox:SetPoint("LEFT", groupChkBox, "RIGHT", columnStep, 0)
 
-	local petsChkBox = mini:CreateSettingCheckbox({
+	local petsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Pets",
 		Tooltip = "Show markers for pets.",
@@ -258,7 +258,7 @@ function M:Build()
 
 	petsChkBox:SetPoint("TOPLEFT", alliesChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
 
-	local npcsChkBox = mini:CreateSettingCheckbox({
+	local npcsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "NPCs",
 		Tooltip = "Show markers for NPCs.",
@@ -273,13 +273,13 @@ function M:Build()
 
 	npcsChkBox:SetPoint("LEFT", petsChkBox, "RIGHT", columnStep, 0)
 
-	local sizeDivider = mini:CreateDivider(panel, "Size & Position & Background")
+	local sizeDivider = mini:Divider({ Parent = panel, Text = "Size & Position & Background" })
 
 	sizeDivider:SetPoint("TOP", petsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
 	sizeDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	sizeDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local friendlyBgChkBox = mini:CreateSettingCheckbox({
+	local friendlyBgChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Friendly Background",
 		Tooltip = "Add a background behind friendly icons.",
@@ -295,7 +295,7 @@ function M:Build()
 	friendlyBgChkBox:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	friendlyBgChkBox:SetPoint("LEFT", panel, "LEFT", columnStep, 0)
 
-	local enemyBgChkBox = mini:CreateSettingCheckbox({
+	local enemyBgChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Enemy Background",
 		Tooltip = "Add a background behind enemy icons.",
@@ -313,7 +313,7 @@ function M:Build()
 	local settingsWidth = mini:SettingsSize()
 	local usableWidth = settingsWidth - leftInset
 	local sliderWidth = (usableWidth / 2) - horizontalSpacing
-	local sizeSlider = mini:CreateSlider({
+	local sizeSlider = mini:Slider({
 		Parent = panel,
 		LabelText = "Size",
 		Min = 20,
@@ -339,7 +339,7 @@ function M:Build()
 	sizeSlider.Slider:SetPoint("TOP", friendlyBgChkBox, "BOTTOM", 0, -verticalSpacing * 3)
 	sizeSlider.Slider:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local backgroundPaddingSlider = mini:CreateSlider({
+	local backgroundPaddingSlider = mini:Slider({
 		LabelText = "Padding",
 		Parent = panel,
 		Min = 0,
@@ -361,7 +361,7 @@ function M:Build()
 
 	backgroundPaddingSlider.Slider:SetPoint("LEFT", sizeSlider.Slider, "RIGHT", horizontalSpacing, 0)
 
-	local offsetXSlider = mini:CreateSlider({
+	local offsetXSlider = mini:Slider({
 		LabelText = "X Offset",
 		Parent = panel,
 		Min = -200,
@@ -383,7 +383,7 @@ function M:Build()
 
 	offsetXSlider.Slider:SetPoint("TOPLEFT", sizeSlider.Slider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
-	local offsetYSlider = mini:CreateSlider({
+	local offsetYSlider = mini:Slider({
 		Parent = panel,
 		Min = -200,
 		Max = 200,

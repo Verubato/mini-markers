@@ -21,7 +21,7 @@ function M:Build()
 	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
 	description:SetText("Additional role filters and colouring.")
 
-	local friendlyDivider = mini:CreateDivider(panel, "Friendly Filters")
+	local friendlyDivider = mini:Divider({ Parent = panel, Text = "Friendly Filters" })
 
 	friendlyDivider:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
 	friendlyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
@@ -31,7 +31,7 @@ function M:Build()
 	local columnStep = mini:ColumnWidth(columns, mini.HorizontalSpacing, 1)
 	local start = math.floor(columnStep / 2)
 
-	local friendlyTankChk = mini:CreateSettingCheckbox({
+	local friendlyTankChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Tanks",
 		Tooltip = "Show icons for friendly tanks.",
@@ -47,7 +47,7 @@ function M:Build()
 	friendlyTankChk:SetPoint("TOP", friendlyDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	friendlyTankChk:SetPoint("LEFT", panel, "LEFT", start, 0)
 
-	local friendlyHealerChk = mini:CreateSettingCheckbox({
+	local friendlyHealerChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Healers",
 		Tooltip = "Show icons for friendly healers.",
@@ -62,7 +62,7 @@ function M:Build()
 
 	friendlyHealerChk:SetPoint("LEFT", friendlyTankChk, "RIGHT", columnStep, 0)
 
-	local friendlyDpsChk = mini:CreateSettingCheckbox({
+	local friendlyDpsChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "DPS",
 		Tooltip = "Show icons for friendly DPS.",
@@ -77,13 +77,13 @@ function M:Build()
 
 	friendlyDpsChk:SetPoint("LEFT", friendlyHealerChk, "RIGHT", columnStep, 0)
 
-	local enemyDivider = mini:CreateDivider(panel, "Enemy Filters")
+	local enemyDivider = mini:Divider({ Parent = panel, Text = "Enemy Filters" })
 
 	enemyDivider:SetPoint("TOP", friendlyDpsChk, "BOTTOM", 0, -verticalSpacing)
 	enemyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	enemyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local enemyTankChk = mini:CreateSettingCheckbox({
+	local enemyTankChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Tanks",
 		Tooltip = "Show icons for enemy tanks.",
@@ -99,7 +99,7 @@ function M:Build()
 	enemyTankChk:SetPoint("TOP", enemyDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	enemyTankChk:SetPoint("LEFT", panel, "LEFT", start, 0)
 
-	local enemyHealerChk = mini:CreateSettingCheckbox({
+	local enemyHealerChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Healers",
 		Tooltip = "Show icons for enemy healers.",
@@ -114,7 +114,7 @@ function M:Build()
 
 	enemyHealerChk:SetPoint("LEFT", enemyTankChk, "RIGHT", columnStep, 0)
 
-	local enemyDpsChk = mini:CreateSettingCheckbox({
+	local enemyDpsChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "DPS",
 		Tooltip = "Show icons for enemy DPS.",
@@ -129,13 +129,13 @@ function M:Build()
 
 	enemyDpsChk:SetPoint("LEFT", enemyHealerChk, "RIGHT", columnStep, 0)
 
-	local colouringDivider = mini:CreateDivider(panel, "Enemy Coloring")
+	local colouringDivider = mini:Divider({ Parent = panel, Text = "Enemy Coloring" })
 
 	colouringDivider:SetPoint("TOP", enemyDpsChk, "BOTTOM", 0, -verticalSpacing)
 	colouringDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	colouringDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local enemyRedChk = mini:CreateSettingCheckbox({
+	local enemyRedChk = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Red enemies",
 		Tooltip = "Show red role and textre colors for enemies.",

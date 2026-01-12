@@ -23,7 +23,7 @@ function M:Build()
 	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing)
 	description:SetText("Specify a custom texture to use.")
 
-	local texture = mini:CreateEditBox({
+	local texture = mini:EditBox({
 		Parent = panel,
 		LabelText = "Texture",
 		-- same width as 2 sliders plus gap
@@ -45,7 +45,7 @@ function M:Build()
 	texture.Label:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 	texture.EditBox:SetPoint("TOPLEFT", texture.Label, "BOTTOMLEFT", 0, -verticalSpacing)
 
-	local textureRot = mini:CreateSlider({
+	local textureRot = mini:Slider({
 		Parent = panel,
 		Min = 0,
 		Max = 360,
