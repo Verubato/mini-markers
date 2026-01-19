@@ -246,8 +246,7 @@ local function GetTextureForUnit(unit)
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
 		else
-			local resolved = ResolveUnit(unit) or unit
-			local specId = fs and fs.Inspector and fs.Inspector:GetUnitSpecId(resolved)
+			local specId = fs and fs.Inspector and fs.Inspector:GetUnitSpecId(unit)
 
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
@@ -272,8 +271,7 @@ local function GetTextureForUnit(unit)
 		and fs.Inspector
 		and fs.Inspector.GetUnitSpecId
 	then
-		local resolved = ResolveUnit(unit) or unit
-		local specId = fs.Inspector:GetUnitSpecId(resolved)
+		local specId = fs.Inspector:GetUnitSpecId(unit)
 
 		if specId then
 			local _, _, _, icon = GetSpecializationInfoByID(specId)
@@ -297,8 +295,7 @@ local function GetTextureForUnit(unit)
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
 		elseif GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
-			local resolved = ResolveUnit(unit) or unit
-			local specId = fs.Inspector:GetUnitSpecId(resolved)
+			local specId = fs.Inspector:GetUnitSpecId(unit)
 
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
