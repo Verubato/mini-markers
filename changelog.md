@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0
+
+Added new DH devourer icon.
+
 ## 3.0.6
 
 Fixed error causing icons to not show.
