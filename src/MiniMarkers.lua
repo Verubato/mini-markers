@@ -34,14 +34,6 @@ local function NormalizeRealm(realm)
 	return realm
 end
 
-local function IsSecret(value)
-	if not issecretvalue then
-		return false
-	end
-
-	return issercretvalue(value)
-end
-
 local function BnKey(name, realm)
 	return name .. "-" .. NormalizeRealm(realm)
 end
@@ -156,44 +148,6 @@ end
 local function GetNameplateAnchor(nameplate)
 	-- nameplate addons hide the UnitFrame but not the nameplate
 	return nameplate.UnitFrame:IsVisible() and nameplate.UnitFrame or nameplate
-end
-
--- FrameSort 7.8.2 does this, but previous version didn't
--- so let's do it here manually for a few weeks then remove it
-local function ResolveUnit(unit)
-	if not string.find(unit, "nameplate") then
-		return unit
-	end
-
-	local _, instanceType = IsInInstance()
-
-	if instanceType ~= "arena" then
-		return unit
-	end
-
-	local count = GetNumArenaOpponentSpecs()
-
-	if count <= 0 then
-		return unit
-	end
-
-	for i = 1, count do
-		local resolvedUnit = "arena" .. i
-		local resolvedPetUnit = "arena" .. i
-		local isUnit = UnitIsUnit(unit, resolvedUnit)
-
-		if not IsSecret(isUnit) and isUnit then
-			return resolvedUnit
-		end
-
-		local isPetUnit = UnitIsUnit(unit, resolvedPetUnit)
-
-		if not IsSecret(isPetUnit) and isPetUnit then
-			return resolvedUnit
-		end
-	end
-
-	return unit
 end
 
 local function GetTextureForUnit(unit)
