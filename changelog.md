@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.6
+
+Fixed error causing icons to not show.
+
 ## 3.0.5
 
 Fixed error being thrown when FrameSort is not installed.
