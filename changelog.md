@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.4
+
+Fixed icons not working in Midnight.
+
 ## 3.0.3
 
 - Fixed flagged NPCs showing when PvP checkbox ticked.
