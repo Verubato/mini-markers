@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.5
+
+Fixed error being thrown when FrameSort is not installed.
+
 ## 3.0.4
 
 Fixed icons not working in Midnight.
