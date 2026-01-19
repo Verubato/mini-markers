@@ -247,7 +247,7 @@ local function GetTextureForUnit(unit)
 			role = UnitGroupRolesAssigned(unit)
 		else
 			local resolved = ResolveUnit(unit) or unit
-			local specId = fs.Inspector:GetUnitSpecId(resolved)
+			local specId = fs and fs.Inspector and fs.Inspector:GetUnitSpecId(resolved)
 
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
