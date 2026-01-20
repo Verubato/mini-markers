@@ -42,8 +42,8 @@ local dbDefaults = {
 	OffsetX = 0,
 	OffsetY = 20,
 
-	IconTexture = "covenantsanctum-renown-doublearrow-depressed",
-	IconRotation = 90,
+	IconTexture = "plunderstorm-glues-logoarrow",
+	IconRotation = 0,
 
 	IconClassColors = true,
 	IconDesaturated = true,

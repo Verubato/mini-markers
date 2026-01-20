@@ -10,6 +10,7 @@
 
 MiniFramework.lua
 Config\Config.lua
+Config\AtlasPicker.lua
 Config\Main.lua
 Config\Roles.lua
 Config\CustomTexture.lua

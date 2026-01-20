@@ -360,25 +360,41 @@ function M:EditBox(options)
 		error("EditBox - options must not be nil.")
 	end
 
-	if not options.Parent or not options.GetValue or not options.SetValue then
+	if not options.Parent or not options.GetValue then
 		error("EditBox - invalid options.")
 	end
 
 	local label = options.Parent:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	label:SetText(options.LabelText or "")
 
-	local box = CreateFrame("EditBox", nil, options.Parent, "InputBoxTemplate")
+	local box = CreateFrame("EditBox", nil, options.Parent)
+	box:SetMultiLine(options.MultiLine or false)
 	box:SetSize(options.Width or 80, options.Height or 20)
 	box:SetAutoFocus(false)
+	box:SetFontObject("GameFontWhite")
+
+	local padding = 10
+	box:SetTextInsets(padding, padding, padding, padding)
+
+	local bg = CreateFrame("Frame", nil, options.Parent, "BackdropTemplate")
+	bg:SetBackdrop({
+		edgeFile = "Interface\\Glues\\Common\\TextPanel-Border",
+		edgeSize = 16,
+	})
+	bg:SetAllPoints(box)
 
 	if options.Numeric then
 		ConfigureNumbericBox(box, options.AllowNegatives)
 	end
 
+	local readonly = options.Readonly == true
+
 	local function Commit()
 		local new = box:GetText()
 
-		options.SetValue(new)
+		if options.SetValue then
+			options.SetValue(new)
+		end
 
 		local value = options.GetValue() or ""
 
@@ -386,12 +402,25 @@ function M:EditBox(options)
 		box:SetCursorPosition(0)
 	end
 
+	if readonly then
+		box:SetScript("OnTextChanged", function(_, userInput)
+			if not userInput then
+				return
+			end
+
+			box:SetText(options.GetValue() or "")
+		end)
+	else
+		box:SetScript("OnEditFocusLost", Commit)
+	end
+
 	box:SetScript("OnEnterPressed", function(boxSelf)
 		boxSelf:ClearFocus()
-		Commit()
-	end)
 
-	box:SetScript("OnEditFocusLost", Commit)
+		if not readonly then
+			Commit()
+		end
+	end)
 
 	function box.MiniRefresh(boxSelf)
 		local value = options.GetValue()
@@ -839,10 +868,12 @@ loader:SetScript("OnEvent", OnAddonLoaded)
 ---@field Tooltip string?
 ---@field Numeric boolean?
 ---@field AllowNegatives boolean?
+---@field MultiLine boolean?
 ---@field Width number?
 ---@field Height number?
+---@field Readonly boolean?
 ---@field GetValue fun(): string|number
----@field SetValue fun(value: string|number)
+---@field SetValue? fun(value: string|number)
 
 ---@class EditBoxReturn
 ---@field EditBox table
