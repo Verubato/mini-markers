@@ -246,6 +246,10 @@ local function GetTextureForUnit(unit)
 		pass = pass or (isPlayer and UnitIsPVP(unit))
 	end
 
+	if not pass then
+		return nil
+	end
+
 	if HasAnyRoleFilter(isFriendly, isEnemy) then
 		local role
 
@@ -260,7 +264,6 @@ local function GetTextureForUnit(unit)
 			end
 		end
 
-		-- doesn't matter if pass is already true, it's hard gated by the role filter here
 		pass = role and IsRoleEnabled(role, isFriendly, isEnemy)
 	end
 
