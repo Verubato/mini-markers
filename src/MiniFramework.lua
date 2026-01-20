@@ -118,6 +118,14 @@ function M:NotifyCombatLockdown()
 	M:Notify("Can't do that during combat.")
 end
 
+function M:IsSecret(value)
+	if not issecretvalue then
+		return false
+	end
+
+	return issecretvalue(value)
+end
+
 function M:CopyTable(src, dst)
 	if type(dst) ~= "table" then
 		dst = {}

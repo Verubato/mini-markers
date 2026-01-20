@@ -88,6 +88,12 @@ end
 
 local function IsTotem(unit)
 	local creatureType, creatureTypeId = UnitCreatureType(unit)
+
+	-- in midnight we can't tell
+	if mini:IsSecret(creatureType) or mini:IsSecret(creatureTypeId) then
+		return false
+	end
+
 	return creatureType == "Totem" or creatureTypeId == creatureTypeTotem
 end
 
