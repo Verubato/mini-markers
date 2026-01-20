@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.1
+
+Logic fix causing markers causing group filter to not work.
+
 ## 3.2.0
 
 - Secret value handling fix for Midnight.
