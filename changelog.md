@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.2.0
+
+- Secret value handling fix for Midnight.
+- Added custom texture selector.
+
 ## 3.1.0
 
 Added new DH devourer icon.
