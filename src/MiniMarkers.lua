@@ -70,6 +70,10 @@ local function IsFriend(unit)
 		return false
 	end
 
+	if mini:IsSecret(name) or mini:IsSecret(realm) then
+		return false
+	end
+
 	local key = BnKey(name, realm)
 	return bnFriendCache[key] == true
 end
