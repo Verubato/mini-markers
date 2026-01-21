@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.2
+
+Secret handling fix.
+
 ## 3.2.1
 
 Logic fix causing markers causing group filter to not work.
