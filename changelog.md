@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.0
+
+Arena option only from Lesh.
+
 ## 3.2.2
 
 Secret handling fix.
