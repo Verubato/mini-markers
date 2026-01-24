@@ -101,6 +101,11 @@ local function IsTotem(unit)
 	return creatureType == "Totem" or creatureTypeId == creatureTypeTotem
 end
 
+local function IsArenaInstance()
+	local inInstance, instanceType = IsInInstance()
+	return inInstance and instanceType == "arena"
+end
+
 local function HasAnyRoleFilter(isFriendly, isEnemy)
 	if isFriendly then
 		return not db.FriendlyTankEnabled or not db.FriendlyHealerEnabled or not db.FriendlyDpsEnabled
@@ -172,6 +177,10 @@ local function GetTextureForUnit(unit)
 
 	-- ignore totems
 	if IsTotem(unit) then
+		return nil
+	end
+
+	if db.ArenaOnlyEnabled and not IsArenaInstance() then
 		return nil
 	end
 
