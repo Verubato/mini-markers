@@ -273,6 +273,21 @@ function M:Build()
 
 	npcsChkBox:SetPoint("LEFT", petsChkBox, "RIGHT", columnStep, 0)
 
+	local arenaOnlyChkBox = mini:Checkbox({
+		Parent = panel,
+		LabelText = "Arena Only",
+		Tooltip = "Show markers only inside arenas.",
+		GetValue = function()
+			return db.ArenaOnlyEnabled
+		end,
+		SetValue = function(enabled)
+			db.ArenaOnlyEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	arenaOnlyChkBox:SetPoint("LEFT", npcsChkBox, "RIGHT", columnStep, 0)
+
 	local sizeDivider = mini:Divider({ Parent = panel, Text = "Size & Position & Background" })
 
 	sizeDivider:SetPoint("TOP", petsChkBox, "BOTTOM", 0, -verticalSpacing / 2)

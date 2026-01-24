@@ -13,6 +13,7 @@ local dbDefaults = {
 	PetsEnabled = false,
 	FriendsEnabled = true,
 	PvPEnabled = true,
+	ArenaOnlyEnabled = false,
 
 	FriendlyTankEnabled = true,
 	FriendlyHealerEnabled = true,
