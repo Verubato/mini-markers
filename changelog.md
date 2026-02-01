@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.3.1
+
+Excluded bgs from Midnight as it's no longer possible.
+
 ## 3.3.0
 
 Arena option only from Lesh.
