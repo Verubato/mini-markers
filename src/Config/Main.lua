@@ -232,7 +232,7 @@ function M:Build()
 
 	local pvpChkBox = mini:Checkbox({
 		Parent = panel,
-		LabelText = "PvP",
+		LabelText = "PvP Flagged",
 		Tooltip = "Show markers for pvp flagged members.",
 		GetValue = function()
 			return db.PvPEnabled
