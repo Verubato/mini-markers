@@ -180,7 +180,9 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
-	if db.ArenaOnlyEnabled and not IsArenaInstance() then
+	local isArena = IsArenaInstance()
+
+	if db.ArenaOnlyEnabled and not isArena then
 		return nil
 	end
 
@@ -240,6 +242,14 @@ local function GetTextureForUnit(unit)
 	local backgroundEnabled = (isFriendly and db.FriendlyBackgroundEnabled) or (isEnemy and db.EnemyBackgroundEnabled)
 
 	if db.EnemiesEnabled then
+		if mini:HasSecrets() then
+			-- in midnight we can't get spec information in bgs
+			-- so we'll only run when in arena
+			if isEnemy and not isArena then
+				return nil
+			end
+		end
+
 		pass = pass or (isPlayer and isEnemy)
 	end
 
