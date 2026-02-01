@@ -104,7 +104,9 @@ function M:Build()
 
 	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", columnStep, 0)
 
-	local enemyTypesDivider = mini:Divider({ Parent = panel, Text = "Enemy Icon Types" })
+	-- bgs don't allow us to determin specs in midnight
+	local enemyText = mini:HasSecrets() and "Enemy Arena Icon Types" or "Enemy Icon Types"
+	local enemyTypesDivider = mini:Divider({ Parent = panel, Text = enemyText })
 
 	enemyTypesDivider:SetPoint("TOP", textureIconsChkBox, "BOTTOM", 0, -verticalSpacing)
 	enemyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)

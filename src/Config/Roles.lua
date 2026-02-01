@@ -129,7 +129,7 @@ function M:Build()
 
 	enemyDpsChk:SetPoint("LEFT", enemyHealerChk, "RIGHT", columnStep, 0)
 
-	local colouringDivider = mini:Divider({ Parent = panel, Text = "Enemy Coloring" })
+	local colouringDivider = mini:Divider({ Parent = panel, Text = "Enemy Colouring" })
 
 	colouringDivider:SetPoint("TOP", enemyDpsChk, "BOTTOM", 0, -verticalSpacing)
 	colouringDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)

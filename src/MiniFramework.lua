@@ -126,6 +126,14 @@ function M:IsSecret(value)
 	return issecretvalue(value)
 end
 
+function M:HasSecrets()
+	if LE_EXPANSION_LEVEL_CURRENT == nil or LE_EXPANSION_MIDNIGHT == nil then
+		return false
+	end
+
+	return LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_MIDNIGHT
+end
+
 function M:CopyTable(src, dst)
 	if type(dst) ~= "table" then
 		dst = {}
