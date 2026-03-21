@@ -168,8 +168,9 @@ end
 -- Selects an icon for a unit in priority order: spec -> role -> class -> texture.
 -- Used for both the single-unit path and the per-arena-unit multi-icon path.
 local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
-	local iconWidth = db.IconWidth or dbDefaults.IconWidth
-	local iconHeight = db.IconHeight or dbDefaults.IconHeight
+	local iconWidth = isEnemy and (db.EnemyIconWidth or dbDefaults.EnemyIconWidth) or (db.FriendlyIconWidth or dbDefaults.FriendlyIconWidth)
+	local iconHeight = isEnemy and (db.EnemyIconHeight or dbDefaults.EnemyIconHeight) or (db.FriendlyIconHeight or dbDefaults.FriendlyIconHeight)
+	local backgroundPadding = isEnemy and (db.EnemyBackgroundPadding or dbDefaults.EnemyBackgroundPadding) or (db.FriendlyBackgroundPadding or dbDefaults.FriendlyBackgroundPadding)
 	local fs = FrameSortApi and FrameSortApi.v3
 
 	if
@@ -191,7 +192,7 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 				FallbackTexture = icon,
 				BackgroundEnabled = backgroundEnabled,
 				BackgroundShape = backgroundSquare,
-				BackgroundPadding = db.BackgroundPadding,
+				BackgroundPadding = backgroundPadding,
 				Width = iconWidth,
 				Height = iconHeight,
 			}
@@ -217,7 +218,7 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 				Texture = texturesRoot .. "Roles\\" .. role .. ".tga",
 				BackgroundEnabled = backgroundEnabled,
 				BackgroundShape = backgroundCircle,
-				BackgroundPadding = db.BackgroundPadding,
+				BackgroundPadding = backgroundPadding,
 				Width = iconWidth,
 				Height = iconHeight,
 				Color = GetUnitColor(unit),
@@ -234,7 +235,7 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
 				BackgroundEnabled = backgroundEnabled,
 				BackgroundShape = backgroundSquare,
-				BackgroundPadding = db.BackgroundPadding,
+				BackgroundPadding = backgroundPadding,
 				Width = iconWidth,
 				Height = iconHeight,
 			}
@@ -246,7 +247,7 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 			Texture = db.IconTexture or dbDefaults.IconTexture,
 			BackgroundEnabled = backgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = db.BackgroundPadding,
+			BackgroundPadding = backgroundPadding,
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
 			Width = iconWidth,
 			Height = iconHeight,
@@ -279,8 +280,8 @@ local function GetTextureForUnit(unit)
 		return nil
 	end
 
-	local iconWidth = db.IconWidth or dbDefaults.IconWidth
-	local iconHeight = db.IconHeight or dbDefaults.IconHeight
+	local iconWidth = db.FriendlyIconWidth or dbDefaults.FriendlyIconWidth
+	local iconHeight = db.FriendlyIconHeight or dbDefaults.FriendlyIconHeight
 
 	if IsPet(unit) then
 		if not db.PetsEnabled then
@@ -292,7 +293,7 @@ local function GetTextureForUnit(unit)
 			Texture = petIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = db.BackgroundPadding,
+			BackgroundPadding = backgroundPadding,
 			Width = iconWidth * petScale,
 			Height = iconHeight * petScale,
 			Color = db.IconClassColors and GetClassColor(unit) or nil,
@@ -304,7 +305,7 @@ local function GetTextureForUnit(unit)
 			Texture = friendIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = db.BackgroundPadding,
+			BackgroundPadding = backgroundPadding,
 			Width = iconWidth,
 			Height = iconHeight,
 		}
@@ -315,7 +316,7 @@ local function GetTextureForUnit(unit)
 			Texture = guildIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = backgroundCircle,
-			BackgroundPadding = db.BackgroundPadding,
+			BackgroundPadding = backgroundPadding,
 			Width = iconWidth,
 			Height = iconHeight,
 		}
@@ -632,7 +633,7 @@ local function ApplyArenaMultiMarker(unit, nameplate, icons)
 		end
 
 		texture:ClearAllPoints()
-		texture:SetPoint("BOTTOM", anchor, "TOP", tonumber(db.OffsetX) or 0, tonumber(db.OffsetY) or 0)
+		texture:SetPoint("BOTTOM", anchor, "TOP", tonumber(db.EnemyOffsetX) or dbDefaults.EnemyOffsetX, tonumber(db.EnemyOffsetY) or dbDefaults.EnemyOffsetY)
 		texture:Show()
 		texture:SetAlphaFromBoolean(secretMatch)
 
@@ -715,8 +716,11 @@ local function AddMarker(unit, nameplate)
 	end
 
 	local anchor = GetNameplateAnchor(nameplate)
+	local isEnemyUnit = UnitIsEnemy("player", unit)
+	local offsetX = isEnemyUnit and (tonumber(db.EnemyOffsetX) or 0) or (tonumber(db.FriendlyOffsetX) or 0)
+	local offsetY = isEnemyUnit and (tonumber(db.EnemyOffsetY) or 0) or (tonumber(db.FriendlyOffsetY) or 0)
 	texture:ClearAllPoints()
-	texture:SetPoint("BOTTOM", anchor, "TOP", tonumber(db.OffsetX) or 0, tonumber(db.OffsetY) or 0)
+	texture:SetPoint("BOTTOM", anchor, "TOP", offsetX, offsetY)
 	texture:Show()
 
 	if options.BackgroundEnabled then

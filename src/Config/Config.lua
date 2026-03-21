@@ -3,7 +3,7 @@ local _, addon = ...
 local mini = addon.Framework
 ---@class Db
 local dbDefaults = {
-	Version = 7,
+	Version = 8,
 
 	GroupEnabled = true,
 	AlliesEnabled = true,
@@ -37,11 +37,17 @@ local dbDefaults = {
 
 	EnableDistanceFading = false,
 
-	IconWidth = 50,
-	IconHeight = 50,
+	FriendlyIconWidth = 50,
+	FriendlyIconHeight = 50,
 
-	OffsetX = 0,
-	OffsetY = 20,
+	EnemyIconWidth = 50,
+	EnemyIconHeight = 50,
+
+	FriendlyOffsetX = 0,
+	FriendlyOffsetY = 20,
+
+	EnemyOffsetX = 0,
+	EnemyOffsetY = 20,
 
 	IconTexture = "plunderstorm-glues-logoarrow",
 	IconRotation = 0,
@@ -51,7 +57,8 @@ local dbDefaults = {
 
 	FriendlyBackgroundEnabled = true,
 	EnemyBackgroundEnabled = true,
-	BackgroundPadding = 6,
+	FriendlyBackgroundPadding = 6,
+	EnemyBackgroundPadding = 6,
 
 	PetIconScale = 0.5,
 }
@@ -119,6 +126,26 @@ local function GetAndUpgradeDb()
 			vars.EveryoneEnabled = nil
 
 			vars.Version = 7
+		elseif vars.Version == 7 then
+			vars.FriendlyIconWidth = vars.IconWidth
+			vars.FriendlyIconHeight = vars.IconHeight
+			vars.FriendlyOffsetX = vars.OffsetX
+			vars.FriendlyOffsetY = vars.OffsetY
+			vars.FriendlyBackgroundPadding = vars.BackgroundPadding
+
+			vars.EnemyIconWidth = vars.IconWidth
+			vars.EnemyIconHeight = vars.IconHeight
+			vars.EnemyOffsetX = vars.OffsetX
+			vars.EnemyOffsetY = vars.OffsetY
+			vars.EnemyBackgroundPadding = vars.BackgroundPadding
+
+			vars.IconWidth = nil
+			vars.IconHeight = nil
+			vars.OffsetX = nil
+			vars.OffsetY = nil
+			vars.BackgroundPadding = nil
+
+			vars.Version = 8
 		end
 	end
 
