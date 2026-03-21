@@ -7,6 +7,20 @@ local dbDefaults = config.DbDefaults
 local M = {}
 addon.Config.Panels.Main = M
 
+StaticPopupDialogs["MINIMARKERS_CONFIRM_RESET"] = {
+	text = "%s",
+	button1 = YES,
+	button2 = NO,
+	OnAccept = function(_, data)
+		if data and data.OnYes then
+			data.OnYes()
+		end
+	end,
+	timeout = 0,
+	whileDead = true,
+	hideOnEscape = true,
+}
+
 function M:Build()
 	---@type Db
 	local db = addon.DB
@@ -439,17 +453,21 @@ function M:Build()
 			return
 		end
 
-		db = mini:ResetSavedVars(dbDefaults)
+		StaticPopup_Show("MINIMARKERS_CONFIRM_RESET", "Are you sure you want to reset to default settings?", nil, {
+			OnYes = function()
+				db = mini:ResetSavedVars(dbDefaults)
 
-		local hasFs = FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector
+				local hasFs = FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector
 
-		if hasFs then
-			db.FriendlySpecIcons = true
-		end
+				if hasFs then
+					db.FriendlySpecIcons = true
+				end
 
-		panel:MiniRefresh()
-		addon:Refresh()
-		mini:Notify("Settings reset to default.")
+				panel:MiniRefresh()
+				addon:Refresh()
+				mini:Notify("Settings reset to default.")
+			end,
+		})
 	end)
 
 	return panel
