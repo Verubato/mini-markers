@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.5.0
+
+Separated size and position config for friendly and enemy units.
+
 ## 3.4.0
 
 Fixed enemy arena units not mapping to the correct icon.
