@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.4.0
+
+Fixed enemy arena units not mapping to the correct icon.
+
 ## 3.3.1
 
 Excluded bgs from Midnight as it's no longer possible.
