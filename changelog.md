@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.0
+
+Removed enemy markers from Midnight since Blizzard have blocked it.
+
 ## 3.5.0
 
 Separated size and position config for friendly and enemy units.
