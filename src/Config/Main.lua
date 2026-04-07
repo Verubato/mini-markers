@@ -118,83 +118,88 @@ function M:Build()
 
 	textureIconsChkBox:SetPoint("LEFT", classIconsChkBox, "RIGHT", columnStep, 0)
 
-	-- bgs don't allow us to determin specs in midnight
-	local enemyText = mini:HasSecrets() and "Enemy Arena Icon Types" or "Enemy Icon Types"
-	local enemyTypesDivider = mini:Divider({ Parent = panel, Text = enemyText })
+	local lastIconTypesWidget = textureIconsChkBox
 
-	enemyTypesDivider:SetPoint("TOP", textureIconsChkBox, "BOTTOM", 0, -verticalSpacing)
-	enemyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	enemyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+	if not mini:HasSecrets() then
+		-- bgs don't allow us to determin specs in midnight
+		local enemyTypesDivider = mini:Divider({ Parent = panel, Text = "Enemy Icon Types" })
 
-	local enemySpecIconsChkBox = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Spec Icons",
-		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
-		GetValue = function()
-			return db.EnemySpecIcons
-		end,
-		SetValue = function(enabled)
-			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
-				mini:ShowDialog({ Text = "Spec icons requires FrameSort 7.8.1+ to function." })
-				return
-			end
+		enemyTypesDivider:SetPoint("TOP", textureIconsChkBox, "BOTTOM", 0, -verticalSpacing)
+		enemyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+		enemyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-			db.EnemySpecIcons = enabled
-			addon:Refresh()
-		end,
-	})
+		local enemySpecIconsChkBox = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Spec Icons",
+			Tooltip = "Use spec icons. Requires FrameSort for this to work.",
+			GetValue = function()
+				return db.EnemySpecIcons
+			end,
+			SetValue = function(enabled)
+				if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
+					mini:ShowDialog({ Text = "Spec icons requires FrameSort 7.8.1+ to function." })
+					return
+				end
 
-	enemySpecIconsChkBox:SetPoint("TOP", enemyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	enemySpecIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+				db.EnemySpecIcons = enabled
+				addon:Refresh()
+			end,
+		})
 
-	local enemyRoleIconsChkBox = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Role Icons",
-		Tooltip = "Use tank/healer/dps role icons.",
-		GetValue = function()
-			return db.EnemyRoleIcons
-		end,
-		SetValue = function(enabled)
-			db.EnemyRoleIcons = enabled
-			addon:Refresh()
-		end,
-	})
+		enemySpecIconsChkBox:SetPoint("TOP", enemyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+		enemySpecIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	enemyRoleIconsChkBox:SetPoint("LEFT", enemySpecIconsChkBox, "RIGHT", columnStep, 0)
+		local enemyRoleIconsChkBox = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Role Icons",
+			Tooltip = "Use tank/healer/dps role icons.",
+			GetValue = function()
+				return db.EnemyRoleIcons
+			end,
+			SetValue = function(enabled)
+				db.EnemyRoleIcons = enabled
+				addon:Refresh()
+			end,
+		})
 
-	local enemyClassIconsChkBox = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Class Icons",
-		Tooltip = "Use special high quality class icons.",
-		GetValue = function()
-			return db.EnemyClassIcons
-		end,
-		SetValue = function(enabled)
-			db.EnemyClassIcons = enabled
-			addon:Refresh()
-		end,
-	})
+		enemyRoleIconsChkBox:SetPoint("LEFT", enemySpecIconsChkBox, "RIGHT", columnStep, 0)
 
-	enemyClassIconsChkBox:SetPoint("LEFT", enemyRoleIconsChkBox, "RIGHT", columnStep, 0)
+		local enemyClassIconsChkBox = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Class Icons",
+			Tooltip = "Use special high quality class icons.",
+			GetValue = function()
+				return db.EnemyClassIcons
+			end,
+			SetValue = function(enabled)
+				db.EnemyClassIcons = enabled
+				addon:Refresh()
+			end,
+		})
 
-	local enemyTextureIconsChkBox = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Texture Icons",
-		Tooltip = "Use the specified texture for icons.",
-		GetValue = function()
-			return db.EnemyTextureIcons
-		end,
-		SetValue = function(enabled)
-			db.EnemyTextureIcons = enabled
-			addon:Refresh()
-		end,
-	})
+		enemyClassIconsChkBox:SetPoint("LEFT", enemyRoleIconsChkBox, "RIGHT", columnStep, 0)
 
-	enemyTextureIconsChkBox:SetPoint("LEFT", enemyClassIconsChkBox, "RIGHT", columnStep, 0)
+		local enemyTextureIconsChkBox = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Texture Icons",
+			Tooltip = "Use the specified texture for icons.",
+			GetValue = function()
+				return db.EnemyTextureIcons
+			end,
+			SetValue = function(enabled)
+				db.EnemyTextureIcons = enabled
+				addon:Refresh()
+			end,
+		})
+
+		enemyTextureIconsChkBox:SetPoint("LEFT", enemyClassIconsChkBox, "RIGHT", columnStep, 0)
+
+		lastIconTypesWidget = enemyClassIconsChkBox
+	end
 
 	local filtersDivider = mini:Divider({ Parent = panel, Text = "Filters" })
 
-	filtersDivider:SetPoint("TOP", enemyClassIconsChkBox, "BOTTOM", 0, -verticalSpacing / 2)
+	filtersDivider:SetPoint("TOP", lastIconTypesWidget, "BOTTOM", 0, -verticalSpacing / 2)
 	filtersDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	filtersDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
@@ -214,20 +219,25 @@ function M:Build()
 	alliesChkBox:SetPoint("TOP", filtersDivider, "BOTTOM", 0, -verticalSpacing / 2)
 	alliesChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
-	local enemiesChkBox = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Enemies",
-		Tooltip = "Show markers for all enemy players.",
-		GetValue = function()
-			return db.EnemiesEnabled
-		end,
-		SetValue = function(enabled)
-			db.EnemiesEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+	local lastFilterWidget = alliesChkBox
 
-	enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", columnStep, 0)
+	if not mini:HasSecrets() then
+		local enemiesChkBox = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Enemies",
+			Tooltip = "Show markers for all enemy players.",
+			GetValue = function()
+				return db.EnemiesEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemiesEnabled = enabled
+				addon:Refresh()
+			end,
+		})
+
+		enemiesChkBox:SetPoint("LEFT", alliesChkBox, "RIGHT", columnStep, 0)
+		lastFilterWidget = enemiesChkBox
+	end
 
 	local groupChkBox = mini:Checkbox({
 		Parent = panel,
@@ -242,7 +252,7 @@ function M:Build()
 		end,
 	})
 
-	groupChkBox:SetPoint("LEFT", enemiesChkBox, "RIGHT", columnStep, 0)
+	groupChkBox:SetPoint("LEFT", lastFilterWidget, "RIGHT", columnStep, 0)
 
 	local pvpChkBox = mini:Checkbox({
 		Parent = panel,
@@ -314,271 +324,277 @@ function M:Build()
 	local usableWidth = settingsWidth - leftInset
 	local sliderWidth = (usableWidth / 2) - horizontalSpacing
 
-	local tabContainer = CreateFrame("Frame", nil, panel)
-	tabContainer:SetPoint("TOP", sizeDivider, "BOTTOM", 0, 0)
-	tabContainer:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	tabContainer:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-	tabContainer:SetHeight(210)
-
 	local friendlyEditBoxes = {}
 	local enemyEditBoxes = {}
 
-	local tabCtrl = mini:CreateTabs({
-		Parent = tabContainer,
-		TabFitToParent = true,
-		ContentInsets = { Left = leftInset, Right = horizontalSpacing, Top = verticalSpacing / 2, Bottom = 0 },
-		Tabs = {
-			{
-				Key = "Friendly",
-				Title = "Friendly",
-				Build = function(content)
-					local bgChkBox = mini:Checkbox({
-						Parent = content,
-						LabelText = "Background",
-						Tooltip = "Add a background behind friendly icons.",
-						GetValue = function()
-							return db.FriendlyBackgroundEnabled
-						end,
-						SetValue = function(enabled)
-							db.FriendlyBackgroundEnabled = enabled
-							addon:Refresh()
-						end,
-					})
+	local function BuildFriendlyContent(content)
+		local bgChkBox = mini:Checkbox({
+			Parent = content,
+			LabelText = "Background",
+			Tooltip = "Add a background behind friendly icons.",
+			GetValue = function()
+				return db.FriendlyBackgroundEnabled
+			end,
+			SetValue = function(enabled)
+				db.FriendlyBackgroundEnabled = enabled
+				addon:Refresh()
+			end,
+		})
 
-					bgChkBox:SetPoint("TOP", content, "TOP", 0, 0)
-					bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+		bgChkBox:SetPoint("TOP", content, "TOP", 0, 0)
+		bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
 
-					local sizeSlider = mini:Slider({
-						Parent = content,
-						LabelText = "Size",
-						Min = 20,
-						Max = 200,
-						Step = 5,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.FriendlyIconWidth) or dbDefaults.FriendlyIconWidth
-						end,
-						SetValue = function(value)
-							local size = mini:ClampInt(value, 20, 200, dbDefaults.FriendlyIconWidth)
+		local sizeSlider = mini:Slider({
+			Parent = content,
+			LabelText = "Size",
+			Min = 20,
+			Max = 200,
+			Step = 5,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.FriendlyIconWidth) or dbDefaults.FriendlyIconWidth
+			end,
+			SetValue = function(value)
+				local size = mini:ClampInt(value, 20, 200, dbDefaults.FriendlyIconWidth)
 
-							if db.FriendlyIconWidth == size and db.FriendlyIconHeight == size then
-								return
-							end
+				if db.FriendlyIconWidth == size and db.FriendlyIconHeight == size then
+					return
+				end
 
-							db.FriendlyIconWidth = size
-							db.FriendlyIconHeight = size
-							addon:Refresh()
-						end,
-					})
+				db.FriendlyIconWidth = size
+				db.FriendlyIconHeight = size
+				addon:Refresh()
+			end,
+		})
 
-					sizeSlider.Slider:SetPoint("TOP", bgChkBox, "BOTTOM", 0, -verticalSpacing * 2)
-					sizeSlider.Slider:SetPoint("LEFT", content, "LEFT", 0, 0)
+		sizeSlider.Slider:SetPoint("TOP", bgChkBox, "BOTTOM", 0, -verticalSpacing * 2)
+		sizeSlider.Slider:SetPoint("LEFT", content, "LEFT", 0, 0)
 
-					local paddingSlider = mini:Slider({
-						Parent = content,
-						LabelText = "Padding",
-						Min = 0,
-						Max = 30,
-						Step = 1,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.FriendlyBackgroundPadding) or dbDefaults.FriendlyBackgroundPadding
-						end,
-						SetValue = function(value)
-							if db.FriendlyBackgroundPadding == value then
-								return
-							end
+		local paddingSlider = mini:Slider({
+			Parent = content,
+			LabelText = "Padding",
+			Min = 0,
+			Max = 30,
+			Step = 1,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.FriendlyBackgroundPadding) or dbDefaults.FriendlyBackgroundPadding
+			end,
+			SetValue = function(value)
+				if db.FriendlyBackgroundPadding == value then
+					return
+				end
 
-							db.FriendlyBackgroundPadding = mini:ClampInt(value, 0, 30, 0)
-							addon:Refresh()
-						end,
-					})
+				db.FriendlyBackgroundPadding = mini:ClampInt(value, 0, 30, 0)
+				addon:Refresh()
+			end,
+		})
 
-					paddingSlider.Slider:SetPoint("LEFT", sizeSlider.Slider, "RIGHT", horizontalSpacing, 0)
+		paddingSlider.Slider:SetPoint("LEFT", sizeSlider.Slider, "RIGHT", horizontalSpacing, 0)
 
-					local offsetXSlider = mini:Slider({
-						Parent = content,
-						LabelText = "X Offset",
-						Min = -200,
-						Max = 200,
-						Step = 5,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.FriendlyOffsetX) or dbDefaults.FriendlyOffsetX
-						end,
-						SetValue = function(value)
-							if db.FriendlyOffsetX == value then
-								return
-							end
+		local offsetXSlider = mini:Slider({
+			Parent = content,
+			LabelText = "X Offset",
+			Min = -200,
+			Max = 200,
+			Step = 5,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.FriendlyOffsetX) or dbDefaults.FriendlyOffsetX
+			end,
+			SetValue = function(value)
+				if db.FriendlyOffsetX == value then
+					return
+				end
 
-							db.FriendlyOffsetX = mini:ClampInt(value, -200, 200, 0)
-							addon:Refresh()
-						end,
-					})
+				db.FriendlyOffsetX = mini:ClampInt(value, -200, 200, 0)
+				addon:Refresh()
+			end,
+		})
 
-					offsetXSlider.Slider:SetPoint("TOPLEFT", sizeSlider.Slider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+		offsetXSlider.Slider:SetPoint("TOPLEFT", sizeSlider.Slider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
 
-					local offsetYSlider = mini:Slider({
-						Parent = content,
-						LabelText = "Y Offset",
-						Min = -200,
-						Max = 200,
-						Step = 5,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.FriendlyOffsetY) or dbDefaults.FriendlyOffsetY
-						end,
-						SetValue = function(value)
-							if db.FriendlyOffsetY == value then
-								return
-							end
+		local offsetYSlider = mini:Slider({
+			Parent = content,
+			LabelText = "Y Offset",
+			Min = -200,
+			Max = 200,
+			Step = 5,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.FriendlyOffsetY) or dbDefaults.FriendlyOffsetY
+			end,
+			SetValue = function(value)
+				if db.FriendlyOffsetY == value then
+					return
+				end
 
-							db.FriendlyOffsetY = mini:ClampInt(value, -200, 200, 0)
-							addon:Refresh()
-						end,
-					})
+				db.FriendlyOffsetY = mini:ClampInt(value, -200, 200, 0)
+				addon:Refresh()
+			end,
+		})
 
-					offsetYSlider.Slider:SetPoint("LEFT", offsetXSlider.Slider, "RIGHT", horizontalSpacing, 0)
+		offsetYSlider.Slider:SetPoint("LEFT", offsetXSlider.Slider, "RIGHT", horizontalSpacing, 0)
 
-					friendlyEditBoxes[1] = sizeSlider.EditBox
-					friendlyEditBoxes[2] = paddingSlider.EditBox
-					friendlyEditBoxes[3] = offsetXSlider.EditBox
-					friendlyEditBoxes[4] = offsetYSlider.EditBox
-				end,
+		friendlyEditBoxes[1] = sizeSlider.EditBox
+		friendlyEditBoxes[2] = paddingSlider.EditBox
+		friendlyEditBoxes[3] = offsetXSlider.EditBox
+		friendlyEditBoxes[4] = offsetYSlider.EditBox
+	end
+
+	local function BuildEnemyContent(content)
+		local bgChkBox = mini:Checkbox({
+			Parent = content,
+			LabelText = "Background",
+			Tooltip = "Add a background behind enemy icons.",
+			GetValue = function()
+				return db.EnemyBackgroundEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemyBackgroundEnabled = enabled
+				addon:Refresh()
+			end,
+		})
+
+		bgChkBox:SetPoint("TOP", content, "TOP", 0, 0)
+		bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+
+		local sizeSlider = mini:Slider({
+			Parent = content,
+			LabelText = "Size",
+			Min = 20,
+			Max = 200,
+			Step = 5,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.EnemyIconWidth) or dbDefaults.EnemyIconWidth
+			end,
+			SetValue = function(value)
+				local size = mini:ClampInt(value, 20, 200, dbDefaults.EnemyIconWidth)
+
+				if db.EnemyIconWidth == size and db.EnemyIconHeight == size then
+					return
+				end
+
+				db.EnemyIconWidth = size
+				db.EnemyIconHeight = size
+				addon:Refresh()
+			end,
+		})
+
+		sizeSlider.Slider:SetPoint("TOP", bgChkBox, "BOTTOM", 0, -verticalSpacing * 2)
+		sizeSlider.Slider:SetPoint("LEFT", content, "LEFT", 0, 0)
+
+		local paddingSlider = mini:Slider({
+			Parent = content,
+			LabelText = "Padding",
+			Min = 0,
+			Max = 30,
+			Step = 1,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.EnemyBackgroundPadding) or dbDefaults.EnemyBackgroundPadding
+			end,
+			SetValue = function(value)
+				if db.EnemyBackgroundPadding == value then
+					return
+				end
+
+				db.EnemyBackgroundPadding = mini:ClampInt(value, 0, 30, 0)
+				addon:Refresh()
+			end,
+		})
+
+		paddingSlider.Slider:SetPoint("LEFT", sizeSlider.Slider, "RIGHT", horizontalSpacing, 0)
+
+		local offsetXSlider = mini:Slider({
+			Parent = content,
+			LabelText = "X Offset",
+			Min = -200,
+			Max = 200,
+			Step = 5,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.EnemyOffsetX) or dbDefaults.EnemyOffsetX
+			end,
+			SetValue = function(value)
+				if db.EnemyOffsetX == value then
+					return
+				end
+
+				db.EnemyOffsetX = mini:ClampInt(value, -200, 200, 0)
+				addon:Refresh()
+			end,
+		})
+
+		offsetXSlider.Slider:SetPoint("TOPLEFT", sizeSlider.Slider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
+
+		local offsetYSlider = mini:Slider({
+			Parent = content,
+			LabelText = "Y Offset",
+			Min = -200,
+			Max = 200,
+			Step = 5,
+			Width = sliderWidth,
+			GetValue = function()
+				return tonumber(db.EnemyOffsetY) or dbDefaults.EnemyOffsetY
+			end,
+			SetValue = function(value)
+				if db.EnemyOffsetY == value then
+					return
+				end
+
+				db.EnemyOffsetY = mini:ClampInt(value, -200, 200, 0)
+				addon:Refresh()
+			end,
+		})
+
+		offsetYSlider.Slider:SetPoint("LEFT", offsetXSlider.Slider, "RIGHT", horizontalSpacing, 0)
+
+		enemyEditBoxes[1] = sizeSlider.EditBox
+		enemyEditBoxes[2] = paddingSlider.EditBox
+		enemyEditBoxes[3] = offsetXSlider.EditBox
+		enemyEditBoxes[4] = offsetYSlider.EditBox
+	end
+
+	if mini:HasSecrets() then
+		local content = CreateFrame("Frame", nil, panel)
+		content:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
+		content:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+		content:SetPoint("RIGHT", panel, "RIGHT", -horizontalSpacing, 0)
+
+		BuildFriendlyContent(content)
+		mini:WireTabNavigation(friendlyEditBoxes)
+	else
+		local tabContainer = CreateFrame("Frame", nil, panel)
+		tabContainer:SetPoint("TOP", sizeDivider, "BOTTOM", 0, 0)
+		tabContainer:SetPoint("LEFT", panel, "LEFT", 0, 0)
+		tabContainer:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+		tabContainer:SetHeight(210)
+
+		local tabCtrl = mini:CreateTabs({
+			Parent = tabContainer,
+			TabFitToParent = true,
+			ContentInsets = { Left = leftInset, Right = horizontalSpacing, Top = verticalSpacing / 2, Bottom = 0 },
+			Tabs = {
+				{ Key = "Friendly", Title = "Friendly", Build = BuildFriendlyContent },
+				{ Key = "Enemy",    Title = "Enemy",    Build = BuildEnemyContent },
 			},
-			{
-				Key = "Enemy",
-				Title = "Enemy",
-				Build = function(content)
-					local bgChkBox = mini:Checkbox({
-						Parent = content,
-						LabelText = "Background",
-						Tooltip = "Add a background behind enemy icons.",
-						GetValue = function()
-							return db.EnemyBackgroundEnabled
-						end,
-						SetValue = function(enabled)
-							db.EnemyBackgroundEnabled = enabled
-							addon:Refresh()
-						end,
-					})
+		})
 
-					bgChkBox:SetPoint("TOP", content, "TOP", 0, 0)
-					bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+		mini:WireTabNavigation(friendlyEditBoxes)
+		mini:WireTabNavigation(enemyEditBoxes)
 
-					local sizeSlider = mini:Slider({
-						Parent = content,
-						LabelText = "Size",
-						Min = 20,
-						Max = 200,
-						Step = 5,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.EnemyIconWidth) or dbDefaults.EnemyIconWidth
-						end,
-						SetValue = function(value)
-							local size = mini:ClampInt(value, 20, 200, dbDefaults.EnemyIconWidth)
+		panel.OnMiniRefresh = function()
+			local friendlyContent = tabCtrl:GetContent("Friendly")
+			if friendlyContent and friendlyContent.MiniRefresh then
+				friendlyContent:MiniRefresh()
+			end
 
-							if db.EnemyIconWidth == size and db.EnemyIconHeight == size then
-								return
-							end
-
-							db.EnemyIconWidth = size
-							db.EnemyIconHeight = size
-							addon:Refresh()
-						end,
-					})
-
-					sizeSlider.Slider:SetPoint("TOP", bgChkBox, "BOTTOM", 0, -verticalSpacing * 2)
-					sizeSlider.Slider:SetPoint("LEFT", content, "LEFT", 0, 0)
-
-					local paddingSlider = mini:Slider({
-						Parent = content,
-						LabelText = "Padding",
-						Min = 0,
-						Max = 30,
-						Step = 1,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.EnemyBackgroundPadding) or dbDefaults.EnemyBackgroundPadding
-						end,
-						SetValue = function(value)
-							if db.EnemyBackgroundPadding == value then
-								return
-							end
-
-							db.EnemyBackgroundPadding = mini:ClampInt(value, 0, 30, 0)
-							addon:Refresh()
-						end,
-					})
-
-					paddingSlider.Slider:SetPoint("LEFT", sizeSlider.Slider, "RIGHT", horizontalSpacing, 0)
-
-					local offsetXSlider = mini:Slider({
-						Parent = content,
-						LabelText = "X Offset",
-						Min = -200,
-						Max = 200,
-						Step = 5,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.EnemyOffsetX) or dbDefaults.EnemyOffsetX
-						end,
-						SetValue = function(value)
-							if db.EnemyOffsetX == value then
-								return
-							end
-
-							db.EnemyOffsetX = mini:ClampInt(value, -200, 200, 0)
-							addon:Refresh()
-						end,
-					})
-
-					offsetXSlider.Slider:SetPoint("TOPLEFT", sizeSlider.Slider, "BOTTOMLEFT", 0, -verticalSpacing * 3)
-
-					local offsetYSlider = mini:Slider({
-						Parent = content,
-						LabelText = "Y Offset",
-						Min = -200,
-						Max = 200,
-						Step = 5,
-						Width = sliderWidth,
-						GetValue = function()
-							return tonumber(db.EnemyOffsetY) or dbDefaults.EnemyOffsetY
-						end,
-						SetValue = function(value)
-							if db.EnemyOffsetY == value then
-								return
-							end
-
-							db.EnemyOffsetY = mini:ClampInt(value, -200, 200, 0)
-							addon:Refresh()
-						end,
-					})
-
-					offsetYSlider.Slider:SetPoint("LEFT", offsetXSlider.Slider, "RIGHT", horizontalSpacing, 0)
-
-					enemyEditBoxes[1] = sizeSlider.EditBox
-					enemyEditBoxes[2] = paddingSlider.EditBox
-					enemyEditBoxes[3] = offsetXSlider.EditBox
-					enemyEditBoxes[4] = offsetYSlider.EditBox
-				end,
-			},
-		},
-	})
-
-	mini:WireTabNavigation(friendlyEditBoxes)
-	mini:WireTabNavigation(enemyEditBoxes)
-
-	panel.OnMiniRefresh = function()
-		local friendlyContent = tabCtrl:GetContent("Friendly")
-		if friendlyContent and friendlyContent.MiniRefresh then
-			friendlyContent:MiniRefresh()
-		end
-
-		local enemyContent = tabCtrl:GetContent("Enemy")
-		if enemyContent and enemyContent.MiniRefresh then
-			enemyContent:MiniRefresh()
+			local enemyContent = tabCtrl:GetContent("Enemy")
+			if enemyContent and enemyContent.MiniRefresh then
+				enemyContent:MiniRefresh()
+			end
 		end
 	end
 

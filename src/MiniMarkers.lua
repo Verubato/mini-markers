@@ -336,9 +336,8 @@ local function GetTextureForUnit(unit)
 
 	if db.EnemiesEnabled then
 		if mini:HasSecrets() then
-			-- in midnight we can't get spec information in bgs
-			-- so we'll only run when in arena
-			if isEnemy and not isArena then
+			-- enemy markers are broken in Midnight
+			if isEnemy then
 				return nil
 			end
 		end
@@ -364,51 +363,6 @@ local function GetTextureForUnit(unit)
 
 	if not pass then
 		return nil
-	end
-
-	-- In Midnight arena, nameplate units can't reveal spec/role/class — only arenaX units can.
-	-- Place one icon per arena slot on the nameplate and use SetAlphaFromBoolean(UnitIsUnit(...))
-	-- so that only the icon belonging to the correct arena unit is visible.
-	if mini:HasSecrets() and isArena and isEnemy then
-		local fs = FrameSortApi and FrameSortApi.v3
-		local icons = {}
-
-		for i = 1, GetNumArenaOpponentSpecs() do
-			local arenaUnit = "arena" .. i
-
-			if UnitExists(arenaUnit) then
-				local arenaPass = true
-
-				if HasAnyRoleFilter(isFriendly, isEnemy) then
-					local role
-
-					if GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
-						local specId = fs.Inspector:GetUnitSpecId(arenaUnit)
-
-						if specId then
-							local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
-							role = specRole
-						end
-					end
-
-					arenaPass = role and IsRoleEnabled(role, isFriendly, isEnemy)
-				end
-
-				if arenaPass then
-					local options = GetIconOptions(arenaUnit, isFriendly, isEnemy, backgroundEnabled)
-
-					if options then
-						icons[#icons + 1] = { Options = options, ArenaUnit = arenaUnit }
-					end
-				end
-			end
-		end
-
-		if #icons == 0 then
-			return nil
-		end
-
-		return { ArenaMulti = true, Icons = icons }
 	end
 
 	if HasAnyRoleFilter(isFriendly, isEnemy) then
@@ -525,155 +479,13 @@ local function HideMarker(nameplate)
 	HideMarkerBackground(marker)
 end
 
-local function GetOrCreateArenaMultiMarker(nameplate, count)
-	if not nameplate.ArenaMultiMarker then
-		nameplate.ArenaMultiMarker = {}
-	end
-
-	local ignoreAlpha = not db.EnableDistanceFading
-
-	for i = 1, count do
-		if not nameplate.ArenaMultiMarker[i] then
-			local entry = {
-				WithColor = nameplate:CreateTexture(nil, "OVERLAY", nil, 7),
-				WithoutColor = nameplate:CreateTexture(nil, "OVERLAY", nil, 7),
-				Background = {
-					Circle = nameplate:CreateTexture(nil, "BACKGROUND"),
-					Square = nameplate:CreateTexture(nil, "BACKGROUND"),
-				},
-			}
-
-			local squareMask = nameplate:CreateMaskTexture()
-			squareMask:SetTexture(texturesRoot .. "Shapes\\White128x128.tga")
-			squareMask:SetAllPoints(entry.Background.Square)
-			entry.Background.Square:AddMaskTexture(squareMask)
-			entry.Background.Square:SetColorTexture(0, 0, 0, 1)
-
-			entry.Background.Circle:SetTexture(texturesRoot .. "Shapes\\Circle128x128.tga")
-			entry.Background.Circle:SetVertexColor(0, 0, 0, 1)
-
-			nameplate.ArenaMultiMarker[i] = entry
-		end
-
-		local entry = nameplate.ArenaMultiMarker[i]
-		entry.WithColor:SetIgnoreParentAlpha(ignoreAlpha)
-		entry.WithoutColor:SetIgnoreParentAlpha(ignoreAlpha)
-		entry.Background.Circle:SetIgnoreParentAlpha(ignoreAlpha)
-		entry.Background.Square:SetIgnoreParentAlpha(ignoreAlpha)
-	end
-
-	return nameplate.ArenaMultiMarker
-end
-
-local function HideArenaMultiMarker(nameplate)
-	if not nameplate.ArenaMultiMarker then
-		return
-	end
-
-	for _, entry in ipairs(nameplate.ArenaMultiMarker) do
-		entry.WithColor:Hide()
-		entry.WithoutColor:Hide()
-		entry.Background.Circle:Hide()
-		entry.Background.Square:Hide()
-	end
-end
-
-local function ApplyArenaMultiMarker(unit, nameplate, icons)
-	HideMarker(nameplate)
-
-	local multiMarker = GetOrCreateArenaMultiMarker(nameplate, #icons)
-	local anchor = GetNameplateAnchor(nameplate)
-
-	-- Hide slots beyond the current icon count
-	for i = #icons + 1, #multiMarker do
-		local entry = multiMarker[i]
-		entry.WithColor:Hide()
-		entry.WithoutColor:Hide()
-		entry.Background.Circle:Hide()
-		entry.Background.Square:Hide()
-	end
-
-	for i, iconData in ipairs(icons) do
-		local entry = multiMarker[i]
-		local options = iconData.Options
-		local arenaUnit = iconData.ArenaUnit
-		local secretMatch = UnitIsUnit(unit, arenaUnit)
-
-		local texture
-
-		if options.Color then
-			texture = entry.WithColor
-			entry.WithoutColor:Hide()
-		else
-			texture = entry.WithoutColor
-			entry.WithColor:Hide()
-		end
-
-		if options.Texture then
-			local name = tonumber(options.Texture) or options.Texture
-			local isAtlas = C_Texture.GetAtlasInfo(name) ~= nil
-
-			if isAtlas then
-				texture:SetAtlas(name, false)
-			else
-				texture:SetTexture(name)
-
-				if not texture:GetTexture() and options.FallbackTexture then
-					texture:SetTexture(options.FallbackTexture)
-				end
-			end
-		end
-
-		texture:SetSize(options.Width or 20, options.Height or 20)
-		texture:SetDesaturated(options.Desaturated and true or false)
-		texture:SetRotation(math.rad(options.Rotation or 0))
-
-		if options.Color then
-			texture:SetVertexColor(options.Color.R, options.Color.G, options.Color.B, options.Color.A)
-		end
-
-		texture:ClearAllPoints()
-		texture:SetPoint("BOTTOM", anchor, "TOP", tonumber(db.EnemyOffsetX) or dbDefaults.EnemyOffsetX, tonumber(db.EnemyOffsetY) or dbDefaults.EnemyOffsetY)
-		texture:Show()
-		texture:SetAlphaFromBoolean(secretMatch)
-
-		if options.BackgroundEnabled then
-			local bg
-
-			if options.BackgroundShape == backgroundCircle then
-				bg = entry.Background.Circle
-				entry.Background.Square:Hide()
-			elseif options.BackgroundShape == backgroundSquare then
-				bg = entry.Background.Square
-				entry.Background.Circle:Hide()
-			end
-
-			if bg then
-				ApplyBackground(bg, texture, options.BackgroundPadding or 0)
-				bg:SetAlphaFromBoolean(secretMatch)
-			end
-		else
-			entry.Background.Circle:Hide()
-			entry.Background.Square:Hide()
-		end
-	end
-end
-
 local function AddMarker(unit, nameplate)
 	local options = GetTextureForUnit(unit)
 
 	if not options then
 		HideMarker(nameplate)
-		HideArenaMultiMarker(nameplate)
 		return
 	end
-
-	if options.ArenaMulti then
-		ApplyArenaMultiMarker(unit, nameplate, options.Icons)
-		return
-	end
-
-	HideArenaMultiMarker(nameplate)
 
 	local marker = GetOrCreateMarker(nameplate)
 

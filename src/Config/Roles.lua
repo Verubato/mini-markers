@@ -77,79 +77,81 @@ function M:Build()
 
 	friendlyDpsChk:SetPoint("LEFT", friendlyHealerChk, "RIGHT", columnStep, 0)
 
-	local enemyDivider = mini:Divider({ Parent = panel, Text = "Enemy Filters" })
+	if not mini:HasSecrets() then
+		local enemyDivider = mini:Divider({ Parent = panel, Text = "Enemy Filters" })
 
-	enemyDivider:SetPoint("TOP", friendlyDpsChk, "BOTTOM", 0, -verticalSpacing)
-	enemyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	enemyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+		enemyDivider:SetPoint("TOP", friendlyDpsChk, "BOTTOM", 0, -verticalSpacing)
+		enemyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+		enemyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local enemyTankChk = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Tanks",
-		Tooltip = "Show icons for enemy tanks.",
-		GetValue = function()
-			return db.EnemyTankEnabled
-		end,
-		SetValue = function(enabled)
-			db.EnemyTankEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+		local enemyTankChk = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Tanks",
+			Tooltip = "Show icons for enemy tanks.",
+			GetValue = function()
+				return db.EnemyTankEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemyTankEnabled = enabled
+				addon:Refresh()
+			end,
+		})
 
-	enemyTankChk:SetPoint("TOP", enemyDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	enemyTankChk:SetPoint("LEFT", panel, "LEFT", start, 0)
+		enemyTankChk:SetPoint("TOP", enemyDivider, "BOTTOM", 0, -verticalSpacing / 2)
+		enemyTankChk:SetPoint("LEFT", panel, "LEFT", start, 0)
 
-	local enemyHealerChk = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Healers",
-		Tooltip = "Show icons for enemy healers.",
-		GetValue = function()
-			return db.EnemyHealerEnabled
-		end,
-		SetValue = function(enabled)
-			db.EnemyHealerEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+		local enemyHealerChk = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Healers",
+			Tooltip = "Show icons for enemy healers.",
+			GetValue = function()
+				return db.EnemyHealerEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemyHealerEnabled = enabled
+				addon:Refresh()
+			end,
+		})
 
-	enemyHealerChk:SetPoint("LEFT", enemyTankChk, "RIGHT", columnStep, 0)
+		enemyHealerChk:SetPoint("LEFT", enemyTankChk, "RIGHT", columnStep, 0)
 
-	local enemyDpsChk = mini:Checkbox({
-		Parent = panel,
-		LabelText = "DPS",
-		Tooltip = "Show icons for enemy DPS.",
-		GetValue = function()
-			return db.EnemyDpsEnabled
-		end,
-		SetValue = function(enabled)
-			db.EnemyDpsEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+		local enemyDpsChk = mini:Checkbox({
+			Parent = panel,
+			LabelText = "DPS",
+			Tooltip = "Show icons for enemy DPS.",
+			GetValue = function()
+				return db.EnemyDpsEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemyDpsEnabled = enabled
+				addon:Refresh()
+			end,
+		})
 
-	enemyDpsChk:SetPoint("LEFT", enemyHealerChk, "RIGHT", columnStep, 0)
+		enemyDpsChk:SetPoint("LEFT", enemyHealerChk, "RIGHT", columnStep, 0)
 
-	local colouringDivider = mini:Divider({ Parent = panel, Text = "Enemy Colouring" })
+		local colouringDivider = mini:Divider({ Parent = panel, Text = "Enemy Colouring" })
 
-	colouringDivider:SetPoint("TOP", enemyDpsChk, "BOTTOM", 0, -verticalSpacing)
-	colouringDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	colouringDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+		colouringDivider:SetPoint("TOP", enemyDpsChk, "BOTTOM", 0, -verticalSpacing)
+		colouringDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+		colouringDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
-	local enemyRedChk = mini:Checkbox({
-		Parent = panel,
-		LabelText = "Red enemies",
-		Tooltip = "Show red role and textre colors for enemies.",
-		GetValue = function()
-			return db.EnemyRedEnabled
-		end,
-		SetValue = function(enabled)
-			db.EnemyRedEnabled = enabled
-			addon:Refresh()
-		end,
-	})
+		local enemyRedChk = mini:Checkbox({
+			Parent = panel,
+			LabelText = "Red enemies",
+			Tooltip = "Show red role and textre colors for enemies.",
+			GetValue = function()
+				return db.EnemyRedEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemyRedEnabled = enabled
+				addon:Refresh()
+			end,
+		})
 
-	enemyRedChk:SetPoint("TOP", colouringDivider, "BOTTOM", 0, -verticalSpacing / 2)
-	enemyRedChk:SetPoint("LEFT", panel, "LEFT", start, 0)
+		enemyRedChk:SetPoint("TOP", colouringDivider, "BOTTOM", 0, -verticalSpacing / 2)
+		enemyRedChk:SetPoint("LEFT", panel, "LEFT", start, 0)
+	end
 
 	return panel
 end
