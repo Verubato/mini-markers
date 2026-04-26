@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1
+
+12.0.5 TOC bump.
+
 ## 4.0.0
 
 Removed enemy markers from Midnight since Blizzard have blocked it.
