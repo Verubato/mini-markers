@@ -328,6 +328,27 @@ function M:Build()
 	local enemyEditBoxes = {}
 
 	local function BuildFriendlyContent(content)
+		local shapeDropdown = mini:Dropdown({
+			Parent = content,
+			Items = { "square", "circle" },
+			GetText = function(value)
+				return value == "circle" and "Circle" or "Square"
+			end,
+			GetValue = function()
+				return db.FriendlyIconShape or dbDefaults.FriendlyIconShape
+			end,
+			SetValue = function(value)
+				db.FriendlyIconShape = value
+				addon:Refresh()
+			end,
+		})
+
+		shapeDropdown:SetPoint("TOPLEFT", content, "TOPLEFT", 50, 0)
+
+		local shapeLabel = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+		shapeLabel:SetPoint("RIGHT", shapeDropdown, "LEFT", -horizontalSpacing / 2, 0)
+		shapeLabel:SetText("Shape")
+
 		local bgChkBox = mini:Checkbox({
 			Parent = content,
 			LabelText = "Background",
@@ -341,8 +362,24 @@ function M:Build()
 			end,
 		})
 
-		bgChkBox:SetPoint("TOP", content, "TOP", 0, 0)
+		bgChkBox:SetPoint("TOP", shapeDropdown, "BOTTOM", 0, -verticalSpacing / 4)
 		bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+
+		local borderChkBox = mini:Checkbox({
+			Parent = content,
+			LabelText = "Border",
+			Tooltip = "Add a class-coloured border around friendly icons.",
+			GetValue = function()
+				return db.FriendlyBorderEnabled
+			end,
+			SetValue = function(enabled)
+				db.FriendlyBorderEnabled = enabled
+				addon:Refresh()
+			end,
+		})
+
+		borderChkBox:SetPoint("LEFT", bgChkBox, "RIGHT", columnStep, 0)
+		borderChkBox:SetPoint("TOP", bgChkBox, "TOP", 0, 0)
 
 		local sizeSlider = mini:Slider({
 			Parent = content,
@@ -443,6 +480,27 @@ function M:Build()
 	end
 
 	local function BuildEnemyContent(content)
+		local shapeDropdown = mini:Dropdown({
+			Parent = content,
+			Items = { "square", "circle" },
+			GetText = function(value)
+				return value == "circle" and "Circle" or "Square"
+			end,
+			GetValue = function()
+				return db.EnemyIconShape or dbDefaults.EnemyIconShape
+			end,
+			SetValue = function(value)
+				db.EnemyIconShape = value
+				addon:Refresh()
+			end,
+		})
+
+		shapeDropdown:SetPoint("TOPLEFT", content, "TOPLEFT", 50, 0)
+
+		local shapeLabel = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+		shapeLabel:SetPoint("RIGHT", shapeDropdown, "LEFT", -horizontalSpacing / 2, 0)
+		shapeLabel:SetText("Shape")
+
 		local bgChkBox = mini:Checkbox({
 			Parent = content,
 			LabelText = "Background",
@@ -456,8 +514,24 @@ function M:Build()
 			end,
 		})
 
-		bgChkBox:SetPoint("TOP", content, "TOP", 0, 0)
+		bgChkBox:SetPoint("TOP", shapeDropdown, "BOTTOM", 0, -verticalSpacing / 4)
 		bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+
+		local borderChkBox = mini:Checkbox({
+			Parent = content,
+			LabelText = "Border",
+			Tooltip = "Add a class-coloured border around enemy icons.",
+			GetValue = function()
+				return db.EnemyBorderEnabled
+			end,
+			SetValue = function(enabled)
+				db.EnemyBorderEnabled = enabled
+				addon:Refresh()
+			end,
+		})
+
+		borderChkBox:SetPoint("LEFT", bgChkBox, "RIGHT", columnStep, 0)
+		borderChkBox:SetPoint("TOP", bgChkBox, "TOP", 0, 0)
 
 		local sizeSlider = mini:Slider({
 			Parent = content,
@@ -570,7 +644,7 @@ function M:Build()
 		tabContainer:SetPoint("TOP", sizeDivider, "BOTTOM", 0, 0)
 		tabContainer:SetPoint("LEFT", panel, "LEFT", 0, 0)
 		tabContainer:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-		tabContainer:SetHeight(210)
+		tabContainer:SetHeight(240)
 
 		local tabCtrl = mini:CreateTabs({
 			Parent = tabContainer,
