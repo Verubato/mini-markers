@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.0
+
+Added circle shape option plus class coloured borders.
+
 ## 4.0.1
 
 12.0.5 TOC bump.
