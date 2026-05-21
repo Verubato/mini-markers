@@ -11,16 +11,28 @@ local bnFriendCache = {}
 local bnCacheValid = false
 local backgroundCircle = 1
 local backgroundSquare = 2
+local borderThickness = 2
 local creatureTypeTotem = 11
 local texturesRoot = "Interface\\AddOns\\" .. addonName .. "\\Textures\\"
 local friendIconTexture = texturesRoot .. "Friend.tga"
 local guildIconTexture = texturesRoot .. "Guild.tga"
 local petIconTexture = texturesRoot .. "Pet.tga"
+local circleShapeTexture = texturesRoot .. "Shapes\\Circle128x128.tga"
+local squareShapeTexture = texturesRoot .. "Shapes\\White128x128.tga"
+
+local function ResolveShape(shapeName)
+	if shapeName == "circle" then
+		return backgroundCircle
+	end
+	return backgroundSquare
+end
 
 ---@class Marker
 ---@field WithColor table
 ---@field WithoutColor table
+---@field IconMask table
 ---@field Background table
+---@field Border table
 
 local function IsUnitInMyGroup(unit)
 	return UnitIsUnit(unit, "player") or UnitInParty(unit) or UnitInRaid(unit)
@@ -171,6 +183,10 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 	local iconWidth = isEnemy and (db.EnemyIconWidth or dbDefaults.EnemyIconWidth) or (db.FriendlyIconWidth or dbDefaults.FriendlyIconWidth)
 	local iconHeight = isEnemy and (db.EnemyIconHeight or dbDefaults.EnemyIconHeight) or (db.FriendlyIconHeight or dbDefaults.FriendlyIconHeight)
 	local backgroundPadding = isEnemy and (db.EnemyBackgroundPadding or dbDefaults.EnemyBackgroundPadding) or (db.FriendlyBackgroundPadding or dbDefaults.FriendlyBackgroundPadding)
+	local shapeName = isEnemy and (db.EnemyIconShape or dbDefaults.EnemyIconShape) or (db.FriendlyIconShape or dbDefaults.FriendlyIconShape)
+	local shape = ResolveShape(shapeName)
+	local borderEnabled = isEnemy and db.EnemyBorderEnabled or db.FriendlyBorderEnabled
+	local borderColor = borderEnabled and GetClassColor(unit) or nil
 	local fs = FrameSortApi and FrameSortApi.v3
 
 	if
@@ -191,8 +207,10 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 				Texture = texture,
 				FallbackTexture = icon,
 				BackgroundEnabled = backgroundEnabled,
-				BackgroundShape = backgroundSquare,
+				BackgroundShape = shape,
 				BackgroundPadding = backgroundPadding,
+				BorderEnabled = borderEnabled and borderColor ~= nil,
+				BorderColor = borderColor,
 				Width = iconWidth,
 				Height = iconHeight,
 			}
@@ -217,8 +235,10 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 			return {
 				Texture = texturesRoot .. "Roles\\" .. role .. ".tga",
 				BackgroundEnabled = backgroundEnabled,
-				BackgroundShape = backgroundCircle,
+				BackgroundShape = shape,
 				BackgroundPadding = backgroundPadding,
+				BorderEnabled = borderEnabled and borderColor ~= nil,
+				BorderColor = borderColor,
 				Width = iconWidth,
 				Height = iconHeight,
 				Color = GetUnitColor(unit),
@@ -234,8 +254,10 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 			return {
 				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
 				BackgroundEnabled = backgroundEnabled,
-				BackgroundShape = backgroundSquare,
+				BackgroundShape = shape,
 				BackgroundPadding = backgroundPadding,
+				BorderEnabled = borderEnabled and borderColor ~= nil,
+				BorderColor = borderColor,
 				Width = iconWidth,
 				Height = iconHeight,
 			}
@@ -246,8 +268,10 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 		return {
 			Texture = db.IconTexture or dbDefaults.IconTexture,
 			BackgroundEnabled = backgroundEnabled,
-			BackgroundShape = backgroundCircle,
+			BackgroundShape = shape,
 			BackgroundPadding = backgroundPadding,
+			BorderEnabled = borderEnabled and borderColor ~= nil,
+			BorderColor = borderColor,
 			Rotation = db.IconRotation or dbDefaults.IconRotation,
 			Width = iconWidth,
 			Height = iconHeight,
@@ -282,6 +306,10 @@ local function GetTextureForUnit(unit)
 
 	local iconWidth = db.FriendlyIconWidth or dbDefaults.FriendlyIconWidth
 	local iconHeight = db.FriendlyIconHeight or dbDefaults.FriendlyIconHeight
+	local friendlyBackgroundPadding = db.FriendlyBackgroundPadding or dbDefaults.FriendlyBackgroundPadding
+	local friendlyShape = ResolveShape(db.FriendlyIconShape or dbDefaults.FriendlyIconShape)
+	local friendlyBorderColor = db.FriendlyBorderEnabled and GetClassColor(unit) or nil
+	local friendlyBorderEnabled = db.FriendlyBorderEnabled and friendlyBorderColor ~= nil
 
 	if IsPet(unit) then
 		if not db.PetsEnabled then
@@ -292,8 +320,10 @@ local function GetTextureForUnit(unit)
 		return {
 			Texture = petIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
-			BackgroundShape = backgroundCircle,
-			BackgroundPadding = backgroundPadding,
+			BackgroundShape = friendlyShape,
+			BackgroundPadding = friendlyBackgroundPadding,
+			BorderEnabled = friendlyBorderEnabled,
+			BorderColor = friendlyBorderColor,
 			Width = iconWidth * petScale,
 			Height = iconHeight * petScale,
 			Color = db.IconClassColors and GetClassColor(unit) or nil,
@@ -304,8 +334,10 @@ local function GetTextureForUnit(unit)
 		return {
 			Texture = friendIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
-			BackgroundShape = backgroundCircle,
-			BackgroundPadding = backgroundPadding,
+			BackgroundShape = friendlyShape,
+			BackgroundPadding = friendlyBackgroundPadding,
+			BorderEnabled = friendlyBorderEnabled,
+			BorderColor = friendlyBorderColor,
 			Width = iconWidth,
 			Height = iconHeight,
 		}
@@ -315,8 +347,10 @@ local function GetTextureForUnit(unit)
 		return {
 			Texture = guildIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
-			BackgroundShape = backgroundCircle,
-			BackgroundPadding = backgroundPadding,
+			BackgroundShape = friendlyShape,
+			BackgroundPadding = friendlyBackgroundPadding,
+			BorderEnabled = friendlyBorderEnabled,
+			BorderColor = friendlyBorderColor,
 			Width = iconWidth,
 			Height = iconHeight,
 		}
@@ -401,6 +435,8 @@ local function GetOrCreateMarker(nameplate)
 		marker.WithoutColor:SetIgnoreParentAlpha(ignoreAlpha)
 		marker.Background.Circle:SetIgnoreParentAlpha(ignoreAlpha)
 		marker.Background.Square:SetIgnoreParentAlpha(ignoreAlpha)
+		marker.Border.Circle:SetIgnoreParentAlpha(ignoreAlpha)
+		marker.Border.Square:SetIgnoreParentAlpha(ignoreAlpha)
 
 		return marker
 	end
@@ -408,32 +444,57 @@ local function GetOrCreateMarker(nameplate)
 	marker = {
 		WithoutColor = nameplate:CreateTexture(nil, "OVERLAY", nil, 7),
 		WithColor = nameplate:CreateTexture(nil, "OVERLAY", nil, 7),
+		IconMask = nameplate:CreateMaskTexture(),
 		Background = {
-			Circle = nameplate:CreateTexture(nil, "BACKGROUND"),
-			Square = nameplate:CreateTexture(nil, "BACKGROUND"),
+			Circle = nameplate:CreateTexture(nil, "BACKGROUND", nil, 1),
+			Square = nameplate:CreateTexture(nil, "BACKGROUND", nil, 1),
+		},
+		Border = {
+			Circle = nameplate:CreateTexture(nil, "BACKGROUND", nil, 0),
+			Square = nameplate:CreateTexture(nil, "BACKGROUND", nil, 0),
 		},
 	}
 
 	local bg = marker.Background
 
 	local squareTexture = nameplate:CreateMaskTexture()
-	squareTexture:SetTexture(texturesRoot .. "Shapes\\White128x128.tga")
+	squareTexture:SetTexture(squareShapeTexture)
 	squareTexture:SetAllPoints(bg.Square)
 
 	bg.Square:AddMaskTexture(squareTexture)
 	bg.Square:SetColorTexture(0, 0, 0, 1)
 
 	-- don't use masks for circles as they don't scale properly at different sizes
-	bg.Circle:SetTexture(texturesRoot .. "Shapes\\Circle128x128.tga")
+	bg.Circle:SetTexture(circleShapeTexture)
 	bg.Circle:SetVertexColor(0, 0, 0, 1)
+
+	local border = marker.Border
+
+	local borderSquareMask = nameplate:CreateMaskTexture()
+	borderSquareMask:SetTexture(squareShapeTexture)
+	borderSquareMask:SetAllPoints(border.Square)
+
+	border.Square:AddMaskTexture(borderSquareMask)
+	border.Square:SetColorTexture(1, 1, 1, 1)
+
+	border.Circle:SetTexture(circleShapeTexture)
+
+	-- masks icon textures to the configured shape; texture changes per shape in AddMarker
+	marker.IconMask:SetTexture(squareShapeTexture)
+	marker.WithColor:AddMaskTexture(marker.IconMask)
+	marker.WithoutColor:AddMaskTexture(marker.IconMask)
 
 	marker.WithColor:SetIgnoreParentAlpha(ignoreAlpha)
 	marker.WithoutColor:SetIgnoreParentAlpha(ignoreAlpha)
 	bg.Circle:SetIgnoreParentAlpha(ignoreAlpha)
 	bg.Square:SetIgnoreParentAlpha(ignoreAlpha)
+	border.Circle:SetIgnoreParentAlpha(ignoreAlpha)
+	border.Square:SetIgnoreParentAlpha(ignoreAlpha)
 
 	marker.WithoutColor:Hide()
 	marker.WithColor:Hide()
+	border.Circle:Hide()
+	border.Square:Hide()
 
 	nameplate.Marker = marker
 	return marker
@@ -453,17 +514,31 @@ local function HideMarkerBackground(marker)
 	end
 end
 
-local function ApplyBackground(bg, texture, padding)
-	padding = padding or 0
+local function HideMarkerBorder(marker)
+	if not marker.Border then
+		return
+	end
+
+	if marker.Border.Circle then
+		marker.Border.Circle:Hide()
+	end
+
+	if marker.Border.Square then
+		marker.Border.Square:Hide()
+	end
+end
+
+local function ApplyShape(shapeTexture, texture, extraPadding)
+	extraPadding = extraPadding or 0
 
 	local w, h = texture:GetSize()
-	local size = math.max(w, h) + padding * 2
+	local size = math.max(w, h) + extraPadding * 2
 	size = math.floor(size + 0.5)
 
-	bg:ClearAllPoints()
-	bg:SetPoint("CENTER", texture, "CENTER")
-	bg:SetSize(size, size)
-	bg:Show()
+	shapeTexture:ClearAllPoints()
+	shapeTexture:SetPoint("CENTER", texture, "CENTER")
+	shapeTexture:SetSize(size, size)
+	shapeTexture:Show()
 end
 
 local function HideMarker(nameplate)
@@ -477,6 +552,7 @@ local function HideMarker(nameplate)
 	marker.WithoutColor:Hide()
 
 	HideMarkerBackground(marker)
+	HideMarkerBorder(marker)
 end
 
 local function AddMarker(unit, nameplate)
@@ -535,6 +611,14 @@ local function AddMarker(unit, nameplate)
 	texture:SetPoint("BOTTOM", anchor, "TOP", offsetX, offsetY)
 	texture:Show()
 
+	local shapeTextureFile = options.BackgroundShape == backgroundCircle and circleShapeTexture or squareShapeTexture
+	marker.IconMask:SetTexture(shapeTextureFile)
+	marker.IconMask:ClearAllPoints()
+	marker.IconMask:SetAllPoints(texture)
+
+	HideMarkerBackground(marker)
+	HideMarkerBorder(marker)
+
 	if options.BackgroundEnabled then
 		local padding = options.BackgroundPadding or 0
 		local bg
@@ -545,13 +629,26 @@ local function AddMarker(unit, nameplate)
 			bg = marker.Background.Square
 		end
 
-		HideMarkerBackground(marker)
-
 		if bg then
-			ApplyBackground(bg, texture, padding)
+			ApplyShape(bg, texture, padding)
 		end
-	else
-		HideMarkerBackground(marker)
+	end
+
+	if options.BorderEnabled and options.BorderColor then
+		local padding = options.BackgroundEnabled and (options.BackgroundPadding or 0) or 0
+		local border
+
+		if options.BackgroundShape == backgroundCircle then
+			border = marker.Border.Circle
+			border:SetVertexColor(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B, options.BorderColor.A)
+		elseif options.BackgroundShape == backgroundSquare then
+			border = marker.Border.Square
+			border:SetColorTexture(options.BorderColor.R, options.BorderColor.G, options.BorderColor.B, options.BorderColor.A)
+		end
+
+		if border then
+			ApplyShape(border, texture, padding + borderThickness)
+		end
 	end
 end
 

@@ -3,7 +3,7 @@ local _, addon = ...
 local mini = addon.Framework
 ---@class Db
 local dbDefaults = {
-	Version = 8,
+	Version = 9,
 
 	GroupEnabled = true,
 	AlliesEnabled = true,
@@ -59,6 +59,11 @@ local dbDefaults = {
 	EnemyBackgroundEnabled = true,
 	FriendlyBackgroundPadding = 6,
 	EnemyBackgroundPadding = 6,
+
+	FriendlyIconShape = "square",
+	EnemyIconShape = "square",
+	FriendlyBorderEnabled = false,
+	EnemyBorderEnabled = false,
 
 	PetIconScale = 0.5,
 }
@@ -146,6 +151,13 @@ local function GetAndUpgradeDb()
 			vars.BackgroundPadding = nil
 
 			vars.Version = 8
+		elseif vars.Version == 8 then
+			vars.FriendlyIconShape = dbDefaults.FriendlyIconShape
+			vars.EnemyIconShape = dbDefaults.EnemyIconShape
+			vars.FriendlyBorderEnabled = dbDefaults.FriendlyBorderEnabled
+			vars.EnemyBorderEnabled = dbDefaults.EnemyBorderEnabled
+
+			vars.Version = 9
 		end
 	end
 
