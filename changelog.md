@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.1.1
+
+- Fix for flickering borders.
+- Fixed markers not showing on opposite-faction arena teammates (cross-faction / mercenary mode).
+
 ## 4.1.0
 
 Added circle shape option plus class coloured borders.
