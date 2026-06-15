@@ -438,6 +438,15 @@ local function GetTextureForUnit(unit)
 	return GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 end
 
+-- nameplates move at sub-pixel positions; the default pixel-grid snapping rounds
+-- each texture's edges to the device grid independently, so the border rim shifts
+-- by +/-1px frame-to-frame as a unit drifts, which reads as flickering. Disabling
+-- snapping keeps every texture aligned to the icon at exact (fractional) positions.
+local function DisablePixelSnapping(texture)
+	texture:SetSnapToPixelGrid(false)
+	texture:SetTexelSnappingBias(0)
+end
+
 ---@return Marker
 local function GetOrCreateMarker(nameplate)
 	local marker = nameplate.Marker
@@ -469,11 +478,20 @@ local function GetOrCreateMarker(nameplate)
 		},
 	}
 
+	DisablePixelSnapping(marker.WithoutColor)
+	DisablePixelSnapping(marker.WithColor)
+	DisablePixelSnapping(marker.IconMask)
+	DisablePixelSnapping(marker.Background.Circle)
+	DisablePixelSnapping(marker.Background.Square)
+	DisablePixelSnapping(marker.Border.Circle)
+	DisablePixelSnapping(marker.Border.Square)
+
 	local bg = marker.Background
 
 	local squareTexture = nameplate:CreateMaskTexture()
 	squareTexture:SetTexture(squareShapeTexture)
 	squareTexture:SetAllPoints(bg.Square)
+	DisablePixelSnapping(squareTexture)
 
 	bg.Square:AddMaskTexture(squareTexture)
 	bg.Square:SetColorTexture(0, 0, 0, 1)
@@ -487,6 +505,7 @@ local function GetOrCreateMarker(nameplate)
 	local borderSquareMask = nameplate:CreateMaskTexture()
 	borderSquareMask:SetTexture(squareShapeTexture)
 	borderSquareMask:SetAllPoints(border.Square)
+	DisablePixelSnapping(borderSquareMask)
 
 	border.Square:AddMaskTexture(borderSquareMask)
 	border.Square:SetColorTexture(1, 1, 1, 1)
