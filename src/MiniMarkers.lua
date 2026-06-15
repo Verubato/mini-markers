@@ -152,6 +152,26 @@ local function IsRoleEnabled(role, isFriendly, isEnemy)
 	return false
 end
 
+-- Resolves whether a unit should be treated as friendly or enemy.
+-- Group members are always friendly: opposite-faction arena teammates (cross-faction /
+-- mercenary mode) can make UnitIsEnemy report them as hostile, which would otherwise
+-- route them down the enemy path and drop their marker.
+local function GetUnitReaction(unit)
+	if IsUnitInMyGroup(unit) then
+		return true, false
+	end
+
+	local isFriendly = UnitIsFriend("player", unit)
+	local isEnemy = UnitIsEnemy("player", unit)
+
+	-- treat neutrals as friendly
+	if not isFriendly and not isEnemy then
+		isFriendly = true
+	end
+
+	return isFriendly, isEnemy
+end
+
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
 	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
@@ -159,7 +179,7 @@ local function GetClassColor(unit)
 end
 
 local function GetUnitColor(unit)
-	local isEnemy = UnitIsEnemy("player", unit)
+	local _, isEnemy = GetUnitReaction(unit)
 
 	if isEnemy and db.EnemyRedEnabled then
 		return { R = 1, G = 0, B = 0, A = 1 }
@@ -357,13 +377,7 @@ local function GetTextureForUnit(unit)
 	end
 
 	local isPlayer = UnitIsPlayer(unit)
-	local isFriendly = UnitIsFriend("player", unit)
-	local isEnemy = UnitIsEnemy("player", unit)
-
-	-- treat neutrals as friendly
-	if not isFriendly and not isEnemy then
-		isFriendly = true
-	end
+	local isFriendly, isEnemy = GetUnitReaction(unit)
 
 	local pass = false
 	local backgroundEnabled = (isFriendly and db.FriendlyBackgroundEnabled) or (isEnemy and db.EnemyBackgroundEnabled)
@@ -604,7 +618,7 @@ local function AddMarker(unit, nameplate)
 	end
 
 	local anchor = GetNameplateAnchor(nameplate)
-	local isEnemyUnit = UnitIsEnemy("player", unit)
+	local _, isEnemyUnit = GetUnitReaction(unit)
 	local offsetX = isEnemyUnit and (tonumber(db.EnemyOffsetX) or 0) or (tonumber(db.FriendlyOffsetX) or 0)
 	local offsetY = isEnemyUnit and (tonumber(db.EnemyOffsetY) or 0) or (tonumber(db.FriendlyOffsetY) or 0)
 	texture:ClearAllPoints()
