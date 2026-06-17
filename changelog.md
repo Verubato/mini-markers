@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.1.2
+
+12.0.7 TOC bump.
+
 ## 4.1.1
 
 - Fix for flickering borders.
