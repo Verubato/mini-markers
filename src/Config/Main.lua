@@ -284,6 +284,21 @@ function M:Build()
 
 	petsChkBox:SetPoint("TOPLEFT", alliesChkBox, "BOTTOMLEFT", 0, -verticalSpacing / 4)
 
+	local ownPetChkBox = mini:Checkbox({
+		Parent = panel,
+		LabelText = "My Pet",
+		Tooltip = "Show a marker for your own pet, even when Pets is disabled.",
+		GetValue = function()
+			return db.OwnPetEnabled
+		end,
+		SetValue = function(enabled)
+			db.OwnPetEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	ownPetChkBox:SetPoint("LEFT", petsChkBox, "RIGHT", columnStep, 0)
+
 	local npcsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "NPCs",
@@ -297,7 +312,7 @@ function M:Build()
 		end,
 	})
 
-	npcsChkBox:SetPoint("LEFT", petsChkBox, "RIGHT", columnStep, 0)
+	npcsChkBox:SetPoint("LEFT", ownPetChkBox, "RIGHT", columnStep, 0)
 
 	local arenaOnlyChkBox = mini:Checkbox({
 		Parent = panel,
