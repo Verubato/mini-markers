@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.0
+
+Added own pet icon.
+
 ## 4.1.2
 
 12.0.7 TOC bump.
