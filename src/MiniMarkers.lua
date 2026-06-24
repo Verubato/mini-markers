@@ -17,6 +17,7 @@ local texturesRoot = "Interface\\AddOns\\" .. addonName .. "\\Textures\\"
 local friendIconTexture = texturesRoot .. "Friend.tga"
 local guildIconTexture = texturesRoot .. "Guild.tga"
 local petIconTexture = texturesRoot .. "Pet.tga"
+local ownPetIconTexture = texturesRoot .. "OwnPet.blp"
 local circleShapeTexture = texturesRoot .. "Shapes\\Circle128x128.tga"
 local squareShapeTexture = texturesRoot .. "Shapes\\White128x128.tga"
 
@@ -90,8 +91,12 @@ local function IsFriend(unit)
 	return bnFriendCache[key] == true
 end
 
+local function IsOwnPet(unit)
+	return UnitIsUnit(unit, "pet")
+end
+
 local function IsPet(unit)
-	if UnitIsUnit(unit, "pet") then
+	if IsOwnPet(unit) then
 		return true
 	end
 
@@ -332,13 +337,21 @@ local function GetTextureForUnit(unit)
 	local friendlyBorderEnabled = db.FriendlyBorderEnabled and friendlyBorderColor ~= nil
 
 	if IsPet(unit) then
-		if not db.PetsEnabled then
+		local isOwnPet = IsOwnPet(unit)
+
+		if isOwnPet then
+			if not db.OwnPetEnabled then
+				return nil
+			end
+		elseif not db.PetsEnabled then
 			return nil
 		end
 
-		local petScale = db.PetIconScale or dbDefaults.PetIconScale
+		-- own pet is a deliberate highlight, so render it at full marker size;
+		-- other pets keep the de-emphasized pet scale
+		local petScale = isOwnPet and 1 or (db.PetIconScale or dbDefaults.PetIconScale)
 		return {
-			Texture = petIconTexture,
+			Texture = isOwnPet and ownPetIconTexture or petIconTexture,
 			BackgroundEnabled = db.FriendlyBackgroundEnabled,
 			BackgroundShape = friendlyShape,
 			BackgroundPadding = friendlyBackgroundPadding,

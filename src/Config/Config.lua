@@ -11,6 +11,7 @@ local dbDefaults = {
 	GuildEnabled = true,
 	NpcsEnabled = false,
 	PetsEnabled = false,
+	OwnPetEnabled = false,
 	FriendsEnabled = true,
 	PvPEnabled = true,
 	ArenaOnlyEnabled = false,
