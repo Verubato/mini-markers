@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.2.1
+
+12.1 version support
+
 ## 4.2.0
 
 Added own pet icon.

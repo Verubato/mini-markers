@@ -1,8 +1,8 @@
-## Interface: 120007, 50503, 40402, 38000, 30405, 20505, 11508
+## Interface: 120100, 120007, 50503, 40402, 38000, 30405, 20505, 11508
 ## Title: MiniMarkers
 ## Notes: Creates markers above nameplates.
 ## Author: Verz
-## Version: 4.2.0
+## Version: 4.2.1
 ## SavedVariables: MiniMarkersDB
 ## OptionalDeps: FrameSort
 ## IconTexture: Interface\AddOns\MiniMarkers\Textures\Addon.blp
