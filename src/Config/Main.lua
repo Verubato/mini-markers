@@ -33,17 +33,16 @@ function M:Build()
 	local panel = CreateFrame("Frame")
 	panel.name = addonName
 
-	local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
-	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOP", 0, -verticalSpacing)
-	title:SetText(string.format("%s - %s", addonName, version))
-
-	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
-	description:SetText("Show markers above nameplates.")
+	local header = mini:PanelHeader({
+		Parent = panel,
+		Description = "Show markers above nameplates.",
+		Point = "TOP",
+		Y = -verticalSpacing,
+		Gap = verticalSpacing / 2,
+	})
 
 	local priority = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	priority:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing / 2)
+	priority:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing / 2)
 	priority:SetText("Priority: spec > role -> class -> texture.")
 
 	local friendlyTypesDivider = mini:Divider({ Parent = panel, Text = "Friendly Icon Types" })

@@ -20,13 +20,14 @@ function M:Build()
 	local panel = CreateFrame("Frame")
 	panel.name = "Special Icons"
 
-	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOP", 0, -verticalSpacing)
-	title:SetText("Special Icons")
-
-	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
-	description:SetText("Use special icons for friends and guild members.")
+	local header = mini:PanelHeader({
+		Parent = panel,
+		Title = "Special Icons",
+		Description = "Use special icons for friends and guild members.",
+		Point = "TOP",
+		Y = -verticalSpacing,
+		Gap = verticalSpacing / 2,
+	})
 
 	local friendsChkBox = mini:Checkbox({
 		Parent = panel,
@@ -41,7 +42,7 @@ function M:Build()
 		end,
 	})
 
-	friendsChkBox:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
+	friendsChkBox:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing)
 	friendsChkBox:SetPoint("LEFT", panel, "LEFT", start, 0)
 
 	local guildChkBox = mini:Checkbox({

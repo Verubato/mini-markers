@@ -8,7 +8,7 @@
 ## IconTexture: Interface\AddOns\MiniMarkers\Textures\Addon.blp
 ## X-Curse-Project-ID: 1418841
 
-MiniFramework.lua
+Libs\MiniFramework\MiniFramework.xml
 Config\Config.lua
 Config\AtlasPicker.lua
 Config\Main.lua

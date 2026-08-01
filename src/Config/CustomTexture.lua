@@ -35,13 +35,14 @@ function M:Build()
 	local panel = CreateFrame("Frame")
 	panel.name = "Custom Texture"
 
-	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOP", 0, -verticalSpacing)
-	title:SetText("Custom Texture")
-
-	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing)
-	description:SetText("Specify a custom texture to use.")
+	local header = mini:PanelHeader({
+		Parent = panel,
+		Title = "Custom Texture",
+		Description = "Specify a custom texture to use.",
+		Point = "TOP",
+		Y = -verticalSpacing,
+		Gap = verticalSpacing,
+	})
 
 	local texture = mini:EditBox({
 		Parent = panel,
@@ -60,7 +61,7 @@ function M:Build()
 		end,
 	})
 
-	texture.Label:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
+	texture.Label:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing)
 	texture.Label:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 	texture.EditBox:SetPoint("TOPLEFT", texture.Label, "BOTTOMLEFT", 0, -verticalSpacing)
 

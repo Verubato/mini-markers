@@ -13,17 +13,18 @@ function M:Build()
 	local panel = CreateFrame("Frame")
 	panel.name = "Roles"
 
-	local title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
-	title:SetPoint("TOP", 0, -verticalSpacing)
-	title:SetText("Role Options")
-
-	local description = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	description:SetPoint("TOP", title, "BOTTOM", 0, -verticalSpacing / 2)
-	description:SetText("Additional role filters and colouring.")
+	local header = mini:PanelHeader({
+		Parent = panel,
+		Title = "Role Options",
+		Description = "Additional role filters and colouring.",
+		Point = "TOP",
+		Y = -verticalSpacing,
+		Gap = verticalSpacing / 2,
+	})
 
 	local friendlyDivider = mini:Divider({ Parent = panel, Text = "Friendly Filters" })
 
-	friendlyDivider:SetPoint("TOP", description, "BOTTOM", 0, -verticalSpacing)
+	friendlyDivider:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing)
 	friendlyDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
 	friendlyDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 
