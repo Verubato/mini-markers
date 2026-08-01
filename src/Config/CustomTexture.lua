@@ -1,5 +1,7 @@
 local _, addon = ...
 local config = addon.Config
+---@class Db
+local dbDefaults = config.DbDefaults
 ---@type MiniFramework
 local mini = addon.Framework
 local M = {}
