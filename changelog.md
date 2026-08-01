@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.0
+
+New MiniFramework added across all my mini addons.
+
 ## 4.2.1
 
 12.1 version support
