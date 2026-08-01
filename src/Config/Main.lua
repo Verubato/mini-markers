@@ -36,7 +36,6 @@ function M:Build()
 	local header = mini:PanelHeader({
 		Parent = panel,
 		Description = "Show markers above nameplates.",
-		Y = -verticalSpacing,
 		Gap = verticalSpacing / 2,
 	})
 

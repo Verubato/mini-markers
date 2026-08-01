@@ -17,7 +17,6 @@ function M:Build()
 		Parent = panel,
 		Title = "Role Options",
 		Description = "Additional role filters and colouring.",
-		Y = -verticalSpacing,
 		Gap = verticalSpacing / 2,
 	})
 

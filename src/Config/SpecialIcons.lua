@@ -20,7 +20,6 @@ function M:Build()
 		Parent = panel,
 		Title = "Special Icons",
 		Description = "Use special icons for friends and guild members.",
-		Y = -verticalSpacing,
 		Gap = verticalSpacing / 2,
 	})
 
