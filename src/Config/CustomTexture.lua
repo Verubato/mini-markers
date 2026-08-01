@@ -39,7 +39,6 @@ function M:Build()
 		Parent = panel,
 		Title = "Custom Texture",
 		Description = "Specify a custom texture to use.",
-		Point = "TOP",
 		Y = -verticalSpacing,
 		Gap = verticalSpacing,
 	})

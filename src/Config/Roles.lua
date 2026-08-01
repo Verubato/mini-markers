@@ -17,7 +17,6 @@ function M:Build()
 		Parent = panel,
 		Title = "Role Options",
 		Description = "Additional role filters and colouring.",
-		Point = "TOP",
 		Y = -verticalSpacing,
 		Gap = verticalSpacing / 2,
 	})
@@ -30,7 +29,7 @@ function M:Build()
 
 	local columns = 3
 	local columnStep = mini:ColumnWidth(columns, mini.HorizontalSpacing, 1)
-	local start = math.floor(columnStep / 2)
+	local start = 0
 
 	local friendlyTankChk = mini:Checkbox({
 		Parent = panel,

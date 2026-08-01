@@ -26,7 +26,7 @@ function M:Build()
 	local db = addon.DB
 	local verticalSpacing = mini.VerticalSpacing
 	local horizontalSpacing = mini.HorizontalSpacing
-	local leftInset = horizontalSpacing
+	local leftInset = 0
 	local columns = 4
 	local columnStep = mini:ColumnWidth(columns, horizontalSpacing, 1)
 
@@ -36,13 +36,12 @@ function M:Build()
 	local header = mini:PanelHeader({
 		Parent = panel,
 		Description = "Show markers above nameplates.",
-		Point = "TOP",
 		Y = -verticalSpacing,
 		Gap = verticalSpacing / 2,
 	})
 
 	local priority = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	priority:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing / 2)
+	priority:SetPoint("TOPLEFT", header.Anchor, "BOTTOMLEFT", 0, -verticalSpacing / 2)
 	priority:SetText("Priority: spec > role -> class -> texture.")
 
 	local friendlyTypesDivider = mini:Divider({ Parent = panel, Text = "Friendly Icon Types" })

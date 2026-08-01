@@ -9,13 +9,9 @@ function M:Build()
 	---@type Db
 	local db = addon.DB
 	local columns = 2
-	local settingsWidth = mini:SettingsSize()
-	local leftInset = mini.HorizontalSpacing
-	local rightInset = mini.HorizontalSpacing
 	local verticalSpacing = mini.VerticalSpacing
-	local usableWidth = settingsWidth - leftInset - rightInset
 	local columnStep = mini:ColumnWidth(columns, mini.HorizontalSpacing, 1)
-	local start = usableWidth / 4
+	local start = 0
 
 	local panel = CreateFrame("Frame")
 	panel.name = "Special Icons"
@@ -24,7 +20,6 @@ function M:Build()
 		Parent = panel,
 		Title = "Special Icons",
 		Description = "Use special icons for friends and guild members.",
-		Point = "TOP",
 		Y = -verticalSpacing,
 		Gap = verticalSpacing / 2,
 	})
