@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.1
+
+- Updated interface versions for the latest Classic, TBC and Mists builds.
+- Fixed the addon version showing on config sub-panels.
+
 ## 4.3.0
 
 New MiniFramework added across all my mini addons.
