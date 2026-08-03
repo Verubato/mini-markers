@@ -4,6 +4,7 @@ local mini = addon.Framework
 local config = addon.Config
 ---@class Db
 local dbDefaults = config.DbDefaults
+---@class MainPanel
 local M = {}
 addon.Config.Panels.Main = M
 
