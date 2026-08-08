@@ -22,17 +22,17 @@ More features will be added over time, so stay tuned!
 
 ## Screenshots
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotSettings.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/Settings.png)
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotSpecIcons.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/SpecIcons.png)
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotTextureIcons.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/TextureIcons.png)
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotSmilyIcons.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/SmilyIcons.png)
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotRoleIcons.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/RoleIcons.png)
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotClassIcons.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/ClassIcons.png)
 
 ## Download
 
