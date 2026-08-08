@@ -760,7 +760,7 @@ function addon:Refresh()
 end
 
 if not C_NamePlate or not C_NamePlate.GetNamePlates or not C_NamePlate.GetNamePlateForUnit then
-	mini:Notify("Unable to run due to missing nameplate APIs.")
+	mini:NotifyWithPrefix("Unable to run due to missing nameplate APIs.")
 	return
 end
 
