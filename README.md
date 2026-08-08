@@ -22,17 +22,17 @@ More features will be added over time, so stay tuned!
 
 ## Screenshots
 
-![MiniMarkers screenshot](https://media.forgecdn.net/attachments/1459/68/screenshot-settings-png.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotSettings.png)
 
-![MiniMarkers screenshot](https://media.forgecdn.net/attachments/1457/942/screenshot-spec-icons-png.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotSpecIcons.png)
 
-![MiniMarkers screenshot](https://media.forgecdn.net/attachments/1456/947/screenshot-texture-icons-png.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotTextureIcons.png)
 
-![MiniMarkers screenshot](https://media.forgecdn.net/attachments/1456/946/screenshot-smily-icons-png.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotSmilyIcons.png)
 
-![MiniMarkers screenshot](https://media.forgecdn.net/attachments/1456/933/screenshot-role-icons-png.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotRoleIcons.png)
 
-![MiniMarkers screenshot](https://media.forgecdn.net/attachments/1454/664/screenshot-class-icons-png.png)
+![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/ScreenshotClassIcons.png)
 
 ## Download
 
