@@ -179,7 +179,13 @@ end
 
 local function GetClassColor(unit)
 	local _, classTag = UnitClass(unit)
-	local color = classTag and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
+
+	-- a secret class can't be used as a table key
+	if not classTag or mini:IsSecret(classTag) then
+		return nil
+	end
+
+	local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[classTag]
 	return color and { R = color.r, G = color.g, B = color.b, A = 1 }
 end
 
