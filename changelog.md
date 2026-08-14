@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.3.5
+
+Dropped old retail clients support.
+
 ## 4.3.4
 
 Fixed an error on Midnight clients when the game returned a protected class for a nameplate unit.
