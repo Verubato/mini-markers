@@ -1,7 +1,7 @@
 # MiniMarkers bot reference
 
-Addon: MiniMarkers, version 4.3.3, by Verz.
-Supported interface versions (from the .toc): 120100, 120007, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0 / 12.0.7) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
+Addon: MiniMarkers, version 4.3.5, by Verz.
+Supported interface versions (from the .toc): 120100, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
 Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort.
 
 ## What it does
