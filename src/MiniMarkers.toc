@@ -3,7 +3,7 @@
 ## Notes: Creates markers above nameplates.
 ## Category: Mini
 ## Author: Verz
-## Version: 4.3.5
+## Version: 4.3.6
 ## SavedVariables: MiniMarkersDB
 ## OptionalDeps: FrameSort
 ## IconTexture: Interface\AddOns\MiniMarkers\Textures\Addon.blp
