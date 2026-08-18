@@ -2,7 +2,7 @@
 
 Addon: MiniMarkers, version 4.3.5, by Verz.
 Supported interface versions (from the .toc): 120100, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
-Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort.
+Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort (used for spec detection when present; MiniMarkers has its own inspector otherwise).
 
 ## What it does
 
@@ -30,8 +30,8 @@ Reaction rules: group members always count as friendly (this covers cross-factio
 
 ## Icon types
 
-- Spec Icons: the unit's specialization icon. Requires the FrameSort addon (7.8.1+). Enabling it without FrameSort shows a dialog: "Spec icons requires FrameSort 7.8.1+ to function."
-- Role Icons: tank/healer/dps icons. For group members the assigned role is used. For anyone else the role is inferred from their spec, which also requires FrameSort.
+- Spec Icons: the unit's specialization icon. Spec data comes from FrameSort when it is installed, otherwise from MiniMarkers' own inspector (see Spec detection).
+- Role Icons: tank/healer/dps icons. For group members the assigned role is used. For anyone else the role is inferred from their spec.
 - Class Icons: high quality class icons.
 - Texture Icons: the custom texture from the Custom Texture panel.
 
@@ -39,7 +39,7 @@ Colouring: role and texture icons are tinted red for enemies when "Red enemies" 
 
 ## Settings
 
-All settings apply immediately. A "Reset" button sits at the top right of the main panel; it asks for confirmation and restores all defaults (it is blocked during combat). If FrameSort is installed, resetting (or a fresh install) turns "Spec Icons" (friendly) on.
+All settings apply immediately. A "Reset" button sits at the top right of the main panel; it asks for confirmation and restores all defaults (it is blocked during combat).
 
 ### Main panel (MiniMarkers)
 
@@ -49,7 +49,7 @@ Friendly Icon Types:
 
 | Option | Default | Notes |
 |---|---|---|
-| Spec Icons | Off (On if FrameSort was installed at first setup) | Requires FrameSort 7.8.1+ |
+| Spec Icons | On | On for new installs and after a reset; an existing config keeps whatever it was set to |
 | Role Icons | Off | |
 | Class Icons | On | |
 | Texture Icons | Off | Uses the Custom Texture panel's texture |
@@ -90,7 +90,7 @@ Size & Position & Background: two tabs, Friendly and Enemy, each with the same c
 
 ### Roles subpanel
 
-Role filters only take effect once at least one role is unchecked on that side. When they are active, units whose role cannot be determined (not in your group and no FrameSort spec data) are hidden.
+Role filters only take effect once at least one role is unchecked on that side. When they are active, units whose role cannot be determined (not in your group and no spec data yet) are hidden.
 
 - Friendly Filters: Tanks (On), Healers (On), DPS (On).
 - Enemy Filters (hidden on Midnight clients): Tanks (On), Healers (On), DPS (On).
@@ -117,10 +117,21 @@ These exist in MiniMarkersDB but have no options widget:
 | IconDesaturated | true | Desaturate role and texture icons before tinting |
 | EnableDistanceFading | false | When false, markers ignore nameplate alpha fading and stay fully opaque |
 | PetIconScale | 0.5 | Size multiplier for other players' pet icons (own pet is always full size) |
+| SpecCache | {} | GUID -> spec cache written by the built-in inspector, not a user setting. Entries expire after 3 days |
+
+## Spec detection
+
+Spec IDs are resolved through a fallback chain, first hit wins:
+
+1. FrameSort's Inspector API, when FrameSort is installed.
+2. MiniMarkers' own inspector: a cached GUID -> spec table, then the unit's tooltip, then an async `NotifyInspect` queue that walks your group. Results are cached in MiniMarkersDB and survive reloads for 3 days.
+3. `GetArenaOpponentSpec` for arena opponents, matched to nameplate units by unit token.
+
+Only friendly units can be inspected, so enemy specs come from the tooltip or from the arena opponent list. Markers refresh automatically whenever any source learns a new spec.
 
 ## Integrations
 
-- FrameSort (optional dependency): provides spec detection via its Inspector API. Needed for spec icons, and for role icons / role filters on units outside your group. MiniMarkers refreshes markers whenever FrameSort reports new inspect data.
+- FrameSort (optional dependency): its Inspector API is the preferred spec source and is asked first. MiniMarkers refreshes markers whenever FrameSort reports new inspect data. Nothing breaks without it; the built-in inspector takes over.
 - Nameplate addons (Plater, Platynator, etc.): supported. Markers anchor to the Blizzard nameplate unit frame, or to the nameplate itself when an addon hides that frame. MiniMarkers deliberately processes nameplate events one frame late so nameplate addons run first.
 
 ## Version-gated behaviour
@@ -137,8 +148,8 @@ On clients without nameplate APIs at all, the addon prints "Unable to run due to
 
 - No markers at all: check that nameplates are enabled in the game (friendly and/or enemy nameplates, default keys V / shift-V). Markers can only attach to visible nameplates. Also check "Arena Only" is not on while outside an arena.
 - No marker on my own character: intentional. Your own nameplate is always skipped.
-- Spec icons not showing: FrameSort 7.8.1+ must be installed and enabled. Spec data also has to be inspected first, so icons can appear a moment after a unit shows up.
-- Role icons missing on some players: players outside your group need FrameSort for role detection; group members need an assigned role.
+- Spec icons not showing: spec data has to be inspected first, so an icon can appear a moment after a unit shows up. Enemies outside arena often never resolve, since the game does not allow inspecting them.
+- Role icons missing on some players: players outside your group need a resolved spec for role detection; group members need an assigned role.
 - Some players lost their markers after I unchecked a role: with any role filter unchecked, units whose role cannot be determined are hidden too.
 - Enemy markers gone / enemy options missing: on Midnight clients enemy markers are unsupported and their options are hidden.
 - Friend icon not showing for a friend: only Battle.net friends currently online in WoW get the icon, not the character-level friends list.

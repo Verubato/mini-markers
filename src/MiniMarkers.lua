@@ -218,17 +218,13 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 	local shape = ResolveShape(shapeName)
 	local borderEnabled = isEnemy and db.EnemyBorderEnabled or db.FriendlyBorderEnabled
 	local borderColor = borderEnabled and GetClassColor(unit) or nil
-	local fs = FrameSortApi and FrameSortApi.v3
 
 	if
 		UnitIsPlayer(unit)
 		and GetSpecializationInfoByID
 		and ((isFriendly and db.FriendlySpecIcons) or (isEnemy and db.EnemySpecIcons))
-		and fs
-		and fs.Inspector
-		and fs.Inspector.GetUnitSpecId
 	then
-		local specId = fs.Inspector:GetUnitSpecId(unit)
+		local specId = addon.InspectorFacade:GetUnitSpecId(unit)
 
 		if specId then
 			local _, _, _, icon = GetSpecializationInfoByID(specId)
@@ -253,8 +249,8 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
-		elseif GetSpecializationInfoByID and fs and fs.Inspector and fs.Inspector.GetUnitSpecId then
-			local specId = fs.Inspector:GetUnitSpecId(unit)
+		elseif GetSpecializationInfoByID then
+			local specId = addon.InspectorFacade:GetUnitSpecId(unit)
 
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
@@ -434,12 +430,11 @@ local function GetTextureForUnit(unit)
 
 	if HasAnyRoleFilter(isFriendly, isEnemy) then
 		local role
-		local fs = FrameSortApi and FrameSortApi.v3
 
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
 		else
-			local specId = fs and fs.Inspector and fs.Inspector:GetUnitSpecId(unit)
+			local specId = GetSpecializationInfoByID and addon.InspectorFacade:GetUnitSpecId(unit)
 
 			if specId then
 				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
@@ -737,18 +732,14 @@ local function OnEvent(_, event, unit)
 	end)
 end
 
-local function OnFrameSortInspect()
+local function OnSpecInspected()
 	UpdateAllNameplates()
 end
 
 local function OnAddonLoaded()
 	addon.Config:Init()
-
-	local fs = FrameSortApi and FrameSortApi.v3
-
-	if fs and fs.Inspector and fs.Inspector.RegisterCallback then
-		fs.Inspector:RegisterCallback(OnFrameSortInspect)
-	end
+	addon.InspectorFacade:Init()
+	addon.InspectorFacade:RegisterCallback(OnSpecInspected)
 
 	db = MiniMarkersDB or {}
 

@@ -25,7 +25,7 @@ local dbDefaults = {
 	EnemyDpsEnabled = true,
 
 	FriendlyClassIcons = true,
-	FriendlySpecIcons = false,
+	FriendlySpecIcons = true,
 	FriendlyTextureIcons = false,
 	FriendlyRoleIcons = false,
 
@@ -76,16 +76,7 @@ local M = {
 addon.Config = M
 
 local function GetAndUpgradeDb()
-	local firstInit = MiniMarkersDB == nil
 	local vars = mini:GetSavedVars(dbDefaults)
-
-	if firstInit then
-		local hasFs = FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector
-
-		if hasFs then
-			vars.FriendlySpecIcons = true
-		end
-	end
 
 	while vars.Version ~= dbDefaults.Version do
 		if not vars.Version or vars.Version == 1 then

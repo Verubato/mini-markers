@@ -53,16 +53,11 @@ function M:Build()
 	local specIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Spec Icons",
-		Tooltip = "Use spec icons. Requires FrameSort for this to work.",
+		Tooltip = "Use spec icons. Specs are detected on inspect, so an icon can take a moment to appear.",
 		GetValue = function()
 			return db.FriendlySpecIcons
 		end,
 		SetValue = function(enabled)
-			if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
-				mini:ShowDialog({ Text = "Spec icons requires FrameSort 7.8.1+ to function." })
-				return
-			end
-
 			db.FriendlySpecIcons = enabled
 			addon:Refresh()
 		end,
@@ -129,16 +124,11 @@ function M:Build()
 		local enemySpecIconsChkBox = mini:Checkbox({
 			Parent = panel,
 			LabelText = "Spec Icons",
-			Tooltip = "Use spec icons. Requires FrameSort for this to work.",
+			Tooltip = "Use spec icons. Enemies can't be inspected, so this only fills in for arena opponents and anyone whose tooltip names their spec.",
 			GetValue = function()
 				return db.EnemySpecIcons
 			end,
 			SetValue = function(enabled)
-				if enabled and not (FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector) then
-					mini:ShowDialog({ Text = "Spec icons requires FrameSort 7.8.1+ to function." })
-					return
-				end
-
 				db.EnemySpecIcons = enabled
 				addon:Refresh()
 			end,
@@ -698,12 +688,6 @@ function M:Build()
 		StaticPopup_Show("MINIMARKERS_CONFIRM_RESET", "Are you sure you want to reset to default settings?", nil, {
 			OnYes = function()
 				db = mini:ResetSavedVars(dbDefaults)
-
-				local hasFs = FrameSortApi and FrameSortApi.v3 and FrameSortApi.v3.Inspector
-
-				if hasFs then
-					db.FriendlySpecIcons = true
-				end
 
 				panel:MiniRefresh()
 				addon:Refresh()

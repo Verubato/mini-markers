@@ -10,6 +10,8 @@
 ## X-Curse-Project-ID: 1418841
 
 Libs\MiniFramework\MiniFramework.xml
+Inspect\Inspector.lua
+Inspect\InspectorFacade.lua
 Config\Config.lua
 Config\AtlasPicker.lua
 Config\Main.lua
