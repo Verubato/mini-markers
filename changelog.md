@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.1
+
+Fixed an error on Midnight clients when class icons were shown for a nameplate unit with a protected class.
+
 ## 4.4.0
 
 Spec icons no longer require FrameSort.
