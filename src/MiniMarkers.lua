@@ -277,7 +277,8 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 	if (isFriendly and db.FriendlyClassIcons) or (isEnemy and db.EnemyClassIcons) then
 		local _, classFilename = UnitClass(unit)
 
-		if classFilename then
+		-- a secret class name would build a secret texture path, which no texture API accepts
+		if classFilename and not mini:IsSecret(classFilename) then
 			return {
 				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
 				BackgroundEnabled = backgroundEnabled,
@@ -626,7 +627,7 @@ local function AddMarker(unit, nameplate)
 		marker.WithColor:Hide()
 	end
 
-	if options.Texture then
+	if options.Texture and not mini:IsSecret(options.Texture) then
 		-- texture might be a number, in which case we need to parse it as such
 		local name = tonumber(options.Texture) or options.Texture
 		local isAtlas = C_Texture.GetAtlasInfo(name) ~= nil
