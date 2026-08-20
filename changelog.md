@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.2
+
+Reduced CPU use around nameplates and in the spec inspection loop.
+
 ## 4.4.1
 
 Fixed an error on Midnight clients when class icons were shown for a nameplate unit with a protected class.
