@@ -231,13 +231,13 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 
 	if
 		UnitIsPlayer(unit)
-		and GetSpecializationInfoByID
+		and addon.SpecInfo:IsSupported()
 		and ((isFriendly and db.FriendlySpecIcons) or (isEnemy and db.EnemySpecIcons))
 	then
 		local specId = addon.InspectorFacade:GetUnitSpecId(unit)
 
 		if specId then
-			local _, _, _, icon = GetSpecializationInfoByID(specId)
+			local _, _, _, icon = addon.SpecInfo:GetSpecializationInfoByID(specId)
 			local texture = texturesRoot .. "Specs\\" .. specId .. ".tga"
 
 			return {
@@ -259,11 +259,11 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
-		elseif GetSpecializationInfoByID then
+		elseif addon.SpecInfo:IsSupported() then
 			local specId = addon.InspectorFacade:GetUnitSpecId(unit)
 
 			if specId then
-				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
+				local _, _, _, _, specRole = addon.SpecInfo:GetSpecializationInfoByID(specId)
 				role = specRole
 			end
 		end
@@ -445,10 +445,10 @@ local function GetTextureForUnit(unit)
 		if IsUnitInMyGroup(unit) then
 			role = UnitGroupRolesAssigned(unit)
 		else
-			local specId = GetSpecializationInfoByID and addon.InspectorFacade:GetUnitSpecId(unit)
+			local specId = addon.SpecInfo:IsSupported() and addon.InspectorFacade:GetUnitSpecId(unit)
 
 			if specId then
-				local _, _, _, _, specRole = GetSpecializationInfoByID(specId)
+				local _, _, _, _, specRole = addon.SpecInfo:GetSpecializationInfoByID(specId)
 				role = specRole
 			end
 		end

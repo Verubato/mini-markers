@@ -10,6 +10,7 @@
 ## X-Curse-Project-ID: 1418841
 
 Libs\MiniFramework\MiniFramework.xml
+Utils\SpecInfo.lua
 Inspect\Inspector.lua
 Inspect\InspectorFacade.lua
 Config\Config.lua

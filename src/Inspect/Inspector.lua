@@ -109,16 +109,18 @@ local function GetTooltipSpecs()
 
 	tooltipSpecs = { ByPhrase = {}, ByClass = {} }
 
-	if not (GetNumClasses and GetClassInfo and GetNumSpecializationsForClassID and GetSpecializationInfoForClassID) then
+	if not (GetNumClasses and GetClassInfo) then
 		return tooltipSpecs
 	end
+
+	local specInfo = addon.SpecInfo
 
 	for classIdx = 1, GetNumClasses() do
 		local className, classFile, classId = GetClassInfo(classIdx)
 
 		if className and classFile and classId then
-			for specIdx = 1, GetNumSpecializationsForClassID(classId) do
-				local specId, specName = GetSpecializationInfoForClassID(classId, specIdx)
+			for specIdx = 1, specInfo:GetNumSpecializationsForClassID(classId) do
+				local specId, specName = specInfo:GetSpecializationInfoForClassID(classId, specIdx)
 
 				if specId and specName then
 					local phrase = specName .. " " .. className
@@ -414,15 +416,7 @@ function M:GetUnitSpecId(unit)
 	end
 
 	if UnitIsUnit(unit, "player") then
-		if GetSpecialization and GetSpecializationInfo then
-			local index = GetSpecialization()
-
-			if index then
-				return (GetSpecializationInfo(index))
-			end
-		end
-
-		return nil
+		return addon.SpecInfo:GetPlayerSpecId()
 	end
 
 	local guid = SafeUnitGUID(unit)
