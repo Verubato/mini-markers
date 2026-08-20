@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.4.3
+
+Fixed spec icons, spec derived role icons and tooltip spec detection all failing on 12.1, which moved the specialization functions the addon reads.
+
 ## 4.4.2
 
 Reduced CPU use around nameplates and in the spec inspection loop.
