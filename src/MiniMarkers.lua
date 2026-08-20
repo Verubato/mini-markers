@@ -5,6 +5,16 @@ local mini = addon.Framework
 local db
 ---@type Db
 local dbDefaults = addon.Config.DbDefaults
+-- Nameplate work waiting on the next frame: unit token -> true when its plate was added,
+-- false when it was removed.
+local pendingUnits = {}
+-- Set when something needs every plate looked at, which supersedes the queue above.
+local refreshAll = false
+local flushQueued = false
+-- When work was last queued, so a flush can tell whether it is running in the same frame.
+local queuedAt
+---@type fun()
+local QueueFlush
 local eventsFrame
 local bnCacheInvalidator
 local bnFriendCache = {}
@@ -708,33 +718,80 @@ local function UpdateAllNameplates()
 	end
 end
 
-local function ProcessEvent(event, unit)
-	if event == "NAME_PLATE_UNIT_ADDED" then
-		local nameplate = unit and C_NamePlate.GetNamePlateForUnit(unit)
+local function ProcessNameplate(unit, added)
+	local nameplate = unit and C_NamePlate.GetNamePlateForUnit(unit)
 
-		if nameplate then
-			AddMarker(unit, nameplate)
-		end
-	elseif event == "NAME_PLATE_UNIT_REMOVED" then
-		local nameplate = unit and C_NamePlate.GetNamePlateForUnit(unit)
+	if not nameplate then
+		return
+	end
 
-		if nameplate then
-			HideMarker(nameplate)
-		end
-	elseif event == "GROUP_ROSTER_UPDATE" or event == "PLAYER_ENTERING_WORLD" then
-		UpdateAllNameplates()
+	if added then
+		AddMarker(unit, nameplate)
+	else
+		HideMarker(nameplate)
 	end
 end
 
-local function OnEvent(_, event, unit)
-	-- delay our processing to wait for other nameplate addons to process it first
-	C_Timer.After(0, function()
-		ProcessEvent(event, unit)
-	end)
+---Runs the work queued since the last frame. Nameplate events arrive in bursts in a busy
+---zone, so they share one deferral.
+local function Flush()
+	flushQueued = false
+
+	-- Work queued during this frame has not had its frame of grace yet: a scheduled flush can
+	-- fire in the same frame the event arrived in, ahead of the nameplate addons this defers
+	-- to. GetTime holds still within a frame, so this costs at most one extra pass.
+	if queuedAt == GetTime() then
+		QueueFlush()
+		return
+	end
+
+	if refreshAll then
+		refreshAll = false
+		wipe(pendingUnits)
+		UpdateAllNameplates()
+		return
+	end
+
+	for unit, added in pairs(pendingUnits) do
+		ProcessNameplate(unit, added)
+	end
+
+	wipe(pendingUnits)
 end
 
+function QueueFlush()
+	queuedAt = GetTime()
+
+	if flushQueued then
+		return
+	end
+
+	flushQueued = true
+	-- Deferred a frame so other nameplate addons have had theirs first.
+	C_Timer.After(0, Flush)
+end
+
+local function OnEvent(_, event, unit)
+	if event == "NAME_PLATE_UNIT_ADDED" then
+		if unit then
+			pendingUnits[unit] = true
+		end
+	elseif event == "NAME_PLATE_UNIT_REMOVED" then
+		if unit then
+			pendingUnits[unit] = false
+		end
+	else
+		refreshAll = true
+	end
+
+	QueueFlush()
+end
+
+---Inspect results arrive one per unit and in bursts, and the callback carries no unit to
+---narrow the work to, so they share a single pass over every plate.
 local function OnSpecInspected()
-	UpdateAllNameplates()
+	refreshAll = true
+	QueueFlush()
 end
 
 local function OnAddonLoaded()

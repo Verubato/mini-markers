@@ -19,6 +19,11 @@ local CACHE_EXPIRY = 60 * 60 * 24 * 3
 local PRIORITY_MAX = 10
 
 local unitGuidToSpec = {}
+-- Scratch list of group unit tokens, refilled by each pass of the run loop.
+local friendlyUnits = {}
+-- Unit tokens by prefix and index, built as they are first asked for. The run loop walks the
+-- group twice a second and the tokens never change.
+local unitTokens = { raid = {}, party = {} }
 local priorityStack = {}
 local priorityQueued = {}
 local requestedUnit = nil
@@ -60,18 +65,32 @@ local function CanQueueInspect(unit)
 		and CanInspect(unit)
 end
 
-local function GetFriendlyUnits()
-	local units = { "player" }
-	local numGroup = GetNumGroupMembers()
+local function UnitToken(prefix, index)
+	local byIndex = unitTokens[prefix]
+	local token = byIndex[index]
 
-	if IsInRaid() then
-		for i = 1, numGroup do
-			units[#units + 1] = "raid" .. i
-		end
-	else
-		for i = 1, numGroup do
-			units[#units + 1] = "party" .. i
-		end
+	if not token then
+		token = prefix .. index
+		byIndex[index] = token
+	end
+
+	return token
+end
+
+---Fills `units` with the player and everyone grouped with them. Reuses the table it is given:
+---this is called on every pass of the run loop.
+---@param units string[]
+---@return string[] units
+local function GetFriendlyUnits(units)
+	wipe(units)
+
+	units[1] = "player"
+
+	local numGroup = GetNumGroupMembers()
+	local prefix = IsInRaid() and "raid" or "party"
+
+	for i = 1, numGroup do
+		units[#units + 1] = UnitToken(prefix, i)
 	end
 
 	return units
@@ -271,13 +290,14 @@ local function GetNextTarget()
 		end
 	end
 
-	local units = GetFriendlyUnits()
+	local units = GetFriendlyUnits(friendlyUnits)
 	local now = Timestamp()
 
-	-- first pass: units with no cache entry
+	-- first pass: units with no cache entry. These are group tokens, never names, so they
+	-- cannot provoke the error SafeUnitGUID exists to swallow.
 	for _, unit in ipairs(units) do
 		if not UnitIsUnit(unit, "player") then
-			local guid = SafeUnitGUID(unit)
+			local guid = UnitGUID(unit)
 
 			if guid and not mini:IsSecret(guid) then
 				local cacheEntry = unitGuidToSpec[guid]
@@ -292,7 +312,7 @@ local function GetNextTarget()
 	-- second pass: units with stale or missing spec
 	for _, unit in ipairs(units) do
 		if not UnitIsUnit(unit, "player") then
-			local guid = SafeUnitGUID(unit)
+			local guid = UnitGUID(unit)
 
 			if guid and not mini:IsSecret(guid) then
 				local cacheEntry = unitGuidToSpec[guid]
