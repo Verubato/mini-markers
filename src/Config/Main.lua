@@ -675,26 +675,30 @@ function M:Build()
 		end
 	end
 
-	local resetBtn = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-	resetBtn:SetSize(120, 26)
+	local resetBtn = mini:Button({
+		Parent = panel,
+		Text = "Reset",
+		Width = 120,
+		Height = 26,
+		OnClick = function()
+			if InCombatLockdown() then
+				mini:NotifyCombatLockdown()
+				return
+			end
+
+			StaticPopup_Show("MINIMARKERS_CONFIRM_RESET", "Are you sure you want to reset to default settings?", nil, {
+				OnYes = function()
+					db = mini:ResetSavedVars(dbDefaults)
+
+					panel:MiniRefresh()
+					addon:Refresh()
+					mini:NotifyWithPrefix("Settings reset to default.")
+				end,
+			})
+		end,
+	})
+
 	resetBtn:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -16, -16)
-	resetBtn:SetText("Reset")
-	resetBtn:SetScript("OnClick", function()
-		if InCombatLockdown() then
-			mini:NotifyCombatLockdown()
-			return
-		end
-
-		StaticPopup_Show("MINIMARKERS_CONFIRM_RESET", "Are you sure you want to reset to default settings?", nil, {
-			OnYes = function()
-				db = mini:ResetSavedVars(dbDefaults)
-
-				panel:MiniRefresh()
-				addon:Refresh()
-				mini:NotifyWithPrefix("Settings reset to default.")
-			end,
-		})
-	end)
 
 	return panel
 end
