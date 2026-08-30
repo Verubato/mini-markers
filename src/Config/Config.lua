@@ -56,15 +56,15 @@ local dbDefaults = {
 	IconClassColors = true,
 	IconDesaturated = true,
 
-	FriendlyBackgroundEnabled = true,
-	EnemyBackgroundEnabled = true,
+	FriendlyBackgroundEnabled = false,
+	EnemyBackgroundEnabled = false,
 	FriendlyBackgroundPadding = 6,
 	EnemyBackgroundPadding = 6,
 
 	FriendlyIconShape = "square",
 	EnemyIconShape = "square",
-	FriendlyBorderEnabled = false,
-	EnemyBorderEnabled = false,
+	FriendlyBorderEnabled = true,
+	EnemyBorderEnabled = true,
 
 	PetIconScale = 0.5,
 }
