@@ -25,7 +25,7 @@ local atlasList = {
 }
 
 function M:Build()
-	local leftInset = mini.HorizontalSpacing
+	local leftInset = 0
 	local verticalSpacing = mini.VerticalSpacing
 	local horizontalSpacing = mini.HorizontalSpacing
 	local columns = 4
@@ -64,7 +64,9 @@ function M:Build()
 
 	texture.Label:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing)
 	texture.Label:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
-	texture.EditBox:SetPoint("TOPLEFT", texture.Label, "BOTTOMLEFT", 0, -verticalSpacing)
+	-- The flattened field's border draws 6px left of the box's own frame, so anything smaller
+	-- pokes past the panel's edge.
+	texture.EditBox:SetPoint("TOPLEFT", texture.Label, "BOTTOMLEFT", 6, -verticalSpacing)
 
 	local textureRot = mini:Slider({
 		Parent = panel,

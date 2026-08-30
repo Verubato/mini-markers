@@ -4,6 +4,8 @@ local mini = addon.Framework
 local config = addon.Config
 ---@class Db
 local dbDefaults = config.DbDefaults
+-- Both appearance layouts reserve the same block, so the tabs cannot change the page height.
+local APPEARANCE_HEIGHT = 240
 ---@class MainPanel
 local M = {}
 addon.Config.Panels.Main = M
@@ -381,7 +383,6 @@ function M:Build()
 		})
 
 		borderChkBox:SetPoint("LEFT", bgChkBox, "RIGHT", columnStep, 0)
-		borderChkBox:SetPoint("TOP", bgChkBox, "TOP", 0, 0)
 
 		local sizeSlider = mini:Slider({
 			Parent = content,
@@ -533,7 +534,6 @@ function M:Build()
 		})
 
 		borderChkBox:SetPoint("LEFT", bgChkBox, "RIGHT", columnStep, 0)
-		borderChkBox:SetPoint("TOP", bgChkBox, "TOP", 0, 0)
 
 		local sizeSlider = mini:Slider({
 			Parent = content,
@@ -638,6 +638,9 @@ function M:Build()
 		content:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
 		content:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 		content:SetPoint("RIGHT", panel, "RIGHT", -horizontalSpacing, 0)
+		-- The left and right points pin the centre, so the block needs a height of its own to
+		-- resolve.
+		content:SetHeight(APPEARANCE_HEIGHT)
 
 		BuildFriendlyContent(content)
 		mini:WireTabNavigation(friendlyEditBoxes)
@@ -646,7 +649,7 @@ function M:Build()
 		tabContainer:SetPoint("TOP", sizeDivider, "BOTTOM", 0, 0)
 		tabContainer:SetPoint("LEFT", panel, "LEFT", 0, 0)
 		tabContainer:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-		tabContainer:SetHeight(240)
+		tabContainer:SetHeight(APPEARANCE_HEIGHT)
 
 		local tabCtrl = mini:CreateTabs({
 			Parent = tabContainer,
