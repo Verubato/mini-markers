@@ -5,7 +5,7 @@
 -- Requirements: Lua 5.1. The shared harness lives in the build submodule, so a fresh clone
 -- needs `git submodule update --init` first.
 
-package.path = "build/Lua/?.lua;tests/?.lua;" .. package.path
+package.path = "build/Lua/?.lua;tests/Helpers/?.lua;tests/?.lua;" .. package.path
 
 io.write("MiniMarkers - unit tests\n")
 io.write("======================================\n")
@@ -16,6 +16,10 @@ local testFiles = {
 	"tests/TestDefaults.lua",
 	"tests/TestSpecCache.lua",
 	"tests/TestSecretPvp.lua",
+	"tests/TestSecretValues.lua",
+	"tests/TestNameplates.lua",
+	"tests/TestInspect.lua",
+	"tests/TestInspectQueue.lua",
 }
 
 local loadErrors = {}
