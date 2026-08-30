@@ -5,7 +5,7 @@ local config = addon.Config
 ---@class Db
 local dbDefaults = config.DbDefaults
 -- Both appearance layouts reserve the same block, so the tabs cannot change the page height.
-local APPEARANCE_HEIGHT = 240
+local APPEARANCE_HEIGHT = 210
 ---@class MainPanel
 local M = {}
 addon.Config.Panels.Main = M
@@ -24,9 +24,12 @@ function M:Build()
 
 	local header = mini:PanelHeader({
 		Parent = panel,
-		Description = "Show markers above nameplates.",
+		Lines = {
+			"Show markers above nameplates.",
+			"Priority: spec > role -> class -> texture.",
+		},
 		Gap = verticalSpacing / 2,
-		Divider = true,
+		Divider = "Friendly Icon Types",
 		Reset = {
 			OnAccept = function()
 				if InCombatLockdown() then
@@ -41,16 +44,6 @@ function M:Build()
 		},
 	})
 
-	local priority = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-	priority:SetPoint("TOPLEFT", header.Anchor, "BOTTOMLEFT", 0, -verticalSpacing / 2)
-	priority:SetText("Priority: spec > role -> class -> texture.")
-
-	local friendlyTypesDivider = mini:Divider({ Parent = panel, Text = "Friendly Icon Types" })
-
-	friendlyTypesDivider:SetPoint("TOP", priority, "BOTTOM", 0, -verticalSpacing)
-	friendlyTypesDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
-	friendlyTypesDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
-
 	local specIconsChkBox = mini:Checkbox({
 		Parent = panel,
 		LabelText = "Spec Icons",
@@ -64,7 +57,7 @@ function M:Build()
 		end,
 	})
 
-	specIconsChkBox:SetPoint("TOP", friendlyTypesDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	specIconsChkBox:SetPoint("TOP", header.Anchor, "BOTTOM", 0, -verticalSpacing / 2)
 	specIconsChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
 
 	local roleIconsChkBox = mini:Checkbox({
@@ -366,8 +359,8 @@ function M:Build()
 			end,
 		})
 
-		bgChkBox:SetPoint("TOP", shapeDropdown, "BOTTOM", 0, -verticalSpacing / 4)
-		bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+		-- A left point pins the centre, so the toggle lands level with the dropdown beside it.
+		bgChkBox:SetPoint("LEFT", shapeDropdown, "RIGHT", horizontalSpacing, 0)
 
 		local borderChkBox = mini:Checkbox({
 			Parent = content,
@@ -407,7 +400,7 @@ function M:Build()
 			end,
 		})
 
-		sizeSlider.Slider:SetPoint("TOP", bgChkBox, "BOTTOM", 0, -verticalSpacing * 2)
+		sizeSlider.Slider:SetPoint("TOP", shapeDropdown, "BOTTOM", 0, -(verticalSpacing + mini.SliderChipOverhang))
 		sizeSlider.Slider:SetPoint("LEFT", content, "LEFT", 0, 0)
 
 		local paddingSlider = mini:Slider({
@@ -517,8 +510,8 @@ function M:Build()
 			end,
 		})
 
-		bgChkBox:SetPoint("TOP", shapeDropdown, "BOTTOM", 0, -verticalSpacing / 4)
-		bgChkBox:SetPoint("LEFT", content, "LEFT", 0, 0)
+		-- A left point pins the centre, so the toggle lands level with the dropdown beside it.
+		bgChkBox:SetPoint("LEFT", shapeDropdown, "RIGHT", horizontalSpacing, 0)
 
 		local borderChkBox = mini:Checkbox({
 			Parent = content,
@@ -558,7 +551,7 @@ function M:Build()
 			end,
 		})
 
-		sizeSlider.Slider:SetPoint("TOP", bgChkBox, "BOTTOM", 0, -verticalSpacing * 2)
+		sizeSlider.Slider:SetPoint("TOP", shapeDropdown, "BOTTOM", 0, -(verticalSpacing + mini.SliderChipOverhang))
 		sizeSlider.Slider:SetPoint("LEFT", content, "LEFT", 0, 0)
 
 		local paddingSlider = mini:Slider({
