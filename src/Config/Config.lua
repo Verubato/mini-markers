@@ -24,15 +24,15 @@ local dbDefaults = {
 	EnemyHealerEnabled = true,
 	EnemyDpsEnabled = true,
 
-	FriendlyClassIcons = true,
+	FriendlyClassIcons = false,
 	FriendlySpecIcons = true,
 	FriendlyTextureIcons = false,
 	FriendlyRoleIcons = false,
 
 	EnemyClassIcons = false,
-	EnemySpecIcons = false,
+	EnemySpecIcons = true,
 	EnemyTextureIcons = false,
-	EnemyRoleIcons = true,
+	EnemyRoleIcons = false,
 
 	EnemyRedEnabled = true,
 
@@ -56,10 +56,10 @@ local dbDefaults = {
 	IconClassColors = true,
 	IconDesaturated = true,
 
-	FriendlyBackgroundEnabled = false,
-	EnemyBackgroundEnabled = false,
-	FriendlyBackgroundPadding = 6,
-	EnemyBackgroundPadding = 6,
+	FriendlyBackgroundEnabled = true,
+	EnemyBackgroundEnabled = true,
+	FriendlyBackgroundPadding = 1,
+	EnemyBackgroundPadding = 1,
 
 	FriendlyIconShape = "square",
 	EnemyIconShape = "square",
