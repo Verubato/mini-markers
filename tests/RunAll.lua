@@ -15,6 +15,7 @@ local testFiles = {
 	"tests/TestAppearance.lua",
 	"tests/TestDefaults.lua",
 	"tests/TestSpecCache.lua",
+	"tests/TestSecretPvp.lua",
 }
 
 local loadErrors = {}

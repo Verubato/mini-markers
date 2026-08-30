@@ -432,7 +432,13 @@ local function GetTextureForUnit(unit)
 	end
 
 	if db.PvPEnabled then
-		pass = pass or (isPlayer and UnitIsPVP(unit))
+		local isPvP = UnitIsPVP(unit)
+
+		-- PvP status can come back secret for a nameplate unit under Midnight, so a unit we
+		-- can't read skips this rule instead of crashing on the boolean test.
+		if not mini:IsSecret(isPvP) then
+			pass = pass or (isPlayer and isPvP)
+		end
 	end
 
 	if not pass then
