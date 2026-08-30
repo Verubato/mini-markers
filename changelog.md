@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.4.4
+
+- UI improvements.
+- Fixed a crash when updating nameplates.
+- New installs now default to spec icons alone, with a background, a border, and the tightest padding.
+
 ## 4.4.3
 
 Fixed spec icons, spec derived role icons and tooltip spec detection all failing on 12.1, which moved the specialization functions the addon reads.

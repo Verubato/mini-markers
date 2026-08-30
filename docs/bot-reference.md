@@ -1,6 +1,6 @@
 # MiniMarkers bot reference
 
-Addon: MiniMarkers, version 4.4.3, by Verz.
+Addon: MiniMarkers, version 4.4.4, by Verz.
 Supported interface versions (from the .toc): 120100, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
 Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort (used for spec detection when present; MiniMarkers has its own inspector otherwise).
 
@@ -51,15 +51,15 @@ Friendly Icon Types:
 |---|---|---|
 | Spec Icons | On | On for new installs and after a reset; an existing config keeps whatever it was set to |
 | Role Icons | Off | |
-| Class Icons | On | |
+| Class Icons | Off | |
 | Texture Icons | Off | Uses the Custom Texture panel's texture |
 
 Enemy Icon Types (hidden on Midnight clients, see Version-gated behaviour):
 
 | Option | Default |
 |---|---|
-| Spec Icons | Off |
-| Role Icons | On |
+| Spec Icons | On |
+| Role Icons | Off |
 | Class Icons | Off |
 | Texture Icons | Off |
 
@@ -82,9 +82,9 @@ Size & Position & Background: two tabs, Friendly and Enemy, each with the same c
 |---|---|---|---|
 | Shape (dropdown) | Square | Square / Circle | Shape of the icon mask, background and border |
 | Background | On | checkbox | Black background behind the icon |
-| Border | Off | checkbox | Class-coloured border around the icon (needs a resolvable class colour) |
+| Border | On | checkbox | Class-coloured border around the icon (needs a resolvable class colour) |
 | Size | 50 | 20-200, step 5 | Sets icon width and height together |
-| Padding | 6 | 0-30, step 1 | Background padding around the icon |
+| Padding | 1 | 0-30, step 1 | Background padding around the icon |
 | X Offset | 0 | -200 to 200, step 5 | Horizontal offset from the nameplate |
 | Y Offset | 20 | -200 to 200, step 5 | Vertical offset above the nameplate |
 
