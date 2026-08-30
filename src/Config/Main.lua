@@ -8,20 +8,6 @@ local dbDefaults = config.DbDefaults
 local M = {}
 addon.Config.Panels.Main = M
 
-StaticPopupDialogs["MINIMARKERS_CONFIRM_RESET"] = {
-	text = "%s",
-	button1 = YES,
-	button2 = NO,
-	OnAccept = function(_, data)
-		if data and data.OnYes then
-			data.OnYes()
-		end
-	end,
-	timeout = 0,
-	whileDead = true,
-	hideOnEscape = true,
-}
-
 function M:Build()
 	---@type Db
 	local db = addon.DB
@@ -38,6 +24,19 @@ function M:Build()
 		Parent = panel,
 		Description = "Show markers above nameplates.",
 		Gap = verticalSpacing / 2,
+		Divider = true,
+		Reset = {
+			OnAccept = function()
+				if InCombatLockdown() then
+					mini:NotifyCombatLockdown()
+					return
+				end
+
+				db = mini:ResetSavedVars(dbDefaults)
+				addon:Refresh()
+				mini:NotifyWithPrefix("Settings reset to default.")
+			end,
+		},
 	})
 
 	local priority = panel:CreateFontString(nil, "ARTWORK", "GameFontWhite")
@@ -348,7 +347,7 @@ function M:Build()
 
 		shapeDropdown:SetPoint("TOPLEFT", content, "TOPLEFT", 50, 0)
 
-		local shapeLabel = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+		local shapeLabel = content:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 		shapeLabel:SetPoint("RIGHT", shapeDropdown, "LEFT", -horizontalSpacing / 2, 0)
 		shapeLabel:SetText("Shape")
 
@@ -500,7 +499,7 @@ function M:Build()
 
 		shapeDropdown:SetPoint("TOPLEFT", content, "TOPLEFT", 50, 0)
 
-		local shapeLabel = content:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+		local shapeLabel = content:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 		shapeLabel:SetPoint("RIGHT", shapeDropdown, "LEFT", -horizontalSpacing / 2, 0)
 		shapeLabel:SetText("Shape")
 
@@ -674,31 +673,6 @@ function M:Build()
 			end
 		end
 	end
-
-	local resetBtn = mini:Button({
-		Parent = panel,
-		Text = "Reset",
-		Width = 120,
-		Height = 26,
-		OnClick = function()
-			if InCombatLockdown() then
-				mini:NotifyCombatLockdown()
-				return
-			end
-
-			StaticPopup_Show("MINIMARKERS_CONFIRM_RESET", "Are you sure you want to reset to default settings?", nil, {
-				OnYes = function()
-					db = mini:ResetSavedVars(dbDefaults)
-
-					panel:MiniRefresh()
-					addon:Refresh()
-					mini:NotifyWithPrefix("Settings reset to default.")
-				end,
-			})
-		end,
-	})
-
-	resetBtn:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -16, -16)
 
 	return panel
 end

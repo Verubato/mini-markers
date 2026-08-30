@@ -42,6 +42,7 @@ function M:Build()
 		Title = "Custom Texture",
 		Description = "Specify a custom texture to use.",
 		Gap = verticalSpacing,
+		Divider = true,
 	})
 
 	local texture = mini:EditBox({

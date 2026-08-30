@@ -21,6 +21,7 @@ function M:Build()
 		Title = "Special Icons",
 		Description = "Use special icons for friends and guild members.",
 		Gap = verticalSpacing / 2,
+		Divider = true,
 	})
 
 	local friendsChkBox = mini:Checkbox({
