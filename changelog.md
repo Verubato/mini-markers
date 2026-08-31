@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.5.0
+
+- Class icons now use the game's own class icons.
+
 ## 4.4.4
 
 - UI improvements.

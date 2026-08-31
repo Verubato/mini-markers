@@ -1,6 +1,6 @@
 # MiniMarkers bot reference
 
-Addon: MiniMarkers, version 4.4.4, by Verz.
+Addon: MiniMarkers, version 4.5.0, by Verz.
 Supported interface versions (from the .toc): 120100, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
 Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort (used for spec detection when present; MiniMarkers has its own inspector otherwise).
 
@@ -142,6 +142,8 @@ On Midnight clients (expansion level 12+, where the game returns "secret" protec
 - Battle.net friend detection fails when the game hides unit names, so friend icons may not show.
 - Totem detection is unavailable, so totems may be treated as NPCs.
 
+On clients that do not ship the game's class icon atlas, Class Icons draw nothing and the next enabled icon type is used instead.
+
 On clients without nameplate APIs at all, the addon prints "Unable to run due to missing nameplate APIs." and does nothing.
 
 ## Troubleshooting by symptom
@@ -149,6 +151,7 @@ On clients without nameplate APIs at all, the addon prints "Unable to run due to
 - No markers at all: check that nameplates are enabled in the game (friendly and/or enemy nameplates, default keys V / shift-V). Markers can only attach to visible nameplates. Also check "Arena Only" is not on while outside an arena.
 - No marker on my own character: intentional. Your own nameplate is always skipped.
 - Spec icons not showing: spec data has to be inspected first, so an icon can appear a moment after a unit shows up. Enemies outside arena often never resolve, since the game does not allow inspecting them.
+- Class icons not showing: they come from the game's own class icon atlas, which older clients do not have. The next enabled icon type is used instead, so with nothing else ticked there is no marker.
 - Role icons missing on some players: players outside your group need a resolved spec for role detection; group members need an assigned role.
 - Some players lost their markers after I unchecked a role: with any role filter unchecked, units whose role cannot be determined are hidden too.
 - Enemy markers gone / enemy options missing: on Midnight clients enemy markers are unsupported and their options are hidden.
