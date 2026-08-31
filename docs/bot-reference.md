@@ -32,7 +32,7 @@ Reaction rules: group members always count as friendly (this covers cross-factio
 
 - Spec Icons: the unit's specialization icon. Spec data comes from FrameSort when it is installed, otherwise from MiniMarkers' own inspector (see Spec detection).
 - Role Icons: tank/healer/dps icons. For group members the assigned role is used. For anyone else the role is inferred from their spec.
-- Class Icons: high quality class icons.
+- Class Icons: the game's own class icons.
 - Texture Icons: the custom texture from the Custom Texture panel.
 
 Colouring: role and texture icons are tinted red for enemies when "Red enemies" is on (default), otherwise class-coloured when class colours are enabled (default, saved-variable only, see Hidden settings). Class and spec icons are never tinted.

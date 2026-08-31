@@ -67,7 +67,7 @@ fw.describe("MiniMarkers - secret values", function()
 		fw.falsy(env.Plates[UNIT].Marker.Border.Square:IsShown(), "no colour to draw a border in")
 	end)
 
-	fw.it("does not build a class texture path out of a class file name the client will not hand over", function()
+	fw.it("does not build a class atlas name out of a class file name the client will not hand over", function()
 		local secretClass = {}
 
 		env.Db.FriendlySpecIcons = false

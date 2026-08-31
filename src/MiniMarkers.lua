@@ -287,18 +287,23 @@ local function GetIconOptions(unit, isFriendly, isEnemy, backgroundEnabled)
 	if (isFriendly and db.FriendlyClassIcons) or (isEnemy and db.EnemyClassIcons) then
 		local _, classFilename = UnitClass(unit)
 
-		-- a secret class name would build a secret texture path, which no texture API accepts
+		-- a secret class name would build a secret atlas name, which no texture API accepts
 		if classFilename and not mini:IsSecret(classFilename) then
-			return {
-				Texture = texturesRoot .. "Classes\\" .. classFilename .. ".tga",
-				BackgroundEnabled = backgroundEnabled,
-				BackgroundShape = shape,
-				BackgroundPadding = backgroundPadding,
-				BorderEnabled = borderEnabled and borderColor ~= nil,
-				BorderColor = borderColor,
-				Width = iconWidth,
-				Height = iconHeight,
-			}
+			local atlas = "classicon-" .. classFilename:lower()
+
+			-- a background ringing an empty icon reads worse than no marker
+			if C_Texture.GetAtlasInfo(atlas) then
+				return {
+					Texture = atlas,
+					BackgroundEnabled = backgroundEnabled,
+					BackgroundShape = shape,
+					BackgroundPadding = backgroundPadding,
+					BorderEnabled = borderEnabled and borderColor ~= nil,
+					BorderColor = borderColor,
+					Width = iconWidth,
+					Height = iconHeight,
+				}
+			end
 		end
 	end
 
