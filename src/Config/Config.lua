@@ -1,9 +1,12 @@
-local _, addon = ...
+local addonName, addon = ...
 ---@type MiniFramework
 local mini = addon.Framework
 ---@class Db
 local dbDefaults = {
 	Version = 9,
+
+	---@type table<string, {SpecId: number?, LastSeen: number?, LastAttempt: number?}>
+	SpecCache = {},
 
 	GroupEnabled = true,
 	AlliesEnabled = true,
@@ -75,8 +78,29 @@ local M = {
 }
 addon.Config = M
 
+-- The chain below only steps whole versions up to ours, so anything else would never end.
+local function CanMigrate(version)
+	if version == nil then
+		return true
+	end
+
+	return type(version) == "number" and version % 1 == 0 and version >= 1 and version <= dbDefaults.Version
+end
+
 local function GetAndUpgradeDb()
-	local vars = mini:GetSavedVars(dbDefaults)
+	-- Read before any fetch, because a bare GetSavedVars publishes an empty table to the global.
+	local isFirstLogin = _G[addonName .. "DB"] == nil
+
+	if isFirstLogin then
+		return mini:GetSavedVars(dbDefaults)
+	end
+
+	-- Unmerged, so each step branches on the version the profile was actually saved at.
+	local vars = mini:GetSavedVars()
+
+	if not CanMigrate(vars.Version) then
+		return mini:GetSavedVars(dbDefaults)
+	end
 
 	while vars.Version ~= dbDefaults.Version do
 		if not vars.Version or vars.Version == 1 then
@@ -153,7 +177,9 @@ local function GetAndUpgradeDb()
 		end
 	end
 
-	return vars
+	-- Fill anything the chain left unset, so a step that read a key its profile never had lands on
+	-- the default instead of nil.
+	return mini:GetSavedVars(dbDefaults)
 end
 
 function M:Init()
