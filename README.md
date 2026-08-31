@@ -32,8 +32,6 @@ More features will be added over time, so stay tuned!
 
 ![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/RoleIcons.png)
 
-![MiniMarkers screenshot](https://raw.githubusercontent.com/Verubato/mini-markers/main/assets/Screenshots/ClassIcons.png)
-
 ## Download
 
 Available on [CurseForge](https://www.curseforge.com/wow/addons/minimarkers).
