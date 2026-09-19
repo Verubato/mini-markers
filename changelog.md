@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.5.1
+
+Added WoW Forever support.
+
 ## 4.5.0
 
 - Class icons now use the game's own class icons.

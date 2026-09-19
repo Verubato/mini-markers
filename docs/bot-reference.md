@@ -1,6 +1,6 @@
 # MiniMarkers bot reference
 
-Addon: MiniMarkers, version 4.5.0, by Verz.
+Addon: MiniMarkers, version 4.5.1, by Verz.
 Supported interface versions (from the .toc): 120100, 16001, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
 Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort (used for spec detection when present; MiniMarkers has its own inspector otherwise).
 
@@ -136,7 +136,7 @@ Only friendly units can be inspected, so enemy specs come from the tooltip or fr
 
 ## Version-gated behaviour
 
-On Midnight clients (expansion level 12+, where the game returns "secret" protected values):
+On Midnight clients and on WoW Forever (both run the 12.x interface, where the game returns "secret" protected values):
 
 - Enemy markers are not supported and are disabled. The Enemy Icon Types section, the Enemies filter, the Enemy size/position tab, the Enemy role filters, and "Red enemies" are all hidden from the options UI.
 - Battle.net friend detection fails when the game hides unit names, so friend icons may not show.
