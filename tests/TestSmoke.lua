@@ -127,8 +127,9 @@ smoke.Run("MiniMarkers", {
 		fw.not_nil(textureBox, "the custom texture panel's Texture field")
 		fw.eq(FindPointOffset(textureBox, "TOPLEFT"), 6, "the field's border art lands inside the panel")
 
+		-- The mock is a client with secrets, which hides the enemy tab.
 		local shapeLabels = FindLabels("Shape")
-		fw.eq(#shapeLabels, 2, "a Shape label on each appearance tab")
+		fw.eq(#shapeLabels, 1, "a Shape label on the friendly tab alone")
 
 		for index, shapeLabel in ipairs(shapeLabels) do
 			local shapeDropdown = PointOn(shapeLabel, "RIGHT")
