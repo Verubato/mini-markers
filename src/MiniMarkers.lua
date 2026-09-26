@@ -643,17 +643,23 @@ local function GetOrCreateGlow(nameplate, marker)
 	return glow
 end
 
-local function UpdateTargetGlow(nameplate)
+-- targetPlate lets a sweep resolve the target once rather than per plate. Left nil, a single
+-- caller gets it resolved here instead.
+local function UpdateTargetGlow(nameplate, targetPlate)
 	local marker = nameplate.Marker
 
 	if not marker then
 		return
 	end
 
+	if targetPlate == nil then
+		targetPlate = C_NamePlate.GetNamePlateForUnit("target")
+	end
+
 	-- Comparing plates rather than units, so no unit value the client may keep secret is read.
 	local isTarget = db.TargetGlowEnabled
 		and marker.GlowAnchor ~= nil
-		and nameplate == C_NamePlate.GetNamePlateForUnit("target")
+		and nameplate == targetPlate
 
 	if not isTarget then
 		if marker.Glow then
@@ -675,9 +681,17 @@ local function UpdateTargetGlow(nameplate)
 end
 
 local function UpdateAllTargetGlows()
+	-- Nothing can be glowing while the option is off, so the sweep has nothing to do.
+	if not db.TargetGlowEnabled then
+		return
+	end
+
+	-- false rather than nil, so a plate is never mistaken for "not resolved yet" below.
+	local targetPlate = C_NamePlate.GetNamePlateForUnit("target") or false
+
 	for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false) or {}) do
 		if nameplate then
-			UpdateTargetGlow(nameplate)
+			UpdateTargetGlow(nameplate, targetPlate)
 		end
 	end
 end
