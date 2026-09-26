@@ -30,6 +30,9 @@ local petIconTexture = texturesRoot .. "Pet.tga"
 local ownPetIconTexture = texturesRoot .. "OwnPet.blp"
 local circleShapeTexture = texturesRoot .. "Shapes\\Circle128x128.tga"
 local squareShapeTexture = texturesRoot .. "Shapes\\White128x128.tga"
+local targetGlowTexture = texturesRoot .. "Glows\\SlotGlow.tga"
+-- The halo needs to reach well past the marker's edge to read, as a share of the marker's size.
+local targetGlowPaddingFactor = 1 / 5
 
 local function ResolveShape(shapeName)
 	if shapeName == "circle" then
@@ -44,6 +47,9 @@ end
 ---@field IconMask table
 ---@field Background table
 ---@field Border table
+---@field Glow table? Built the first time the marker's unit is targeted with the glow on.
+---@field GlowAnchor table? The icon texture the glow centres on, nil while the marker is hidden.
+---@field GlowSize number? The width of everything drawn for the marker, which the glow surrounds.
 
 local function IsUnitInMyGroup(unit)
 	return UnitIsUnit(unit, "player") or UnitInParty(unit) or UnitInRaid(unit)
@@ -497,6 +503,10 @@ local function GetOrCreateMarker(nameplate)
 		marker.Border.Circle:SetIgnoreParentAlpha(ignoreAlpha)
 		marker.Border.Square:SetIgnoreParentAlpha(ignoreAlpha)
 
+		if marker.Glow then
+			marker.Glow:SetIgnoreParentAlpha(ignoreAlpha)
+		end
+
 		return marker
 	end
 
@@ -610,6 +620,68 @@ local function ApplyShape(shapeTexture, texture, extraPadding)
 	shapeTexture:Show()
 end
 
+-- The icon already sits on the top sublevel, so only a child frame can draw over it.
+local function GetOrCreateGlow(nameplate, marker)
+	if marker.Glow then
+		return marker.Glow
+	end
+
+	local glow = CreateFrame("Frame", nil, nameplate)
+	glow:SetFrameLevel(nameplate:GetFrameLevel() + 5)
+	glow:SetIgnoreParentAlpha(not db.EnableDistanceFading)
+
+	glow.Texture = glow:CreateTexture(nil, "OVERLAY")
+	glow.Texture:SetAllPoints()
+	glow.Texture:SetTexture(targetGlowTexture)
+	glow.Texture:SetBlendMode("BLEND")
+	glow.Texture:SetDesaturated(false)
+	DisablePixelSnapping(glow.Texture)
+
+	glow:Hide()
+	marker.Glow = glow
+
+	return glow
+end
+
+local function UpdateTargetGlow(nameplate)
+	local marker = nameplate.Marker
+
+	if not marker then
+		return
+	end
+
+	-- Comparing plates rather than units, so no unit value the client may keep secret is read.
+	local isTarget = db.TargetGlowEnabled
+		and marker.GlowAnchor ~= nil
+		and nameplate == C_NamePlate.GetNamePlateForUnit("target")
+
+	if not isTarget then
+		if marker.Glow then
+			marker.Glow:Hide()
+		end
+
+		return
+	end
+
+	local glow = GetOrCreateGlow(nameplate, marker)
+	local size = marker.GlowSize + marker.GlowSize * targetGlowPaddingFactor * 2
+	local color = db.TargetGlowColor or dbDefaults.TargetGlowColor
+
+	glow:ClearAllPoints()
+	glow:SetPoint("CENTER", marker.GlowAnchor, "CENTER")
+	glow:SetSize(size, size)
+	glow.Texture:SetVertexColor(color.R or 1, color.G or 1, color.B or 1, color.A or 1)
+	glow:Show()
+end
+
+local function UpdateAllTargetGlows()
+	for _, nameplate in ipairs(C_NamePlate.GetNamePlates(false) or {}) do
+		if nameplate then
+			UpdateTargetGlow(nameplate)
+		end
+	end
+end
+
 local function HideMarker(nameplate)
 	local marker = nameplate.Marker
 
@@ -622,6 +694,10 @@ local function HideMarker(nameplate)
 
 	HideMarkerBackground(marker)
 	HideMarkerBorder(marker)
+
+	marker.GlowAnchor = nil
+	marker.GlowSize = nil
+	UpdateTargetGlow(nameplate)
 end
 
 local function AddMarker(unit, nameplate)
@@ -719,6 +795,17 @@ local function AddMarker(unit, nameplate)
 			ApplyShape(border, texture, padding + borderThickness)
 		end
 	end
+
+	local outerPadding = options.BackgroundEnabled and (options.BackgroundPadding or 0) or 0
+
+	if options.BorderEnabled and options.BorderColor then
+		outerPadding = outerPadding + borderThickness
+	end
+
+	-- A size read back from a nameplate texture can be secret.
+	marker.GlowAnchor = texture
+	marker.GlowSize = math.max(options.Width or 20, options.Height or 20) + outerPadding * 2
+	UpdateTargetGlow(nameplate)
 end
 
 local function UpdateAllNameplates()
@@ -791,6 +878,10 @@ local function OnEvent(_, event, unit)
 		if unit then
 			pendingUnits[unit] = false
 		end
+	elseif event == "PLAYER_TARGET_CHANGED" then
+		-- Only the glow depends on the target, so the markers are left as they are.
+		UpdateAllTargetGlows()
+		return
 	else
 		refreshAll = true
 	end
@@ -818,6 +909,7 @@ local function OnAddonLoaded()
 	eventsFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 	eventsFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
 	eventsFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+	eventsFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
 end
 
 function addon:Refresh()

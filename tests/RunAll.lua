@@ -19,6 +19,7 @@ local testFiles = {
 	"tests/TestSecretPvp.lua",
 	"tests/TestSecretValues.lua",
 	"tests/TestNameplates.lua",
+	"tests/TestTargetGlow.lua",
 	"tests/TestClassIcons.lua",
 	"tests/TestInspect.lua",
 	"tests/TestInspectQueue.lua",

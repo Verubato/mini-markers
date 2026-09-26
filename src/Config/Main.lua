@@ -626,6 +626,8 @@ function M:Build()
 		enemyEditBoxes[4] = offsetYSlider.EditBox
 	end
 
+	local appearanceBlock
+
 	if mini:HasSecrets() then
 		local content = CreateFrame("Frame", nil, panel)
 		content:SetPoint("TOP", sizeDivider, "BOTTOM", 0, -verticalSpacing / 2)
@@ -637,12 +639,14 @@ function M:Build()
 
 		BuildFriendlyContent(content)
 		mini:WireTabNavigation(friendlyEditBoxes)
+		appearanceBlock = content
 	else
 		local tabContainer = CreateFrame("Frame", nil, panel)
 		tabContainer:SetPoint("TOP", sizeDivider, "BOTTOM", 0, 0)
 		tabContainer:SetPoint("LEFT", panel, "LEFT", 0, 0)
 		tabContainer:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
 		tabContainer:SetHeight(APPEARANCE_HEIGHT)
+		appearanceBlock = tabContainer
 
 		local tabCtrl = mini:CreateTabs({
 			Parent = tabContainer,
@@ -669,6 +673,46 @@ function M:Build()
 			end
 		end
 	end
+
+	local targetDivider = mini:Divider({ Parent = panel, Text = "Target" })
+
+	-- The block has a fixed height with room to spare below its last row, so the divider eats into it.
+	targetDivider:SetPoint("TOP", appearanceBlock, "BOTTOM", 0, verticalSpacing / 2)
+	targetDivider:SetPoint("LEFT", panel, "LEFT", 0, 0)
+	targetDivider:SetPoint("RIGHT", panel, "RIGHT", 0, 0)
+
+	local targetGlowChkBox = mini:Checkbox({
+		Parent = panel,
+		LabelText = "Glow",
+		Tooltip = "Add a glow around the marker of your current target.",
+		GetValue = function()
+			return db.TargetGlowEnabled
+		end,
+		SetValue = function(enabled)
+			db.TargetGlowEnabled = enabled
+			addon:Refresh()
+		end,
+	})
+
+	targetGlowChkBox:SetPoint("TOP", targetDivider, "BOTTOM", 0, -verticalSpacing / 2)
+	targetGlowChkBox:SetPoint("LEFT", panel, "LEFT", leftInset, 0)
+
+	local targetGlowSwatch = mini:ColorSwatch({
+		Parent = panel,
+		LabelText = "Glow Colour",
+		Tooltip = "Change the colour of the glow around your target's marker.",
+		HasOpacity = false,
+		GetValue = function()
+			local color = db.TargetGlowColor or dbDefaults.TargetGlowColor
+			return color.R, color.G, color.B, color.A
+		end,
+		SetValue = function(r, g, b, a)
+			db.TargetGlowColor = { R = r, G = g, B = b, A = a }
+			addon:Refresh()
+		end,
+	})
+
+	targetGlowSwatch:SetPoint("LEFT", targetGlowChkBox, "RIGHT", columnStep, 0)
 
 	return panel
 end

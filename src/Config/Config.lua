@@ -69,6 +69,10 @@ local dbDefaults = {
 	FriendlyBorderEnabled = true,
 	EnemyBorderEnabled = true,
 
+	TargetGlowEnabled = false,
+	-- White leaves the glow art its own colour.
+	TargetGlowColor = { R = 1, G = 1, B = 1, A = 1 },
+
 	PetIconScale = 0.5,
 }
 
