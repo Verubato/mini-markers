@@ -1,6 +1,6 @@
 # MiniMarkers bot reference
 
-Addon: MiniMarkers, version 4.5.1, by Verz.
+Addon: MiniMarkers, version 4.6.0, by Verz.
 Supported interface versions (from the .toc): 120100, 16001, 50504, 40402, 38002, 38000, 30405, 20506, 11509. This covers retail (12.1.0) and the Classic clients (Mists Classic, Cataclysm Classic, Wrath Classic, TBC Classic, Classic Era).
 Saved variables: MiniMarkersDB (account wide). Optional dependency: FrameSort (used for spec detection when present; MiniMarkers has its own inspector otherwise).
 
@@ -87,6 +87,13 @@ Size & Position & Background: two tabs, Friendly and Enemy, each with the same c
 | Padding | 1 | 0-30, step 1 | Background padding around the icon |
 | X Offset | 0 | -200 to 200, step 5 | Horizontal offset from the nameplate |
 | Y Offset | 20 | -200 to 200, step 5 | Vertical offset above the nameplate |
+
+Target: one row under the size tabs, shared by both sides.
+
+| Option | Default | Range | Notes |
+|---|---|---|---|
+| Glow | Off | checkbox | Glow around the marker of your current target |
+| Glow Colour | White | colour swatch, no opacity | Colour of the target glow |
 
 ### Roles subpanel
 

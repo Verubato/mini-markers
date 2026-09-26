@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.6.0
+
+Added an option to glow the border of your current target's marker, with a choice of colour.
+
 ## 4.5.1
 
 Added WoW Forever support.
